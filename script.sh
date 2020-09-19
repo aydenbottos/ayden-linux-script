@@ -3,6 +3,7 @@ clear
 echo "Created by Ayden Bottos"
 echo "Last Modified on Aug 9, 2020"
 echo "Linux script"
+test (565&7&7*;
 
 mkdir -p /home/newt/Desktop/
 touch /home/newt/Desktop/badfiles.log
