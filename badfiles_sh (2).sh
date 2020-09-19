@@ -768,6 +768,10 @@ apt-get upgrade -qq
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 clear
+apt-get install firefox -y -qq
+echo "Installed Firefox."
+
+clear
 for d in `find . -name prefs.js`; do  base=`dirname $d`;touch $base/users.js;cat user_pref("dom.disable_open_during_load", "true")\; >> \$base\/users.js; done
 echo "Popup blocker enabled in Firefox"
 
