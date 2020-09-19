@@ -15,8 +15,33 @@ then
   exit
 fi
 echo "Script is being run as root."
+
 echo "Running apt-get update"
 apt-get update
+
+echo "Installing apt-transport-https for apt https"
+apt-get install apt-transport-https -y -qq
+
+echo "Updating /etc/apt/sources.list for https"
+if [[ $(lsb_release -r) == "Release:	16.04" ]] || [[ $(lsb_release -r) == "Release:	16.10" ]]
+then
+	chmod 777 /etc/apt/sources.list
+	cp /etc/apt/sources.list /home/newt/Desktop/backups/
+	echo -e "deb https://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse" > /etc/apt/sources.list
+	chmod 644 /etc/apt/sources.list
+elif [[ $(lsb_release -r) == "Release:	19.04" ]] || [[ $(lsb_release -r) == "Release:	19.10" ]]
+then
+	chmod 777 /etc/apt/sources.list
+	cp /etc/apt/sources.list /home/newt/Desktop/backups/
+	echo -e "deb https://us.archive.ubuntu.com/ubuntu/ eoan main restricted universe multiverse \ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse \ndeb https://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe multiverse" > /etc/apt/sources.list
+	chmod 644 /etc/apt/sources.list
+else
+	echo “Error, cannot detect OS version”
+fi
+
+echo "Running apt-get update with HTTPS"
+apt-get update
+clear
 
 echo "The current OS is Linux"
 
@@ -119,7 +144,7 @@ read printYN
 echo Does this machine need MySQL?
 read dbYN
 echo Will this machine be a Web Server?
-read httpYN
+read httpsYN
 echo Does this machine need DNS?
 read dnsYN
 echo Does this machine allow media files?
@@ -425,17 +450,17 @@ echo "MySQL is complete."
 
 
 clear
-if [ $httpYN == no ]
+if [ $httpsYN == no ]
 then
-	ufw deny http
+	ufw deny https
 	ufw deny https
 	apt-get purge apache2 nginx -y -qq
 	rm -r /var/www/*
-	echo "http and https ports have been denied on the firewall. Apache2 has been removed. Web server files have been removed."
-elif [ $httpYN == yes ]
+	echo "https and https ports have been denied on the firewall. Apache2 has been removed. Web server files have been removed."
+elif [ $httpsYN == yes ]
 then
 	apt-get install apache2 -y -qq
-	ufw allow http 
+	ufw allow https 
 	ufw allow https
 	cp /etc/apache2/apache2.conf /home/newt/Desktop/backups/
 	if [ -e /etc/apache2/apache2.conf ]
@@ -444,7 +469,7 @@ then
 	fi
 	chown -R root:root /etc/apache2
 
-	echo "http and https ports have been allowed on the firewall. Apache2 config file has been configured. Only root can now access the Apache2 folder."
+	echo "https and https ports have been allowed on the firewall. Apache2 config file has been configured. Only root can now access the Apache2 folder."
 else
 	echo Response not recognized.
 fi
@@ -743,24 +768,6 @@ cp /etc/apt/apt.conf.d/10periodic /home/newt/Desktop/backups/
 echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Download-Upgradeable-Packages \"1\";\nAPT::Periodic::AutocleanInterval \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";" > /etc/apt/apt.conf.d/10periodic
 chmod 644 /etc/apt/apt.conf.d/10periodic
 echo "Daily update checks, download upgradeable packages, autoclean interval, and unattended upgrade enabled."
-
-clear
-if [[ $(lsb_release -r) == "Release:	16.04" ]] || [[ $(lsb_release -r) == "Release:	16.10" ]]
-then
-	chmod 777 /etc/apt/sources.list
-	cp /etc/apt/sources.list /home/newt/Desktop/backups/
-	echo -e "deb http://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse" > /etc/apt/sources.list
-	chmod 644 /etc/apt/sources.list
-elif [[ $(lsb_release -r) == "Release:	19.04" ]] || [[ $(lsb_release -r) == "Release:	19.10" ]]
-then
-	chmod 777 /etc/apt/sources.list
-	cp /etc/apt/sources.list /home/newt/Desktop/backups/
-	echo -e "deb http://us.archive.ubuntu.com/ubuntu/ eoan main restricted universe multiverse \ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse \ndeb http://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe multiverse" > /etc/apt/sources.list
-	chmod 644 /etc/apt/sources.list
-else
-	echo “Error, cannot detect OS version”
-fi
-echo "Apt Repositories have been added."
 
 clear
 apt-get update -qq
