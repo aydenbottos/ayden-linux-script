@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 echo "Created by Ayden Bottos"
-echo "Last Modified on Aug 9, 2020"
+echo "Last Modified on Sep 19, 2020"
 echo "Linux script"
 
 mkdir -p /home/newt/Desktop/
