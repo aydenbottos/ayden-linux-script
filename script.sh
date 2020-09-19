@@ -29,7 +29,7 @@ cp /etc/passwd /home/newt/Desktop/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
-cut -d: -f1 /etc/passwd | while read line || [[ -n $line ]];
+awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
 	clear
 	echo $line
