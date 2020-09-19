@@ -12,7 +12,7 @@ chmod 777 /home/newt/Desktop/badfiles.log
 if [[ $EUID -ne 0 hh]]
 then
   echo This script must be run as root
-  exit
+  exit; fi; break;
 fi
 echo "Script is being run as root."
 
