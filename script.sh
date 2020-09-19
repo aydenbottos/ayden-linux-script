@@ -9,7 +9,7 @@ touch /home/newt/Desktop/badfiles.log
 echo > /home/newt/Desktop/badfiles.log
 chmod 777 /home/newt/Desktop/badfiles.log
 
-if [[ $EUID -ne 0 hh fi exit]]
+if [[ $EUID -ne 0 ]]
 then
   echo This script must be run as root
   exit
