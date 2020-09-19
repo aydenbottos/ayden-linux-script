@@ -34,14 +34,14 @@ do
 	clear
 	echo $line
 	echo Delete $line? yes or no
-	read yn1
+	read yn1 < /dev/tty
 	if [ $yn1 == yes ]
 	then
 		userdel -r $line
 		echo "$line has been deleted."
 	else	
 		echo Make $line administrator? yes or no
-		read yn2								
+		read yn2 < /dev/tty								
 		if [ $yn2 == yes ]
 		then
 			gpasswd -a $line sudo
@@ -59,11 +59,11 @@ do
 		fi
 		
 		echo Make custom password for $line? yes or no
-		read yn3								
+		read yn3 < /dev/tty								
 		if [ $yn3 == yes ]
 		then
 			echo Password:
-			read pw
+			read pw < /dev/tty
 			echo -e "$pw\n$pw" | passwd $line
 			echo "${users[${i}]} has been given the password '$pw'."
 		fi
