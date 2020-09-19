@@ -342,7 +342,7 @@ clear
 if [ $vpnYN == no ]
 then
 	apt-get purge openvpn -y -qq
-
+fi
 clear
 if [ $mailYN == no ]
 then
