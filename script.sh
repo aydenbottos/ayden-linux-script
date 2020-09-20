@@ -659,9 +659,9 @@ apt-get purge irpas -y -qq
 clear
 echo "IRPAS has been removed."
 
-apt-get purge wireshark* -y -qq
+apt-get purge wireshark* tshark kismet -y -qq
 clear
-echo "Wireshark has been removed."
+echo "Wireshark, TShark and Kismet have been removed."
 
 clear
 echo 'Are there any hacking tools shown? (not counting libcrack2:amd64 or cracklib-runtime)'
