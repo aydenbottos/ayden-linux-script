@@ -85,7 +85,7 @@ do
 			echo "$line has been made a standard user."
 		fi
 		
-		echo -e "$pw\n$pw" | passwd $line
+		echo -e "$pw\n$pw" | passwd "$line"
 		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
 		usermod -U $line
