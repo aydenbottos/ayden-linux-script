@@ -516,71 +516,71 @@ then
 	clear
 	echo "All audio files has been listed."
 
-	find / -name "*.mpeg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.mpg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.mpe" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.dl" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.movie" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.movi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.mv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.iff" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.anim5" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.anim3" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.anim7" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.avi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.vfw" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.avx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.fli" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.flc" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.mov" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.qt" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.spl" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.swf" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.dcr" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.dir" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.dxr" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.rpm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.rm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.smi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.ra" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.ram" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.rv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.wmv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.asf" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.asx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.wma" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.wax" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.wmv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.wmx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.3gp" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.mov" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.mp4" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.avi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.swf" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.flv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.m4v" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.mpeg" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.mpg" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.mpe" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.dl" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.movie" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.movi" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.mv" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.iff" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.anim5" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.anim3" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.anim7" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.avi" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.vfw" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.avx" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.fli" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.flc" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.mov" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.qt" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.spl" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.swf" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.dcr" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.dir" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.dxr" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.rpm" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.rm" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.smi" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.ra" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.ram" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.rv" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.wmv" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.asf" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.asx" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.wma" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.wax" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.wmv" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.wmx" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.3gp" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.mov" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.mp4" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.avi" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.swf" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.flv" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.m4v" -type f >> /home/newt/Desktop/badfiles.log
 	clear
 	echo "All video files have been listed."
 	
-	find / -name "*.tiff" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.tif" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.rs" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.im1" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.gif" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.jpeg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.jpg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.jpe" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.png" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.rgb" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.xwd" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.xpm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.ppm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.pbm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.pgm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.pcx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.ico" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.svg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -name "*.svgz" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.tiff" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.tif" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.rs" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.im1" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.gif" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.jpeg" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.jpg" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.jpe" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.png" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.rgb" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.xwd" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.xpm" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.ppm" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.pbm" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.pgm" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.pcx" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.ico" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.svg" -type f >> /home/newt/Desktop/badfiles.log
+	find / -iname "*.svgz" -type f >> /home/newt/Desktop/badfiles.log
 	clear
 	echo "All image files have been listed."
 else
@@ -589,7 +589,7 @@ fi
 echo "Media files are complete."
 
 clear
-find / -name "*.php" -type f >> /home/newt/Desktop/badfiles.log
+find / -iname "*.php" -type f >> /home/newt/Desktop/badfiles.log
 echo "All PHP files have been listed above. ('/var/cache/dictionaries-common/sqspell.php' is a system PHP file)"
 
 clear
