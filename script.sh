@@ -86,7 +86,7 @@ do
 		fi
 		
 		echo -e "$pw\n$pw" | passwd $line
-		echo "${users[${i}]} has been given the password '$pw'."
+		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
 		usermod -U $line
 		echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
@@ -273,7 +273,7 @@ then
 	usersSMBLength=${#usersSMB[@]}	
 	for (( i=0;i<$usersSMBLength;i++))
 	do
-		echo -e '$pw\n$pw' | smbpasswd -a ${usersSMB[${i}]}
+		echo -e "$pw\n$pw" | smbpasswd -a ${usersSMB[${i}]}
 		echo "${usersSMB[${i}]} has been given the default password for Samba."
 	done
 	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been denied. Samba config file has been configured."
