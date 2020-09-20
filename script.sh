@@ -118,7 +118,6 @@ do
 		gpasswd -a ${usersNew[${i}]} sudo
 		gpasswd -a ${usersNew[${i}]} adm
 		gpasswd -a ${usersNew[${i}]} lpadmin
-		gpasswd -a ${usersNew[${i}]} sambashare
 		echo "${usersNew[${i}]} has been made an administrator."
 	else
 		echo "${usersNew[${i}]} has been made a standard user."
@@ -189,7 +188,10 @@ ufw deny 1337
 echo "Firewall enabled and port 1337 blocked."
 
 clear
-env i='() { :;}; echo Your system is Bash vulnerable' bash -c "echo Bash vulnerability test"
+env i='() { :;}; echo Your system is Bash vulnerable' bash -c "echo broken >> test"
+if test -f "test"; then
+	apt-get install --only-upgrade bash
+fi
 echo "Shellshock Bash vulnerability has been fixed."
 
 clear
