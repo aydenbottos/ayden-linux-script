@@ -3,6 +3,8 @@ clear
 echo "Created by Ayden Bottos"
 echo "Last Modified on Sep 19, 2020"
 echo "Linux script"
+echo "The password used is CyberTaipan123!"
+export pw = CyberTaipan123!
 
 mkdir -p /home/newt/Desktop/
 touch /home/newt/Desktop/badfiles.log
@@ -83,15 +85,8 @@ do
 			echo "$line has been made a standard user."
 		fi
 		
-		echo Make custom password for $line? yes or no
-		read yn3 < /dev/tty								
-		if [ $yn3 == yes ]
-		then
-			echo Password:
-			read pw < /dev/tty
-			echo -e "$pw\n$pw" | passwd $line
-			echo "${users[${i}]} has been given the password '$pw'."
-		fi
+		echo -e "$pw\n$pw" | passwd $line
+		echo "${users[${i}]} has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
 		usermod -U $line
 		echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
@@ -109,6 +104,7 @@ do
 	clear
 	echo ${usersNew[${i}]}
 	adduser ${usersNew[${i}]}
+	echo -e "$pw\n$pw" | passwd ${usersNew[${i}]}
 	echo "A user account for ${usersNew[${i}]} has been created."
 	clear
 	echo Make ${usersNew[${i}]} administrator? yes or no
@@ -188,7 +184,7 @@ ufw deny 1337
 echo "Firewall enabled and port 1337 blocked."
 
 clear
-env i='() { :;}; echo Your system is Bash vulnerable' bash -c "echo broken >> test"
+env i='() { :;}; echo vulnerable >> test' bash -c "echo this is a test"
 if test -f "test"; then
 	apt-get install --only-upgrade bash
 fi
@@ -277,8 +273,8 @@ then
 	usersSMBLength=${#usersSMB[@]}	
 	for (( i=0;i<$usersSMBLength;i++))
 	do
-		echo -e 'Moodle!22\nMoodle!22' | smbpasswd -a ${usersSMB[${i}]}
-		echo "${usersSMB[${i}]} has been given the password 'Moodle!22' for Samba."
+		echo -e '$pw\n$pw' | smbpasswd -a ${usersSMB[${i}]}
+		echo "${usersSMB[${i}]} has been given the default password for Samba."
 	done
 	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been denied. Samba config file has been configured."
 	clear
