@@ -12,5 +12,6 @@ jobs:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review # Change reporter.
           path: "." # Optional.
+          fail_on_error: "false"
           pattern: "*.sh" # Optional.
           exclude: "./.git/*" # Optional.
