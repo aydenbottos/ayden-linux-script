@@ -4,7 +4,7 @@ echo "Created by Ayden Bottos"
 echo "Last Modified on Sep 19, 2020"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
-export pw = CyberTaipan123!
+export pw=CyberTaipan123!
 
 mkdir -p /home/newt/Desktop/
 touch /home/newt/Desktop/badfiles.log
@@ -104,7 +104,7 @@ do
 	clear
 	echo ${usersNew[${i}]}
 	adduser ${usersNew[${i}]}
-	echo -e "$pw\n$pw" | passwd ${usersNew[${i}]}
+	echo -e "$pw\n$pw" | passwd "${usersNew[${i}]}"
 	echo "A user account for ${usersNew[${i}]} has been created."
 	clear
 	echo Make ${usersNew[${i}]} administrator? yes or no
@@ -273,7 +273,7 @@ then
 	usersSMBLength=${#usersSMB[@]}	
 	for (( i=0;i<$usersSMBLength;i++))
 	do
-		echo -e "$pw\n$pw" | smbpasswd -a ${usersSMB[${i}]}
+		echo -e "$pw\n$pw" | smbpasswd -a "${usersSMB[${i}]}"
 		echo "${usersSMB[${i}]} has been given the default password for Samba."
 	done
 	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been denied. Samba config file has been configured."
