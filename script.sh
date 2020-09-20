@@ -823,4 +823,4 @@ apt-get install ecryptfs-utils cryptsetup -y -qq
 
 clear
 echo "Script is complete. Logging user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
-gnome-session-quit
+gnome-session-quit && xfce4-session-logout
