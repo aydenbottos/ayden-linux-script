@@ -17,7 +17,7 @@ background_color 01
 ::This batch file is designed to aid in solving Windows images.
 ::Section 1: UserAccounts
 echo "Here is a list of usernames and passwords "
-rundll32.exxe keymgr dll,KRShowKeyMgr
+rundll32.exe keymgr.dll,KRShowKeyMgr
 
 ::AddingPasswords
 echo "Now add passwords to users without one"
@@ -26,8 +26,8 @@ set /P password="What do you want their password to be? "
 net user %name% %password%
 echo "would you like to add another password? "
 set /p answer=Please choose yes or no:
-if "%answer%"=="Yes" goto : AddingPasswords
-if "%answer%"=="No" goto DeletingUsers
+if "%answer%"=="Yes" goto :: AddingPasswords
+if "%answer%"=="No" goto :: DeletingUsers
 
 
 ::UserRights
