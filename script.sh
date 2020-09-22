@@ -315,8 +315,6 @@ echo "FTP is complete."
 clear
 if [ $sshYN == no ]
 then
-	ufw deny ssh
-	apt-get purge openssh-server -y -qq
 	echo "SSH port has been denied on the firewall. Open-SSH has been removed."
 elif [ $sshYN == yes ]
 then
