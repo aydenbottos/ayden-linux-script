@@ -1,0 +1,142 @@
+echo "Script by Grace - Last Modified 8:15 PM 18/09/2020"
+echo off
+
+rem Account Policies
+net accounts /lockoutduration:30
+net accounts /lockoutthreshold:3
+net accounts /lockoutwindow:30
+net accounts /maxpwage:90
+net accounts /minpwage:8
+net accounts /minpwlen:8
+net accounts /uniquepw:10
+net user guest /active:no
+net user administrator /active:no
+wmic useraccount where name='administrator' rename randomname
+wmic useraccount where name='guest' rename notrandomname
+
+rem Files
+dir /s /b C:\Users
+del /s C:\Users\*.3gp
+del /s C:\Users\*.abs
+del /s C:\Users\*.aif
+del /s C:\Users\*.aiff
+del /s C:\Users\*.anim3
+del /s C:\Users\*.anim5
+del /s C:\Users\*.anim7
+del /s C:\Users\*.au
+del /s C:\Users\*.avi
+del /s C:\Users\*.avi
+del /s C:\Users\*.avx
+del /s C:\Users\*.dcr
+del /s C:\Users\*.dir
+del /s C:\Users\*.dl
+del /s C:\Users\*.flc
+del /s C:\Users\*.fli
+del /s C:\Users\*.flv
+del /s C:\Users\*.gif
+del /s C:\Users\*.iff
+del /s C:\Users\*.im1
+del /s C:\Users\*.jpe
+del /s C:\Users\*.jpeg
+del /s C:\Users\*.jpg
+del /s C:\Users\*.m4v
+del /s C:\Users\*.mid
+del /s C:\Users\*.mod
+del /s C:\Users\*.mov
+del /s C:\Users\*.mov
+del /s C:\Users\*.movi
+del /s C:\Users\*.movie
+del /s C:\Users\*.mp2
+del /s C:\Users\*.mp3
+del /s C:\Users\*.mp4
+del /s C:\Users\*.mpa
+del /s C:\Users\*.mpe
+del /s C:\Users\*.mpeg
+del /s C:\Users\*.mpega
+del /s C:\Users\*.mpg
+del /s C:\Users\*.mv
+del /s C:\Users\*.pcx
+del /s C:\Users\*.pgm
+del /s C:\Users\*.png
+del /s C:\Users\*.qt
+del /s C:\Users\*.ra
+del /s C:\Users\*.ram
+del /s C:\Users\*.rgb
+del /s C:\Users\*.rm
+del /s C:\Users\*.rpm
+del /s C:\Users\*.rs
+del /s C:\Users\*.rv
+del /s C:\Users\*.sid
+del /s C:\Users\*.smi
+del /s C:\Users\*.snd
+del /s C:\Users\*.spl
+del /s C:\Users\*.swf
+del /s C:\Users\*.swf
+del /s C:\Users\*.tif
+del /s C:\Users\*.tiff
+del /s C:\Users\*.vfw
+del /s C:\Users\*.wav
+del /s C:\Users\*.wax
+del /s C:\Users\*.wma
+del /s C:\Users\*.wmv
+del /s C:\Users\*.wmv
+del /s C:\Users\*.wmx
+
+rem Auditing
+auditpol /set /category:"Account Logon" /success:enable #is everything really just success and failure?
+auditpol /set /category:"Account Logon" /failure:enable
+auditpol /set /category:"Account Management" /success:enable
+auditpol /set /category:"Account Management" /failure:enable
+auditpol /set /category:"DS Access" /success:enable
+auditpol /set /category:"DS Access" /failure:enable
+auditpol /set /category:"Logon/Logoff" /success:enable
+auditpol /set /category:"Logon/Logoff" /failure:enable
+auditpol /set /category:"Object Access" /success:enable
+auditpol /set /category:"Object Access" /failure:enable
+auditpol /set /category:"Policy Change" /success:enable
+auditpol /set /category:"Policy Change" /failure:enable
+auditpol /set /category:"Privilege Use" /success:enable
+auditpol /set /category:"Privilege Use" /failure:enable
+auditpol /set /category:"Detailed Tracking" /success:enable
+auditpol /set /category:"Detailed Tracking" /failure:enable
+auditpol /set /category:"System" /success:enable 
+auditpol /set /category:"System" /failure:enable
+
+rem Fire Wall
+netsh advfirewall set allrprofiles state on
+
+rem Service Management
+sc stop ftpsvc
+sc config ftpsvc start= disabled
+sc stop HomeGroupProvider
+sc config HomeGroupProvider start= disabled
+sc stop HomeGroupListener
+sc config HomeGroupListener start= disabled
+sc stop remoteRegistry 
+sc config remoteRegistry start= disabled
+sc stop remoteAccess
+sc config remoteAccess start= disabled
+sc stop RpcSs
+sc config RpcSs start= disabled
+sc stop SessionEnv
+sc config SessionEnv start= disabled
+sc stop SharedAccess
+sc config SharedAccess start= disabled
+sc stop SNMPTRAP
+sc config SNMPTRAP start= disabled
+sc stop SSDPSRV
+sc config SSDPSRV start= disabled
+sc stop SNMP
+sc config SNMP start= disabled
+sc stop TapiSrv
+sc config TapiSrv start= disabled
+sc stop TermService
+sc config TermService start= disabled
+sc stop TlntSvr
+sc config TlntSvr start= disabled
+sc stop UmRdpService
+sc config UmRdpService start= disabled
+sc stop W3SVC
+sc config W3SVC start= disabled
+
+
