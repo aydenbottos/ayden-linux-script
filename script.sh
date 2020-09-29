@@ -95,6 +95,7 @@ readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d"
 echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 do
 	useradd $readmeusersfor
+	echo Created missing user from ReadMe.
 	echo Make $readmeusersfor administrator? yes or no
 	read ynNew								
 	if [ $ynNew == yes ]
