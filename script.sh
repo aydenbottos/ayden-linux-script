@@ -18,9 +18,6 @@ then
 fi
 echo "Script is being run as root."
 
-echo "Running apt-get update"
-apt-get update
-
 echo "Installing apt-transport-https for apt https"
 apt-get install apt-transport-https -y -qq
 
@@ -144,8 +141,6 @@ echo Does this machine need DNS?
 read dnsYN
 echo Does this machine allow media files?
 read mediaFilesYN
-echo Does this machine need VPN?
-read vpnYN
 
 clear
 unalias -a
@@ -358,13 +353,8 @@ else
 	echo Response not recognized.
 fi
 echo "Telnet is complete."
+clear
 
-clear
-if [ $vpnYN == no ]
-then
-	apt-get purge openvpn -y -qq
-fi
-clear
 if [ $mailYN == no ]
 then
 	ufw deny smtp 
