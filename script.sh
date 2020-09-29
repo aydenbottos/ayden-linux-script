@@ -4,7 +4,7 @@ echo "Created by Ayden Bottos"
 echo "Last Modified on Sep 19, 2020"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
-export pw=CyberTaipan123!
+pw=CyberTaipan123!
 
 mkdir -p /home/newt/Desktop/
 touch /home/newt/Desktop/badfiles.log
@@ -56,18 +56,12 @@ cp /etc/passwd /home/newt/Desktop/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
+readmename=$(find $(pwd) -name *readme*.*)
+
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
-	clear
-	echo $line
-	echo Delete $line? yes or no
-	read yn1 < /dev/tty
-	if [ $yn1 == yes ]
-	then
-		userdel -r $line
-		echo "$line has been deleted."
-	else	
-		echo Make $line administrator? yes or no
+	if grep -q "$readmename" "$line"; then
+        	echo Make $line administrator? yes or no
 		read yn2 < /dev/tty								
 		if [ $yn2 == yes ]
 		then
@@ -84,44 +78,38 @@ do
 			gpasswd -d $line root
 			echo "$line has been made a standard user."
 		fi
-		
+
 		echo -e "$pw\n$pw" | passwd "$line"
 		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
 		usermod -U $line
-		echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
-	fi
+		echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
+	else
+		deluser -r $line
+		echo "Deleted unauthorised user $line."
 done
 clear
+readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/\wukong(you)/wukong/' | cat)"
 
-echo Type user account names of users you want to add, with a space in between
-read -a usersNew
-
-usersNewLength=${#usersNew[@]}	
-
-for (( i=0;i<$usersNewLength;i++))
+	
+echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 do
-	clear
-	echo ${usersNew[${i}]}
-	adduser ${usersNew[${i}]}
-	echo -e "$pw\n$pw" | passwd "${usersNew[${i}]}"
-	echo "A user account for ${usersNew[${i}]} has been created."
-	clear
-	echo Make ${usersNew[${i}]} administrator? yes or no
+	useradd $readmeusersfor
+	echo Make $readmeusersfor administrator? yes or no
 	read ynNew								
 	if [ $ynNew == yes ]
 	then
-		gpasswd -a ${usersNew[${i}]} sudo
-		gpasswd -a ${usersNew[${i}]} adm
-		gpasswd -a ${usersNew[${i}]} lpadmin
-		echo "${usersNew[${i}]} has been made an administrator."
+		gpasswd -a $readmeusersfor sudo
+		gpasswd -a $readmeusersfor adm
+		gpasswd -a $readmeusersfor lpadmin
+		echo "$readmeusersfor has been made an administrator."
 	else
-		echo "${usersNew[${i}]} has been made a standard user."
+		echo "$readmeusersfor has been made a standard user."
 	fi
 	
-	passwd -x30 -n3 -w7 ${usersNew[${i}]}
-	usermod -L ${usersNew[${i}]}
-	echo "${usersNew[${i}]}'s password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
+	passwd -x30 -n3 -w7 $readmeusersfor
+	usermod -L $readmeusersfor
+	echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
 done
 
 echo Does this machine need Samba?
@@ -262,7 +250,7 @@ then
 	apt-get install samba -y -qq
 	apt-get install system-config-samba -y -qq
 	cp /etc/samba/smb.conf /home/newt/Desktop/backups/
-	if [ "$(grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
+	if [ "$grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
 	then
 		sed -i 's/####### Authentication #######/####### Authentication #######\nsecurity = user/g' /etc/samba/smb.conf
 	fi
