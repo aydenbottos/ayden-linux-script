@@ -87,6 +87,7 @@ do
 	else
 		deluser -r $line
 		echo "Deleted unauthorised user $line."
+	fi
 done
 clear
 readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/\wukong(you)/wukong/' | cat)"
