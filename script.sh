@@ -90,7 +90,7 @@ do
 	fi
 done
 clear
-readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/\wukong(you)/wukong/' | cat)"
+readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/\<(you)\>//g' | cat)"
 
 	
 echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
