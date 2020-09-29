@@ -13,7 +13,7 @@ If %ERRORLEVEL% == 1 (
 :: Get names of users on computer
 echo Users and Administrators output to %path%output\users.txt
 start C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe "%path%resources\usrList.ps1"
-background_color 01
+color 01
 
 ::This batch file is designed to aid in solving Windows images.
 ::Section 1: UserAccounts
@@ -86,7 +86,7 @@ for %%a in (%bad%) do (
 ::DeletingUsers
 echo "would you like to delete a user? "
 set /p answer=Please choose yes or no:
-if "%answer%"=="yes" goto : DeleteaUser
+if "%answer%"=="yes" goto ::DeleteaUser
 if "%answer%"=="no" goto ::AddingUsers
 
 ::DeleteaUser
@@ -97,8 +97,8 @@ net user %user%/DELETE
 ::AddingUsers
 echo "would you like to add a user?"
 set /p answer1=Please choose yes or no:
-if "%answer1%"=="yes" goto : AddingNewUser
-if "%answer1%"=="no" goto : DisableAccounts
+if "%answer1%"=="yes" goto ::AddingNewUser
+if "%answer1%"=="no" goto ::DisableAccounts
 
 ::AddingNewUser
 set /p username="What is the name of the user you would like to add?”
@@ -106,8 +106,8 @@ set /p pw="What is the password of the user you would like to add?”
 Net user %username% %pw% /ADD
 echo "would you like to add another user?"
 set /p skip=Please choose yes or no:
-if "%skip%"=="yes" goto : AddingNewUser
-if "%skip%"=="no" goto : DisableAccounts
+if "%skip%"=="yes" goto ::AddingNewUser
+if "%skip%"=="no" goto ::DisableAccounts
 
 ::DisableAccounts
 net user guest /active:no
@@ -335,7 +335,7 @@ echo Invalid input %rdpChk%
 goto rdp
 
 
-:WindowsFeatures
+::WindowsFeatures
 echo Installing Dism.exe
 copy %path%resources\Dism.exe C:\Windows\System32
 xcopy %path%resources\Dism* C:\Windows\System32
