@@ -251,7 +251,7 @@ then
 	apt-get install samba -y -qq
 	apt-get install system-config-samba -y -qq
 	cp /etc/samba/smb.conf /home/newt/Desktop/backups/
-	if [ "$grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
+	if [ "$(grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
 	then
 		sed -i 's/####### Authentication #######/####### Authentication #######\nsecurity = user/g' /etc/samba/smb.conf
 	fi
