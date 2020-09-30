@@ -104,7 +104,7 @@ do
 	fi
 done
 
-smbYN=no
+sambaYN=no
 ftpYN=no
 sshYN=no
 telnetYN=no
@@ -118,7 +118,7 @@ vpnYN=no
 services=$(cat "$readmename" | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
 
 if grep -qi 'smb\|samba' "$services"; then
-	smbYN=yes
+	sambaYN=yes
 fi
 if grep -qi ftp "$services"; then
 	ftpYN=yes
