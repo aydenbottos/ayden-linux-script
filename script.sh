@@ -61,24 +61,6 @@ readmename=$(find $(pwd) -name *readme*.*)
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
 	if grep -q "$readmename" "$line"; then
-        	echo Make $line administrator? yes or no
-		read yn2 < /dev/tty								
-		if [ $yn2 == yes ]
-		then
-			gpasswd -a $line sudo
-			gpasswd -a $line adm
-			gpasswd -a $line lpadmin
-			gpasswd -a $line sambashare
-			echo "$line has been made an administrator."
-		else
-			gpasswd -d $line sudo
-			gpasswd -d $line adm
-			gpasswd -d $line lpadmin
-			gpasswd -d $line sambashare
-			gpasswd -d $line root
-			echo "$line has been made a standard user."
-		fi
-
 		echo -e "$pw\n$pw" | passwd "$line"
 		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
@@ -90,28 +72,36 @@ do
 	fi
 done
 clear
-readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
 
+readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
 	
 echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 do
 	useradd $readmeusersfor
 	echo Created missing user from ReadMe.
-	echo Make $readmeusersfor administrator? yes or no
-	read ynNew								
-	if [ $ynNew == yes ]
-	then
-		gpasswd -a $readmeusersfor sudo
-		gpasswd -a $readmeusersfor adm
-		gpasswd -a $readmeusersfor lpadmin
-		echo "$readmeusersfor has been made an administrator."
-	else
-		echo "$readmeusersfor has been made a standard user."
-	fi
-	
 	passwd -x30 -n3 -w7 $readmeusersfor
 	usermod -L $readmeusersfor
 	echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
+done
+
+readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
+
+awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+do
+	if grep -q "$readmeusers" "$line"; then
+		gpasswd -d $line sudo
+		gpasswd -d $line adm
+		gpasswd -d $line lpadmin
+		gpasswd -d $line sambashare
+		gpasswd -d $line root
+		echo "$line has been made a standard user."
+	else
+		gpasswd -a $line sudo
+		gpasswd -a $line adm
+		gpasswd -a $line lpadmin
+		gpasswd -a $line sambashare
+		echo "$line has been made an administrator."
+	fi
 done
 
 echo Does this machine need Samba?
