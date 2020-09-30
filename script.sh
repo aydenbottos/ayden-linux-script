@@ -18,6 +18,12 @@ then
 fi
 echo "Script is being run as root."
 
+chmod 777 /etc/apt/sources.list
+cp /etc/apt/sources.list /home/newt/Desktop/backups/
+nickname = lsb_release -sc
+echo -e “deb http://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse” > /etc/apt/sources.list
+chmod 644 /etc/apt/sources.list
+
 echo "Running apt-get update"
 apt-get update
 
@@ -25,21 +31,11 @@ echo "Installing apt-transport-https for apt https"
 apt-get install apt-transport-https -y -qq
 
 echo "Updating /etc/apt/sources.list for https"
-if [[ $(lsb_release -r) == "Release:	16.04" ]] || [[ $(lsb_release -r) == "Release:	16.10" ]]
-then
-	chmod 777 /etc/apt/sources.list
-	cp /etc/apt/sources.list /home/newt/Desktop/backups/
-	echo -e "deb https://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse" > /etc/apt/sources.list
-	chmod 644 /etc/apt/sources.list
-elif [[ $(lsb_release -r) == "Release:	19.04" ]] || [[ $(lsb_release -r) == "Release:	19.10" ]]
-then
-	chmod 777 /etc/apt/sources.list
-	cp /etc/apt/sources.list /home/newt/Desktop/backups/
-	echo -e "deb https://us.archive.ubuntu.com/ubuntu/ eoan main restricted universe multiverse \ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse \ndeb https://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe multiverse" > /etc/apt/sources.list
-	chmod 644 /etc/apt/sources.list
-else
-	echo “Error, cannot detect OS version”
-fi
+chmod 777 /etc/apt/sources.list
+cp /etc/apt/sources.list /home/newt/Desktop/backups/
+nickname = lsb_release -sc
+echo -e “deb https://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse” > /etc/apt/sources.list
+chmod 644 /etc/apt/sources.list
 
 echo "Running apt-get update with HTTPS"
 apt-get update
