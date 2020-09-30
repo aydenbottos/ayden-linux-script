@@ -51,11 +51,11 @@ cp /etc/passwd /home/newt/Desktop/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
-readmename=$(find $(pwd) -name *readme*.*)
+readmename=$(find $(pwd) -name *readme*.* | grep -E "https:\/\/(.*).aspx" | xargs -L 1 wget -o readme.aspx)
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
-	if grep -q "$readmename" "$line"; then
+	if grep -q readme.aspx "$line"; then
 		echo -e "$pw\n$pw" | passwd "$line"
 		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
@@ -68,7 +68,7 @@ do
 done
 clear
 
-readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
+readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
 	
 echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 do
@@ -79,7 +79,7 @@ do
 	echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
 done
 
-readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' "$readmename" | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
+readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
@@ -110,7 +110,7 @@ httpsYN=no
 dnsYN=no
 mediaFilesYN=no
 vpnYN=no
-services=$(cat "$readmename" | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
+services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
 
 if grep -qi 'smb\|samba' "$services"; then
 	sambaYN=yes
