@@ -104,28 +104,46 @@ do
 	fi
 done
 
-echo Does this machine need Samba?
-read sambaYN
-echo Does this machine need FTP?
-read ftpYN
-echo Does this machine need SSH?
-read sshYN
-echo Does this machine need Telnet?
-read telnetYN
-echo Does this machine need Mail?
-read mailYN
-echo Does this machine need Printing?
-read printYN
-echo Does this machine need MySQL?
-read dbYN
-echo Will this machine be a Web Server?
-read httpsYN
-echo Does this machine need DNS?
-read dnsYN
-echo Does this machine allow media files?
-read mediaFilesYN
-echo Does this machine need VPN?
-read vpnYN
+sambaYN=no
+ftpYN=no
+sshYN=no
+telnetYN=no
+mailYN=no
+printYN=no
+dbYN=no
+httpsYN=no
+dnsYN=no
+mediaFilesYN=no
+vpnYN=no
+services=$(cat "$readmename" | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
+
+if grep -qi 'smb\|samba' "$services"; then
+	sambaYN=yes
+fi
+if grep -qi ftp "$services"; then
+	ftpYN=yes
+fi
+if grep -qi ssh "$services"; then
+	sshYN=yes
+fi
+if grep -qi telnet "$services"; then
+	telnetYN=yes
+fi
+if grep -qi mail "$services"; then
+	mailYN=yes
+fi
+if grep -qi print "$services"; then
+	printYN=yes
+fi
+if grep -qi 'db\|sql' "$services"; then
+	dbYN=yes
+fi
+if grep -qi 'web\|apache\|http' "$services"; then
+	httpsYN=yes
+fi
+if grep -qi 'bind9\|dns' "$services"; then
+	dnsYN=yes
+fi
 
 clear
 unalias -a
