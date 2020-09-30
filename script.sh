@@ -51,7 +51,7 @@ cp /etc/passwd /home/newt/Desktop/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
-find $(pwd) -name '*readme*.*' | grep -E "https:\/\/(.*).aspx" | xargs -L 1 wget -o readme.aspx
+find $(pwd) -iname '*readme*.*' | grep -E "https:\/\/(.*).aspx" | xargs -L 1 wget -o readme.aspx
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
