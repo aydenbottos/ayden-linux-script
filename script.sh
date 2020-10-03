@@ -7,6 +7,7 @@ echo "The password used is CyberTaipan123!"
 pw=CyberTaipan123!
 
 mkdir -p /home/newt/Desktop/
+mdkir /quarantine
 touch /home/newt/Desktop/badfiles.log
 echo > /home/newt/Desktop/badfiles.log
 chmod 777 /home/newt/Desktop/badfiles.log
@@ -472,90 +473,90 @@ echo "DNS is complete."
 clear
 if [ $mediaFilesYN == no ]
 then
-	find / -iname "*.midi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mid" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mod" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mp3" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mp2" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mpa" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.abs" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mpega" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.au" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.snd" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.wav" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.aiff" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.aif" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.sid" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.flac" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.ogg" -type f >> /home/newt/Desktop/badfiles.log
+	find /home -iname "*.midi" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mid" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mod" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mp3" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mp2" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mpa" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.abs" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mpega" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.au" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.snd" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.wav" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.aiff" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.aif" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.sid" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.flac" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.ogg" -type f -exec cp {} /quarantine \;
 	clear
 	echo "All audio files has been listed."
 
-	find / -iname "*.mpeg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mpg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mpe" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.dl" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.movie" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.movi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.iff" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.anim5" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.anim3" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.anim7" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.avi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.vfw" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.avx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.fli" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.flc" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mov" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.qt" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.spl" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.swf" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.dcr" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.dir" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.dxr" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.rpm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.rm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.smi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.ra" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.ram" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.rv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.wmv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.asf" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.asx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.wma" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.wax" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.wmv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.wmx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.3gp" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mov" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.mp4" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.avi" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.swf" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.flv" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.m4v" -type f >> /home/newt/Desktop/badfiles.log
+	find /home -iname "*.mpeg" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mpg" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mpe" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.dl" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.movie" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.movi" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mv" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.iff" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.anim5" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.anim3" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.anim7" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.avi" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.vfw" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.avx" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.fli" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.flc" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mov" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.qt" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.spl" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.swf" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.dcr" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.dir" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.dxr" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.rpm" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.rm" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.smi" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.ra" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.ram" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.rv" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.wmv" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.asf" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.asx" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.wma" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.wax" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.wmv" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.wmx" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.3gp" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mov" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mp4" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.avi" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.swf" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.flv" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.m4v" -type f -exec cp {} /quarantine \;
 	clear
 	echo "All video files have been listed."
 	
-	find / -iname "*.tiff" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.tif" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.rs" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.im1" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.gif" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.jpeg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.jpg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.jpe" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.png" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.rgb" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.xwd" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.xpm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.ppm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.pbm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.pgm" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.pcx" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.ico" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.svg" -type f >> /home/newt/Desktop/badfiles.log
-	find / -iname "*.svgz" -type f >> /home/newt/Desktop/badfiles.log
+	find /home -iname "*.tiff" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.tif" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.rs" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.im1" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.gif" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.jpeg" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.jpg" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.jpe" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.png" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.rgb" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.xwd" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.xpm" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.ppm" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.pbm" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.pgm" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.pcx" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.ico" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.svg" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.svgz" -type f -exec cp {} /quarantine \;
 	clear
 	echo "All image files have been listed."
 else
