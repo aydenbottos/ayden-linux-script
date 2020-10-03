@@ -54,9 +54,9 @@ echo "/etc/group and /etc/passwd files backed up."
 
 find $(pwd) -iname '*readme*.*' | grep -E "https:\/\/(.*).aspx" | xargs -L 1 wget -o readme.aspx
 
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]]; >> /dev/null
+awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
-	if grep -q readme.aspx "$line"; >> /dev/null then
+	if grep -q readme.aspx "$line"; then
 		echo -e "$pw\n$pw" | passwd "$line"
 		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
@@ -71,7 +71,7 @@ clear
 
 readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
 	
-echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]]; >> /dev/null
+echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 do
 	useradd $readmeusersfor
 	echo Created missing user from ReadMe.
@@ -82,9 +82,9 @@ done
 
 readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
 
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]]; >> /dev/null
+awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
-	if grep -q "$readmeusers2" "$line"; >> /dev/null then
+	if grep -q "$readmeusers2" "$line"; then
 		gpasswd -d $line sudo
 		gpasswd -d $line adm
 		gpasswd -d $line lpadmin
@@ -111,33 +111,33 @@ httpsYN=no
 dnsYN=no
 mediaFilesYN=no
 vpnYN=no
-services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d; >> /dev/null/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
+services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
 
-if grep -qi 'smb\|samba' "$services"; >> /dev/null then
+if grep -qi 'smb\|samba' "$services"; then
 	sambaYN=yes
 fi
-if grep -qi ftp "$services"; >> /dev/null then
+if grep -qi ftp "$services"; then
 	ftpYN=yes
 fi
-if grep -qi ssh "$services"; >> /dev/null then
+if grep -qi ssh "$services"; then
 	sshYN=yes
 fi
-if grep -qi telnet "$services"; >> /dev/null then
+if grep -qi telnet "$services"; then
 	telnetYN=yes
 fi
-if grep -qi mail "$services"; >> /dev/null then
+if grep -qi mail "$services"; then
 	mailYN=yes
 fi
-if grep -qi print "$services"; >> /dev/null then
+if grep -qi print "$services"; then
 	printYN=yes
 fi
-if grep -qi 'db\|sql' "$services"; >> /dev/null then
+if grep -qi 'db\|sql' "$services"; then
 	dbYN=yes
 fi
-if grep -qi 'web\|apache\|http' "$services"; >> /dev/null then
+if grep -qi 'web\|apache\|http' "$services"; then
 	httpsYN=yes
 fi
-if grep -qi 'bind9\|dns' "$services"; >> /dev/null then
+if grep -qi 'bind9\|dns' "$services"; then
 	dnsYN=yes
 fi
 
@@ -178,8 +178,8 @@ ufw deny 1337
 echo "Firewall enabled and port 1337 blocked."
 
 clear
-env i='() { :; >> /dev/null}; >> /dev/null echo vulnerable >> test' bash -c "echo this is a test"
-if test -f "test"; >> /dev/null then
+env i='() { :;}; echo vulnerable >> test' bash -c "echo this is a test"
+if test -f "test"; then
 	apt-get install --only-upgrade bash
 fi
 echo "Shellshock Bash vulnerability has been fixed."
@@ -254,7 +254,7 @@ then
 	
 	usersSMB=$readmeusers
 	usersSMBLength=${#usersSMB[@]}	
-	for (( i=0; >> /dev/nulli<$usersSMBLength; >> /dev/nulli++))
+	for (( i=0;i<$usersSMBLength;i++))
 	do
 		echo -e "$pw\n$pw" | smbpasswd -a "${usersSMB[${i}]}"
 		echo "${usersSMB[${i}]} has been given the default password for Samba."
@@ -735,7 +735,7 @@ echo "Only root allowed in cron."
 clear
 chmod 777 /etc/apt/apt.conf.d/10periodic
 cp /etc/apt/apt.conf.d/10periodic /home/newt/Desktop/backups/
-echo -e "APT::Periodic::Update-Package-Lists \"1\"; >> /dev/null\nAPT::Periodic::Download-Upgradeable-Packages \"1\"; >> /dev/null\nAPT::Periodic::AutocleanInterval \"1\"; >> /dev/null\nAPT::Periodic::Unattended-Upgrade \"1\"; >> /dev/null" > /etc/apt/apt.conf.d/10periodic
+echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Download-Upgradeable-Packages \"1\";\nAPT::Periodic::AutocleanInterval \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";" > /etc/apt/apt.conf.d/10periodic
 chmod 644 /etc/apt/apt.conf.d/10periodic
 echo "Daily update checks, download upgradeable packages, autoclean interval, and unattended upgrade enabled."
 
@@ -749,7 +749,7 @@ apt-get install firefox -y -qq
 echo "Installed Firefox."
 
 clear
-for d in `find . -name prefs.js`; >> /dev/null do  base=`dirname $d`; >> /dev/nulltouch $base/users.js; >> /dev/nullcat user_pref\("dom.disable_open_during_load", "true"\)\; >> /dev/null >> \$base\/users.js; >> /dev/null done
+for d in `find . -name prefs.js`; do base=`dirname $d`;touch $base/users.js;cat user_pref\("dom.disable_open_during_load", "true"\)\; >> \$base\/users.js; done
 echo "Popup blocker enabled in Firefox"
 
 
