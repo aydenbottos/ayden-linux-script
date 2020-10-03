@@ -54,9 +54,9 @@ echo "/etc/group and /etc/passwd files backed up."
 
 find $(pwd) -iname '*readme*.*' | grep -E "https:\/\/(.*).aspx" | xargs -L 1 wget -o readme.aspx
 
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]]; >> /dev/null
 do
-	if grep -q readme.aspx "$line"; then
+	if grep -q readme.aspx "$line"; >> /dev/null then
 		echo -e "$pw\n$pw" | passwd "$line"
 		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
@@ -71,7 +71,7 @@ clear
 
 readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
 	
-echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
+echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]]; >> /dev/null
 do
 	useradd $readmeusersfor
 	echo Created missing user from ReadMe.
@@ -82,9 +82,9 @@ done
 
 readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
 
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]]; >> /dev/null
 do
-	if grep -q "$readmeusers2" "$line"; then
+	if grep -q "$readmeusers2" "$line"; >> /dev/null then
 		gpasswd -d $line sudo
 		gpasswd -d $line adm
 		gpasswd -d $line lpadmin
@@ -111,33 +111,33 @@ httpsYN=no
 dnsYN=no
 mediaFilesYN=no
 vpnYN=no
-services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
+services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d; >> /dev/null/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
 
-if grep -qi 'smb\|samba' "$services"; then
+if grep -qi 'smb\|samba' "$services"; >> /dev/null then
 	sambaYN=yes
 fi
-if grep -qi ftp "$services"; then
+if grep -qi ftp "$services"; >> /dev/null then
 	ftpYN=yes
 fi
-if grep -qi ssh "$services"; then
+if grep -qi ssh "$services"; >> /dev/null then
 	sshYN=yes
 fi
-if grep -qi telnet "$services"; then
+if grep -qi telnet "$services"; >> /dev/null then
 	telnetYN=yes
 fi
-if grep -qi mail "$services"; then
+if grep -qi mail "$services"; >> /dev/null then
 	mailYN=yes
 fi
-if grep -qi print "$services"; then
+if grep -qi print "$services"; >> /dev/null then
 	printYN=yes
 fi
-if grep -qi 'db\|sql' "$services"; then
+if grep -qi 'db\|sql' "$services"; >> /dev/null then
 	dbYN=yes
 fi
-if grep -qi 'web\|apache\|http' "$services"; then
+if grep -qi 'web\|apache\|http' "$services"; >> /dev/null then
 	httpsYN=yes
 fi
-if grep -qi 'bind9\|dns' "$services"; then
+if grep -qi 'bind9\|dns' "$services"; >> /dev/null then
 	dnsYN=yes
 fi
 
@@ -178,8 +178,8 @@ ufw deny 1337
 echo "Firewall enabled and port 1337 blocked."
 
 clear
-env i='() { :;}; echo vulnerable >> test' bash -c "echo this is a test"
-if test -f "test"; then
+env i='() { :; >> /dev/null}; >> /dev/null echo vulnerable >> test' bash -c "echo this is a test"
+if test -f "test"; >> /dev/null then
 	apt-get install --only-upgrade bash
 fi
 echo "Shellshock Bash vulnerability has been fixed."
@@ -254,7 +254,7 @@ then
 	
 	usersSMB=$readmeusers
 	usersSMBLength=${#usersSMB[@]}	
-	for (( i=0;i<$usersSMBLength;i++))
+	for (( i=0; >> /dev/nulli<$usersSMBLength; >> /dev/nulli++))
 	do
 		echo -e "$pw\n$pw" | smbpasswd -a "${usersSMB[${i}]}"
 		echo "${usersSMB[${i}]} has been given the default password for Samba."
@@ -473,90 +473,90 @@ echo "DNS is complete."
 clear
 if [ $mediaFilesYN == no ]
 then
-	find /home -iname "*.midi" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mid" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mod" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mp3" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mp2" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mpa" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.abs" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mpega" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.au" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.snd" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.wav" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.aiff" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.aif" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.sid" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.flac" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.ogg" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.midi" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mid" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mod" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mp3" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mp2" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mpa" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.abs" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mpega" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.au" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.snd" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.wav" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.aiff" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.aif" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.sid" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.flac" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.ogg" -type f -exec cp {} /quarantine \; >> /dev/null
 	clear
 	echo "All audio files has been listed."
 
-	find /home -iname "*.mpeg" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mpg" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mpe" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.dl" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.movie" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.movi" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mv" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.iff" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.anim5" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.anim3" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.anim7" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.avi" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.vfw" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.avx" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.fli" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.flc" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mov" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.qt" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.spl" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.swf" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.dcr" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.dir" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.dxr" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.rpm" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.rm" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.smi" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.ra" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.ram" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.rv" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.wmv" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.asf" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.asx" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.wma" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.wax" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.wmv" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.wmx" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.3gp" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mov" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.mp4" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.avi" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.swf" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.flv" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.m4v" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.mpeg" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mpg" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mpe" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.dl" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.movie" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.movi" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mv" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.iff" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.anim5" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.anim3" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.anim7" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.avi" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.vfw" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.avx" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.fli" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.flc" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mov" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.qt" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.spl" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.swf" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.dcr" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.dir" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.dxr" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.rpm" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.rm" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.smi" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.ra" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.ram" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.rv" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.wmv" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.asf" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.asx" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.wma" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.wax" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.wmv" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.wmx" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.3gp" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mov" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.mp4" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.avi" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.swf" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.flv" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.m4v" -type f -exec cp {} /quarantine \; >> /dev/null
 	clear
 	echo "All video files have been listed."
 	
-	find /home -iname "*.tiff" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.tif" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.rs" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.im1" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.gif" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.jpeg" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.jpg" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.jpe" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.png" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.rgb" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.xwd" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.xpm" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.ppm" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.pbm" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.pgm" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.pcx" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.ico" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.svg" -type f -exec cp {} /quarantine \;
-	find /home -iname "*.svgz" -type f -exec cp {} /quarantine \;
+	find /home -iname "*.tiff" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.tif" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.rs" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.im1" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.gif" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.jpeg" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.jpg" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.jpe" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.png" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.rgb" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.xwd" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.xpm" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.ppm" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.pbm" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.pgm" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.pcx" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.ico" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.svg" -type f -exec cp {} /quarantine \; >> /dev/null
+	find /home -iname "*.svgz" -type f -exec cp {} /quarantine \; >> /dev/null
 	clear
 	echo "All image files have been listed."
 else
@@ -696,8 +696,8 @@ clear
 apt-get install libpam-cracklib -y -qq
 cp /etc/pam.d/common-auth /home/newt/Desktop/backups/
 cp /etc/pam.d/common-password /home/newt/Desktop/backups/
-echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so nullok_secure\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already;\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
-echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already;\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=8 difok=3 reject_username minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
+echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so nullok_secure\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
+echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=8 difok=3 reject_username minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
 echo "If password policies are not correctly configured, try this for /etc/pam.d/common-password:\npassword requisite pam_cracklib.so retry=3 minlen=8 difok=3 reject_us11ername minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root"
 echo "Password policies have been set with and /etc/pam.d."
 getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
@@ -735,7 +735,7 @@ echo "Only root allowed in cron."
 clear
 chmod 777 /etc/apt/apt.conf.d/10periodic
 cp /etc/apt/apt.conf.d/10periodic /home/newt/Desktop/backups/
-echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Download-Upgradeable-Packages \"1\";\nAPT::Periodic::AutocleanInterval \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";" > /etc/apt/apt.conf.d/10periodic
+echo -e "APT::Periodic::Update-Package-Lists \"1\"; >> /dev/null\nAPT::Periodic::Download-Upgradeable-Packages \"1\"; >> /dev/null\nAPT::Periodic::AutocleanInterval \"1\"; >> /dev/null\nAPT::Periodic::Unattended-Upgrade \"1\"; >> /dev/null" > /etc/apt/apt.conf.d/10periodic
 chmod 644 /etc/apt/apt.conf.d/10periodic
 echo "Daily update checks, download upgradeable packages, autoclean interval, and unattended upgrade enabled."
 
@@ -749,7 +749,7 @@ apt-get install firefox -y -qq
 echo "Installed Firefox."
 
 clear
-for d in `find . -name prefs.js`; do  base=`dirname $d`;touch $base/users.js;cat user_pref\("dom.disable_open_during_load", "true"\)\; >> \$base\/users.js; done
+for d in `find . -name prefs.js`; >> /dev/null do  base=`dirname $d`; >> /dev/nulltouch $base/users.js; >> /dev/nullcat user_pref\("dom.disable_open_during_load", "true"\)\; >> /dev/null >> \$base\/users.js; >> /dev/null done
 echo "Popup blocker enabled in Firefox"
 
 
