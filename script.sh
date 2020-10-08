@@ -31,12 +31,6 @@ apt-get update
 echo "Installing apt-transport-https for apt https"
 apt-get install apt-transport-https -y -qq
 
-echo "Updating /etc/apt/sources.list for https"
-chmod 777 /etc/apt/sources.list
-cp /etc/apt/sources.list /home/newt/Desktop/backups/
-echo -e "deb https://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb https://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb-src https://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse" > /etc/apt/sources.list
-chmod 644 /etc/apt/sources.list
-
 echo "Running apt-get update with HTTPS"
 apt-get update
 clear
