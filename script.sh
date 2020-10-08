@@ -7,7 +7,7 @@ echo "The password used is CyberTaipan123!"
 pw=CyberTaipan123!
 
 mkdir -p /home/newt/Desktop/
-mdkir /quarantine
+mkdir /quarantine
 touch /home/newt/Desktop/badfiles.log
 echo > /home/newt/Desktop/badfiles.log
 chmod 777 /home/newt/Desktop/badfiles.log
@@ -52,7 +52,7 @@ cp /etc/passwd /home/newt/Desktop/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
-find $(pwd) -iname '*readme*.*' | grep -E "https:\/\/(.*).aspx" | xargs -L 1 wget -o readme.aspx
+find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -o readme.aspx
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
@@ -76,7 +76,7 @@ do
 	useradd $readmeusersfor
 	echo Created missing user from ReadMe.
 	passwd -x30 -n3 -w7 $readmeusersfor
-	usermod -L $readmeusersfor
+	usermod -U $readmeusersfor
 	echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
 done
 
@@ -84,7 +84,7 @@ readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" 
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
-	if grep -q "$readmeusers2" "$line"; then
+	if echo "$readmeusers2" | grep -qi "$line"; then
 		gpasswd -d $line sudo
 		gpasswd -d $line adm
 		gpasswd -d $line lpadmin
@@ -111,7 +111,10 @@ httpsYN=no
 dnsYN=no
 mediaFilesYN=no
 vpnYN=no
+
 services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
+echo "$services" >> services
+services=services
 
 if grep -qi 'smb\|samba' "$services"; then
 	sambaYN=yes
