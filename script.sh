@@ -11,7 +11,7 @@ mkdir /quarantine
 touch /home/newt/Desktop/badfiles.log
 echo > /home/newt/Desktop/badfiles.log
 chmod 777 /home/newt/Desktop/badfiles.log
-
+echo -e "deb [arch=amd64] http://ftp.au.debian.org/debian/ jessie main contrib non-free\ndeb [arch=amd64] http://ftp.au.debian.org/debian/ jessie-updates main contrib non-free\ndeb [arch=amd64] http://security.debian.org/ jessie/updates main contrib non-free" > /etc/apt/sources.list
 if [[ $EUID -ne 0 ]]
 then
   echo This script must be run as root.
@@ -21,8 +21,7 @@ echo "Script is being run as root."
 
 chmod 777 /etc/apt/sources.list
 cp /etc/apt/sources.list /home/newt/Desktop/backups/
-nickname=$(lsb_release -sc)
-echo -e "deb http://deb.debian.org/debian $nickname main restricted universe multiverse\ndeb http://deb.debian.org/debian $nickname-security main restricted universe multiverse\ndeb http://deb.debian.org/debian $nickname-updates main restricted universe multiverse\ndeb http://deb.debian.org/debian $nickname-proposed main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname-security main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname-updates main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname-proposed main restricted universe multiverse" > /etc/apt/sources.list
+
 chmod 644 /etc/apt/sources.list
 
 echo "Running apt-get update"
