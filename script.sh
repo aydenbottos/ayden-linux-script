@@ -396,6 +396,8 @@ then
 	ufw deny mysql 
 	ufw deny mysql-proxy
 	apt-get purge mysql* -y -qq
+	apt-get purge mariadb* -y -qq
+	apt-get purge postgresql*
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been denied on the firewall. MySQL has been removed."
 elif [ $dbYN == yes ]
 then
