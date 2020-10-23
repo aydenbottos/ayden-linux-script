@@ -568,9 +568,14 @@ find / -iname "*.php" -type f >> /home/newt/Desktop/badfiles.log
 echo "All PHP files have been listed above. ('/var/cache/dictionaries-common/sqspell.php' is a system PHP file)"
 
 clear
+find / -perm -4000 >> /home/newt/Desktop/badfiles.log
+find / -perm -2000 >> /home/newt/Desktop/badfiles.log
+
+clear
 apt-get purge netcat -y -qq
 apt-get purge netcat-openbsd -y -qq
 apt-get purge netcat-traditional -y -qq
+apt-get purge gcc g++ -y -qq
 apt-get purge ncat -y -qq
 apt-get purge pnetcat -y -qq
 apt-get purge socat -y -qq
