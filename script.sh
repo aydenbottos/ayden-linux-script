@@ -563,6 +563,72 @@ else
 fi
 echo "Media files are complete."
 
+find / -type f -perm 777 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 776 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 775 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 774 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 773 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 772 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 771 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 770 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 767 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 766 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 765 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 764 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 763 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 762 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 761 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 760 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 757 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 756 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 755 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 754 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 753 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 752 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 751 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 750 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 747 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 746 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 745 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 744 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 743 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 742 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 741 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 740 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 737 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 736 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 735 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 734 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 733 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 732 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 731 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 730 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 727 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 726 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 725 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 724 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 723 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 722 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 721 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 720 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 717 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 716 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 715 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 714 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 713 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 712 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 711 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 710 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 707 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 706 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 705 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 704 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 703 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 702 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 701 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 700 >> /home/newt/Desktop/badfiles.log
+echo "All files with perms 700-777 have been logged."
+
 clear
 find / -iname "*.php" -type f >> /home/newt/Desktop/badfiles.log
 echo "All PHP files have been listed above. ('/var/cache/dictionaries-common/sqspell.php' is a system PHP file)"
