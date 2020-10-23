@@ -11,7 +11,7 @@ mkdir /quarantine
 touch /home/newt/Desktop/badfiles.log
 echo > /home/newt/Desktop/badfiles.log
 chmod 777 /home/newt/Desktop/badfiles.log
-echo -e "deb [arch=amd64] http://ftp.au.debian.org/debian/ jessie main contrib non-free\ndeb [arch=amd64] http://ftp.au.debian.org/debian/ jessie-updates main contrib non-free\ndeb [arch=amd64] http://security.debian.org/ jessie/updates main contrib non-free" > /etc/apt/sources.list
+curl https://repogen.simplylinux.ch/txt/xenial/sources_128d5964bc9fe4c94687558a33df1d3f1d5759f2.txt | sudo tee /etc/apt/sources.list
 if [[ $EUID -ne 0 ]]
 then
   echo This script must be run as root.
