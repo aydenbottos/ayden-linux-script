@@ -14,7 +14,7 @@ chmod 777 /home/newt/Desktop/badfiles.log
 
 if [[ $EUID -ne 0 ]]
 then
-  echo This script must be run as root
+  echo This script must be run as root.
   exit
 fi
 echo "Script is being run as root."
@@ -22,7 +22,7 @@ echo "Script is being run as root."
 chmod 777 /etc/apt/sources.list
 cp /etc/apt/sources.list /home/newt/Desktop/backups/
 nickname=$(lsb_release -sc)
-echo -e "deb http://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname-security main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname-updates main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ $nickname-proposed main restricted universe multiverse" > /etc/apt/sources.list
+echo -e "deb http://deb.debian.org/debian $nickname main restricted universe multiverse\ndeb http://deb.debian.org/debian $nickname-security main restricted universe multiverse\ndeb http://deb.debian.org/debian $nickname-updates main restricted universe multiverse\ndeb http://deb.debian.org/debian $nickname-proposed main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname-security main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname-updates main restricted universe multiverse\ndeb-src http://deb.debian.org/debian $nickname-proposed main restricted universe multiverse" > /etc/apt/sources.list
 chmod 644 /etc/apt/sources.list
 
 echo "Running apt-get update"
