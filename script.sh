@@ -170,8 +170,8 @@ echo "Any startup scripts have been removed."
 clear
 apt-get install ufw -y -qq
 ufw enable
-ufw deny 1337
-echo "Firewall enabled and port 1337 blocked."
+ufw default deny incoming
+echo "Firewall enabled and all ports blocked."
 
 clear
 env i='() { :;}; echo vulnerable >> test' bash -c "echo this is a test"
