@@ -838,6 +838,8 @@ apt-get upgrade openssl libssl-dev
 apt-cache policy openssl libssl-dev
 echo "OpenSSL heart bleed bug has been fixed."
 
+PATH=$(getconf PATH)
+echo "PATH reset to normal."
 
 clear
 apt-get install selinux-policy-default -y -qq
