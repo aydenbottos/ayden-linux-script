@@ -251,6 +251,21 @@ net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends #####
 sysctl -p >> /dev/null
 echo "Sysctl has been configured."
 
+chown root:root /etc/securetty
+chmod 0600 /etc/securetty
+chmod 644 /etc/crontab
+chmod 640 /etc/ftpusers
+chmod 440 /etc/inetd.conf
+chmod 440 /etc/xinetd.conf
+chmod 400 /etc/inetd.d
+chmod 644 /etc/hosts.allow
+chmod 440 /etc/sudoers
+chmod 640 /etc/shadow
+chmod 644 /etc/passwd
+chown root:root /etc/passwd
+chown root:root /etc/shadow
+echo "Finished changing permissions."
+
 clear
 if [ $sambaYN == no ]
 then
