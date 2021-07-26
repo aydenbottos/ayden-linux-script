@@ -11,30 +11,36 @@ mkdir /quarantine
 touch /home/newt/Desktop/badfiles.log
 echo > /home/newt/Desktop/badfiles.log
 chmod 777 /home/newt/Desktop/badfiles.log
-curl https://repogen.simplylinux.ch/txt/xenial/sources_128d5964bc9fe4c94687558a33df1d3f1d5759f2.txt | sudo tee /etc/apt/sources.list
+echo "Important files and directories created."
+
 if [[ $EUID -ne 0 ]]
 then
-  echo This script must be run as root.
+  echo "This script must be run as root."
   exit
 fi
 echo "Script is being run as root."
-
-chmod 777 /etc/apt/sources.list
-cp /etc/apt/sources.list /home/newt/Desktop/backups/
-
-chmod 644 /etc/apt/sources.list
 
 echo "Running apt-get update"
 apt-get update
 
 echo "Installing apt-transport-https for apt https"
-apt-get install apt-transport-https -y -qq
+apt-get install apt-transport-https dirmngr -y -qq
+
+chmod 777 /etc/apt/sources.list
+cp /etc/apt/sources.list /home/newt/Desktop/backups/
+
+if grep -q /etc/*-release "Debian"
+then
+	echo -e "deb https://deb.debian.org/debian/ jessie main contrib\ndeb https://deb.debian.org/debian/ jessie-updates main contrib\ndeb https://deb.debian.org/debian-security jessie/updates main" > /etc/apt/sources.list	
+else
+	echo -e "deb https://mirror.aarnet.edu.au/ubuntu/ xenial main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ xenial-security main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ xenial-updates main universe" > /etc/apt/sources.list
+fi
+chmod 644 /etc/apt/sources.list
+echo "Sources reset to default."
 
 echo "Running apt-get update with HTTPS"
 apt-get update
 clear
-
-echo "The current OS is Linux"
 
 mkdir -p /home/newt/Desktop/backups
 chmod 777 /home/newt/Desktop/backups
@@ -49,7 +55,7 @@ find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs w
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
-	if grep -q readme.aspx "$line"; then
+        if grep -q readme.aspx "$line"; then
 		echo -e "$pw\n$pw" | passwd "$line"
 		echo "$line has been given the password '$pw'."
 		passwd -x30 -n3 -w7 $line
