@@ -142,6 +142,17 @@ unalias -a
 echo "All alias have been removed."
 
 clear
+echo "Functions:" > FunctionsAndVariables.txt
+declare -F >> FunctionsAndVariables.txt
+echo "Saved functions"
+
+clear
+echo "" >> FunctionsAndVariables.txt
+echo "Variables:" >> FunctionsAndVariables.txt
+printenv >> FunctionsAndVariables.txt
+echo "Saved environment variables."
+
+clear
 usermod -L root
 echo "Root account has been locked. Use 'usermod -U root' to unlock it."
 
