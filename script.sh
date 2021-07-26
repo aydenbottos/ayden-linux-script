@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 echo "Created by Ayden Bottos"
-echo "Last Modified on Sep 19, 2020"
+echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
 pw=CyberTaipan123!
