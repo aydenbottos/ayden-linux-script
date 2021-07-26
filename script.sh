@@ -198,6 +198,26 @@ systemctl enable stubby
 echo "DNS-over-TLS has been enabled"
 
 clear
+echo "netcat backdoors:" > backdoors.txt
+netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat" >> backdoors.txt
+
+#goes and grabs the PID of the first process that has the name netcat. Kills the executable, doesn’t go and kill the item in one of the crons. Will go through until it has removed all netcats.
+a=0;
+for i in $(netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat"); do
+	if [[ $(echo $i | grep -c -e "/") -ne 0  ]]; then
+		badPID=$(ps -ef | pgrep $( echo $i  | cut -f2 -d'/'));
+		realPath=$(ls -la /proc/$badPID/exe | cut -f2 -d'>' | cut -f2 -d' ');
+		cp $realPath $a
+		echo "$realPath $a" >> backdoors.txt;
+		a=$((a+1));
+		rm $realPath;
+		kill $badPID;
+	fi
+done
+echo "" >> backdoors.txt
+echo "Finished looking for netcat backdoors."
+
+clear
 chmod 777 /etc/hosts
 cp /etc/hosts /home/newt/Desktop/backups/
 echo > /etc/hosts
