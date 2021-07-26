@@ -11,7 +11,7 @@ mkdir /quarantine
 touch /home/newt/Desktop/badfiles.log
 echo > /home/newt/Desktop/badfiles.log
 chmod 777 /home/newt/Desktop/badfiles.log
-echo -e "deb [arch=amd64] http://ftp.au.debian.org/debian/ jessie main contrib non-free\ndeb [arch=amd64] http://ftp.au.debian.org/debian/ jessie-updates main contrib non-free\ndeb [arch=amd64] http://security.debian.org/ jessie/updates main contrib non-free" > /etc/apt/sources.list
+curl https://repogen.simplylinux.ch/txt/xenial/sources_128d5964bc9fe4c94687558a33df1d3f1d5759f2.txt | sudo tee /etc/apt/sources.list
 if [[ $EUID -ne 0 ]]
 then
   echo This script must be run as root.
@@ -217,6 +217,26 @@ echo "" >> backdoors.txt
 echo "Finished looking for netcat backdoors."
 
 clear
+echo "netcat backdoors:" > backdoors.txt
+netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat" >> backdoors.txt
+
+#goes and grabs the PID of the first process that has the name netcat. Kills the executable, doesn’t go and kill the item in one of the crons. Will go through until it has removed all netcats.
+a=0;
+for i in $(netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat"); do
+	if [[ $(echo $i | grep -c -e "/") -ne 0  ]]; then
+		badPID=$(ps -ef | pgrep $( echo $i  | cut -f2 -d'/'));
+		realPath=$(ls -la /proc/$badPID/exe | cut -f2 -d'>' | cut -f2 -d' ');
+		cp $realPath $a
+		echo "$realPath $a" >> backdoors.txt;
+		a=$((a+1));
+		rm $realPath;
+		kill $badPID;
+	fi
+done
+echo "" >> backdoors.txt
+echo "Finished looking for netcat backdoors."
+
+clear
 chmod 777 /etc/hosts
 cp /etc/hosts /home/newt/Desktop/backups/
 echo > /etc/hosts
@@ -249,6 +269,21 @@ echo -e "# Controls IP packet forwarding\nnet.ipv4.ip_forward = 0\n\n# IP Spoofi
 net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends ##############\n\nkernel.sysrq=0" > /etc/sysctl.conf
 sysctl -p >> /dev/null
 echo "Sysctl has been configured."
+
+chown root:root /etc/securetty
+chmod 0600 /etc/securetty
+chmod 644 /etc/crontab
+chmod 640 /etc/ftpusers
+chmod 440 /etc/inetd.conf
+chmod 440 /etc/xinetd.conf
+chmod 400 /etc/inetd.d
+chmod 644 /etc/hosts.allow
+chmod 440 /etc/sudoers
+chmod 640 /etc/shadow
+chmod 644 /etc/passwd
+chown root:root /etc/passwd
+chown root:root /etc/shadow
+echo "Finished changing permissions."
 
 clear
 if [ $sambaYN == no ]
@@ -874,6 +909,7 @@ apt-get upgrade openssl libssl-dev
 apt-cache policy openssl libssl-dev
 echo "OpenSSL heart bleed bug has been fixed."
 
+clear
 PATH=$(getconf PATH)
 echo "PATH reset to normal."
 
