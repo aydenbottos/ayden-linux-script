@@ -51,6 +51,34 @@ cp /etc/passwd /home/newt/Desktop/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
+if test -f "users.txt"
+then
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do	
+        	if grep -q users.txt "$line"; then
+			echo -e "$pw\n$pw" | passwd "$line"
+			echo "$line has been given the password '$pw'."
+			passwd -x30 -n3 -w7 $line
+			usermod -U $line
+			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
+		else
+			deluser -r $line
+			echo "Deleted unauthorised user $line."
+		fi
+	done
+	
+	readmeusers="$(cat users.txt)"
+	
+	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
+	do
+		useradd $readmeusersfor
+		echo Created missing user from ReadMe.
+		passwd -x30 -n3 -w7 $readmeusersfor
+		usermod -U $readmeusersfor
+		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
+	done
+fi
+
 find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -o readme.aspx
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
@@ -83,7 +111,7 @@ readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" 
 
 awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 do
-	if echo "$readmeusers2" | grep -qi "$line"; then
+	if echo $readmeusers2 | grep -qi "$line"; then
 		gpasswd -d $line sudo
 		gpasswd -d $line adm
 		gpasswd -d $line lpadmin
@@ -112,34 +140,33 @@ mediaFilesYN=no
 vpnYN=no
 
 services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
-echo "$services" >> services
-services=services
+echo $services >> services
 
-if grep -qi 'smb\|samba' "$services"; then
+if grep -qi 'smb\|samba' services; then
 	sambaYN=yes
 fi
-if grep -qi ftp "$services"; then
+if grep -qi ftp services; then
 	ftpYN=yes
 fi
-if grep -qi ssh "$services"; then
+if grep -qi ssh services; then
 	sshYN=yes
 fi
-if grep -qi telnet "$services"; then
+if grep -qi telnet services; then
 	telnetYN=yes
 fi
-if grep -qi mail "$services"; then
+if grep -qi mail services; then
 	mailYN=yes
 fi
-if grep -qi print "$services"; then
+if grep -qi print services; then
 	printYN=yes
 fi
-if grep -qi 'db\|sql' "$services"; then
+if grep -qi 'db\|sql' services; then
 	dbYN=yes
 fi
-if grep -qi 'web\|apache\|http' "$services"; then
+if grep -qi 'web\|apache\|http' services; then
 	httpsYN=yes
 fi
-if grep -qi 'bind9\|dns' "$services"; then
+if grep -qi 'bind9\|dns' services; then
 	dnsYN=yes
 fi
 
