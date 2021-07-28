@@ -55,7 +55,7 @@ if test -f "users.txt"
 then
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do	
-        	if grep -q users.txt "$line"; then
+        	if grep -qi users.txt "$line"; then
 			echo -e "$pw\n$pw" | passwd "$line"
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
@@ -77,97 +77,157 @@ then
 		usermod -U $readmeusersfor
 		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
 	done
-fi
-
-find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -o readme.aspx
-
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
-do
-        if grep -q readme.aspx "$line"; then
-		echo -e "$pw\n$pw" | passwd "$line"
-		echo "$line has been given the password '$pw'."
-		passwd -x30 -n3 -w7 $line
-		usermod -U $line
-		echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
-	else
-		deluser -r $line
-		echo "Deleted unauthorised user $line."
-	fi
-done
-clear
-
-readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
 	
-echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
-do
-	useradd $readmeusersfor
-	echo Created missing user from ReadMe.
-	passwd -x30 -n3 -w7 $readmeusersfor
-	usermod -U $readmeusersfor
-	echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
-done
-
-readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
-
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
-do
-	if echo $readmeusers2 | grep -qi "$line"; then
-		gpasswd -d $line sudo
-		gpasswd -d $line adm
-		gpasswd -d $line lpadmin
-		gpasswd -d $line sambashare
-		gpasswd -d $line root
-		echo "$line has been made a standard user."
-	else
-		gpasswd -a $line sudo
-		gpasswd -a $line adm
-		gpasswd -a $line lpadmin
-		gpasswd -a $line sambashare
-		echo "$line has been made an administrator."
+	readmeusers2="$(grep -qi users.txt "Admin" | cut -d ' ' -f1)"
+	
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do
+		if echo $readmeusers2 | grep -qi "$line"; then
+			gpasswd -a $line sudo
+			gpasswd -a $line adm
+			gpasswd -a $line lpadmin
+			gpasswd -a $line sambashare
+			gpasswd -a $line root
+			echo "$line has been made a standard user."
+		else
+			gpasswd -d $line sudo
+			gpasswd -d $line adm
+			gpasswd -d $line lpadmin
+			gpasswd -d $line sambashare
+			echo "$line has been made an administrator."
+		fi
+	done
+	
+	sambaYN=no
+	ftpYN=no
+	sshYN=no
+	telnetYN=no
+	mailYN=no
+	printYN=no
+	dbYN=no
+	httpsYN=no
+	dnsYN=no
+	mediaFilesYN=no
+	vpnYN=no
+	
+	if grep -qi 'smb\|samba' services.txt; then
+		sambaYN=yes
 	fi
-done
+	if grep -qi ftp services.txt; then
+		ftpYN=yes
+	fi
+	if grep -qi ssh services.txt; then
+		sshYN=yes
+	fi
+	if grep -qi telnet services.txt; then
+		telnetYN=yes
+	fi
+	if grep -qi mail services; then
+		mailYN=yes
+	fi
+	if grep -qi print services.txt; then
+		printYN=yes
+	fi
+	if grep -qi 'db\|sql' services.txt; then
+		dbYN=yes
+	fi
+	if grep -qi 'web\|apache\|http' services.txt; then
+		httpsYN=yes
+	fi
+	if grep -qi 'bind9\|dns' services.txt; then
+		dnsYN=yes
+	fi
+else
+	find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -o readme.aspx
 
-sambaYN=no
-ftpYN=no
-sshYN=no
-telnetYN=no
-mailYN=no
-printYN=no
-dbYN=no
-httpsYN=no
-dnsYN=no
-mediaFilesYN=no
-vpnYN=no
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do
+		if grep -q readme.aspx "$line"; then
+			echo -e "$pw\n$pw" | passwd "$line"
+			echo "$line has been given the password '$pw'."
+			passwd -x30 -n3 -w7 $line
+			usermod -U $line
+			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
+		else
+			deluser -r $line
+			echo "Deleted unauthorised user $line."
+		fi
+	done
+	clear
 
-services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
-echo $services >> services
+	readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
 
-if grep -qi 'smb\|samba' services; then
-	sambaYN=yes
-fi
-if grep -qi ftp services; then
-	ftpYN=yes
-fi
-if grep -qi ssh services; then
-	sshYN=yes
-fi
-if grep -qi telnet services; then
-	telnetYN=yes
-fi
-if grep -qi mail services; then
-	mailYN=yes
-fi
-if grep -qi print services; then
-	printYN=yes
-fi
-if grep -qi 'db\|sql' services; then
-	dbYN=yes
-fi
-if grep -qi 'web\|apache\|http' services; then
-	httpsYN=yes
-fi
-if grep -qi 'bind9\|dns' services; then
-	dnsYN=yes
+	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
+	do
+		useradd $readmeusersfor
+		echo Created missing user from ReadMe.
+		passwd -x30 -n3 -w7 $readmeusersfor
+		usermod -U $readmeusersfor
+		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
+	done
+
+	readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
+
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do
+		if echo $readmeusers2 | grep -qi "$line"; then
+			gpasswd -d $line sudo
+			gpasswd -d $line adm
+			gpasswd -d $line lpadmin
+			gpasswd -d $line sambashare
+			gpasswd -d $line root
+			echo "$line has been made a standard user."
+		else
+			gpasswd -a $line sudo
+			gpasswd -a $line adm
+			gpasswd -a $line lpadmin
+			gpasswd -a $line sambashare
+			echo "$line has been made an administrator."
+		fi
+	done
+
+	sambaYN=no
+	ftpYN=no
+	sshYN=no
+	telnetYN=no
+	mailYN=no
+	printYN=no
+	dbYN=no
+	httpsYN=no
+	dnsYN=no
+	mediaFilesYN=no
+	vpnYN=no
+
+	services="$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)"
+	echo $services >> services
+
+	if grep -qi 'smb\|samba' services; then
+		sambaYN=yes
+	fi
+	if grep -qi ftp services; then
+		ftpYN=yes
+	fi
+	if grep -qi ssh services; then
+		sshYN=yes
+	fi
+	if grep -qi telnet services; then
+		telnetYN=yes
+	fi
+	if grep -qi mail services; then
+		mailYN=yes
+	fi
+	if grep -qi print services; then
+		printYN=yes
+	fi
+	if grep -qi 'db\|sql' services; then
+		dbYN=yes
+	fi
+	if grep -qi 'web\|apache\|http' services; then
+		httpsYN=yes
+	fi
+	if grep -qi 'bind9\|dns' services; then
+		dnsYN=yes
+	fi	
 fi
 
 clear
@@ -230,26 +290,6 @@ systemctl start stubby
 systemctl enable stubby
 echo "DNS-over-TLS has been enabled"
 
-echo "netcat backdoors:" > backdoors.txt
-netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat" >> backdoors.txt
-
-#goes and grabs the PID of the first process that has the name netcat. Kills the executable, doesn’t go and kill the item in one of the crons. Will go through until it has removed all netcats.
-a=0;
-for i in $(netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat"); do
-	if [[ $(echo $i | grep -c -e "/") -ne 0  ]]; then
-		badPID=$(ps -ef | pgrep $( echo $i  | cut -f2 -d'/'));
-		realPath=$(ls -la /proc/$badPID/exe | cut -f2 -d'>' | cut -f2 -d' ');
-		cp $realPath $a
-		echo "$realPath $a" >> backdoors.txt;
-		a=$((a+1));
-		rm $realPath;
-		kill $badPID;
-	fi
-done
-echo "" >> backdoors.txt
-echo "Finished looking for netcat backdoors."
-
-clear
 echo "netcat backdoors:" > backdoors.txt
 netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat" >> backdoors.txt
 
