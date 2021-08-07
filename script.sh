@@ -408,7 +408,7 @@ then
 	ufw deny saft 
 	ufw deny ftps-data 
 	ufw deny ftps
-	apt-get purge vsftpd proftpd -y -qq
+	apt-get purge vsftpd proftpd *ftpd -y -qq
 	echo "vsFTPd has been removed. ftp, sftp, saft, ftps-data, and ftps ports have been denied on the firewall."
 elif [ $ftpYN == yes ]
 then
@@ -496,7 +496,7 @@ then
 	ufw allow imap2 
 	ufw allow imaps 
 	ufw allow pop3s
-	apt-get install postfix -y -qq
+	apt-get install postfix dovecot -y -qq
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been allowed on the firewall."
 else
 	echo Response not recognized.
@@ -840,9 +840,9 @@ apt-get purge irpas -y -qq
 clear
 echo "IRPAS has been removed."
 
-apt-get purge wireshark* tshark kismet -y -qq
+apt-get purge wireshark* tshark kismet zenmap -y -qq
 clear
-echo "Wireshark, TShark and Kismet have been removed."
+echo "Wireshark, TShark, Kismet, and Zenmap have been removed."
 
 apt-get purge logkeys -y -qq
 clear 
