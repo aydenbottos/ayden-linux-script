@@ -138,7 +138,7 @@ then
 		dnsYN=yes
 	fi
 else
-	find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -o readme.aspx
+	find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
 
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
@@ -149,7 +149,7 @@ else
 			usermod -U $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
 		else
-			deluser -r $line
+			userdel -r $line
 			echo "Deleted unauthorised user $line."
 		fi
 	done
