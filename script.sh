@@ -149,7 +149,7 @@ else
 			usermod -U $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
 		else
-			deluser --remove-all-files $line
+			deluser --remove-home $line
 			echo "Deleted unauthorised user $line."
 		fi
 	done
