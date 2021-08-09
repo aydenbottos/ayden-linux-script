@@ -964,7 +964,7 @@ apt-get install firefox -y -qq
 echo "Installed Firefox."
 
 clear
-for d in $(find /home/$(whoami)/.mozilla/firefox -name prefs.js); do base=$(dirname $d);touch $base/users.js;echo "user_pref(\"dom.disable_open_during_load\", \"true\");" >> $base/users.js; done
+su - $(stat -c "%U" .) -c 'firefox --preferences'
 echo "Popup blocker enabled in Firefox"
 
 
