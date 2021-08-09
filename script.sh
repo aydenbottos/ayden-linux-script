@@ -142,14 +142,14 @@ else
 
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
-		if grep -q readme.aspx "$line"; then
+		if grep -qi "$line" readme.aspx; then
 			echo -e "$pw\n$pw" | passwd "$line"
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
 			usermod -U $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
 		else
-			userdel -r $line
+			deluser --remove-all-files $line
 			echo "Deleted unauthorised user $line."
 		fi
 	done
@@ -159,11 +159,16 @@ else
 
 	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 	do
-		useradd $readmeusersfor
-		echo Created missing user from ReadMe.
-		passwd -x30 -n3 -w7 $readmeusersfor
-		usermod -U $readmeusersfor
-		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
+		if grep -qi "$readmeusersfor" /etc/passwd; then
+			echo "User already exists"
+		else
+			adduser $readmeusersfor
+			echo -e "$pw\n$pw" | passwd "$readmeusersfor"
+			echo Created missing user from ReadMe.
+			passwd -x30 -n3 -w7 $readmeusersfor
+			usermod -U $readmeusersfor
+			echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
+		fi
 	done
 
 	readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
