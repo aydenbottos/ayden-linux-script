@@ -162,7 +162,7 @@ else
 		if grep -qi "$readmeusersfor" /etc/passwd; then
 			echo "User already exists"
 		else
-			adduser $readmeusersfor
+			useradd -m $readmeusersfor
 			echo -e "$pw\n$pw" | passwd "$readmeusersfor"
 			echo Created missing user from ReadMe.
 			passwd -x30 -n3 -w7 $readmeusersfor
