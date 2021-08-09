@@ -625,6 +625,7 @@ echo "DNS is complete."
 clear
 if [ $mediaFilesYN == no ]
 then
+	mv $(pwd)/../Pictures/CyberTaipan_Background_WIDE.jpg /
 	find /home -iname "*.midi" -type f -delete >> /home/newt/Desktop/badfiles.log
 	find /home -iname "*.mid" -type f -delete >> /home/newt/Desktop/badfiles.log
 	find /home -iname "*.mod" -type f -delete >> /home/newt/Desktop/badfiles.log
@@ -709,6 +710,7 @@ then
 	find /home -iname "*.ico" -type f -delete >> /home/newt/Desktop/badfiles.log
 	find /home -iname "*.svg" -type f -delete >> /home/newt/Desktop/badfiles.log
 	find /home -iname "*.svgz" -type f -delete >> /home/newt/Desktop/badfiles.log
+	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/CyberTaipan_Background_WIDE.jpg
 	clear
 	echo "All image files have been listed."
 else
@@ -999,7 +1001,7 @@ apt-cache policy openssl libssl-dev
 echo "OpenSSL heart bleed bug has been fixed."
 
 clear
-PATH=$(getconf PATH)
+export $(cat /etc/environment)
 echo "PATH reset to normal."
 
 clear
@@ -1020,8 +1022,4 @@ else
 fi
 
 clear
-apt-get install ecryptfs-utils cryptsetup -y -qq
-
-clear
-echo "Script is complete. Logging user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
-gnome-session-quit && xfce4-session-logout
+echo "Script is complete."
