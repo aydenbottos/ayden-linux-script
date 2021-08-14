@@ -280,6 +280,10 @@ echo "Check for any files for users that should not be administrators in /etc/su
 ls -a /etc/sudoers.d >> /home/newt/Desktop/badfiles.log
 
 clear
+visudo
+echo "Sudoers file secured."
+
+clear
 cp /etc/rc.local /home/newt/Desktop/backups/
 echo > /etc/rc.local
 echo 'exit 0' >> /etc/rc.local
@@ -787,6 +791,10 @@ find / -type f -perm 702 >> /home/newt/Desktop/badfiles.log
 find / -type f -perm 701 >> /home/newt/Desktop/badfiles.log
 find / -type f -perm 700 >> /home/newt/Desktop/badfiles.log
 echo "All files with perms 700-777 have been logged."
+
+clear
+for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/${i} ] && chmod -R 750 /home/${i}; done
+echo "Home directory permissions set."
 
 clear
 find / -iname "*.php" -type f >> /home/newt/Desktop/badfiles.log
