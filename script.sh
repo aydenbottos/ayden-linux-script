@@ -332,6 +332,10 @@ chmod 644 /etc/hosts
 echo "HOSTS file has been set to defaults."
 
 clear
+apt purge *tftpd* -y -qq
+echo "TFTP has been removed."
+
+clear
 chmod 777 /etc/lightdm/lightdm.conf
 cp /etc/lightdm/lightdm.conf /home/newt/Desktop/backups/
 echo > /etc/lightdm/lightdm.conf
