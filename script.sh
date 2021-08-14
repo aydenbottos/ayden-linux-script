@@ -4,7 +4,16 @@ echo "Created by Ayden Bottos"
 echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
+
+if [[ $EUID -ne 0 ]]
+then
+  echo "This script must be run as root."
+  exit
+fi
+echo "Script is being run as root."
+
 pw=CyberTaipan123!
+echo "Universal password set."
 
 echo "Opening forensics questions."
 gnome-terminal
@@ -15,19 +24,16 @@ test -f "Forensics Question 4.txt" && gedit "Forensics Question 4.txt"
 test -f "Forensics Question 5.txt" && gedit "Forensics Question 5.txt"
 test -f "Forensics Question 6.txt" && gedit "Forensics Question 6.txt"
 
-mkdir -p /home/newt/Desktop/
-mkdir /quarantine
-touch /home/newt/Desktop/badfiles.log
-echo > /home/newt/Desktop/badfiles.log
-chmod 777 /home/newt/Desktop/badfiles.log
+clear
+mkdir -p /home/scriptuser/
+touch /home/scriptuser/badfiles.log
+echo > /home/scriptuser/badfiles.log
+chmod 777 /home/scriptuser/badfiles.log
 echo "Important files and directories created."
 
-if [[ $EUID -ne 0 ]]
-then
-  echo "This script must be run as root."
-  exit
-fi
-echo "Script is being run as root."
+mkdir -p /home/scriptuser/backups
+chmod 777 /home/scriptuser/backups
+echo "Backups folder created on the Desktop."
 
 echo "Running apt-get update"
 apt-get update
@@ -36,7 +42,7 @@ echo "Installing apt-transport-https for apt https"
 apt-get install apt-transport-https dirmngr -y -qq
 
 chmod 777 /etc/apt/sources.list
-cp /etc/apt/sources.list /home/newt/Desktop/backups/
+cp /etc/apt/sources.list /home/scriptuser/backups/
 
 if grep -q /etc/*-release "Debian"
 then
@@ -51,12 +57,8 @@ echo "Running apt-get update with HTTPS"
 apt-get update
 clear
 
-mkdir -p /home/newt/Desktop/backups
-chmod 777 /home/newt/Desktop/backups
-echo "Backups folder created on the Desktop."
-
-cp /etc/group /home/newt/Desktop/backups/
-cp /etc/passwd /home/newt/Desktop/backups/
+cp /etc/group /home/scriptuser/backups/
+cp /etc/passwd /home/scriptuser/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
@@ -257,6 +259,7 @@ clear
 echo "" >> FunctionsAndVariables.txt
 echo "Variables:" >> FunctionsAndVariables.txt
 printenv >> FunctionsAndVariables.txt
+mv FunctionsAndVariables.txt /home/scriptuser/
 echo "Saved environment variables."
 
 clear
@@ -273,18 +276,18 @@ echo "Read/Write permissions on shadow have been set."
 
 clear
 echo "Check for any user folders that do not belong to any users in /home/."
-ls -a /home/ >> /home/newt/Desktop/badfiles.log
+ls -a /home/ >> /home/scriptuser/badfiles.log
 
 clear
 echo "Check for any files for users that should not be administrators in /etc/sudoers.d."
-ls -a /etc/sudoers.d >> /home/newt/Desktop/badfiles.log
+ls -a /etc/sudoers.d >> /home/scriptuser/badfiles.log
 
 clear
 visudo
 echo "Sudoers file secured."
 
 clear
-cp /etc/rc.local /home/newt/Desktop/backups/
+cp /etc/rc.local /home/scriptuser/backups/
 echo > /etc/rc.local
 echo 'exit 0' >> /etc/rc.local
 echo "Any startup scripts have been removed."
@@ -318,7 +321,7 @@ for i in $(netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat"); do
 		badPID=$(ps -ef | pgrep $( echo $i  | cut -f2 -d'/'));
 		realPath=$(ls -la /proc/$badPID/exe | cut -f2 -d'>' | cut -f2 -d' ');
 		cp $realPath $a
-		echo "$realPath $a" >> backdoors.txt;
+		echo "$realPath $a" >> /home/scriptuser/backdoors.txt;
 		a=$((a+1));
 		rm $realPath;
 		kill $badPID;
@@ -329,7 +332,7 @@ echo "Finished looking for netcat backdoors."
 
 clear
 chmod 777 /etc/hosts
-cp /etc/hosts /home/newt/Desktop/backups/
+cp /etc/hosts /home/scriptuser/backups/
 echo > /etc/hosts
 echo -e "127.0.0.1 localhost\n127.0.1.1 $USER\n::1 ip6-localhost ip6-loopback\nfe00::0 ip6-localnet\nff00::0 ip6-mcastprefix\nff02::1 ip6-allnodes\nff02::2 ip6-allrouters" >> /etc/hosts
 chmod 644 /etc/hosts
@@ -341,7 +344,7 @@ echo "TFTP has been removed."
 
 clear
 chmod 777 /etc/lightdm/lightdm.conf
-cp /etc/lightdm/lightdm.conf /home/newt/Desktop/backups/
+cp /etc/lightdm/lightdm.conf /home/scriptuser/backups/
 echo > /etc/lightdm/lightdm.conf
 echo -e '[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\ngreeter-show-manual-login=true' >> /etc/lightdm/lightdm.conf
 chmod 644 /etc/lightdm/lightdm.conf
@@ -352,13 +355,13 @@ find /bin/ -name "*.sh" -type f -delete
 echo "badfiles in bin have been removed."
 
 clear
-cp /etc/default/irqbalance /home/newt/Desktop/backups/
+cp /etc/default/irqbalance /home/scriptuser/backups/
 echo > /etc/default/irqbalance
 echo -e "#Configuration for the irqbalance daemon\n\n#Should irqbalance be enabled?\nENABLED=\"0\"\n#Balance the IRQs only once?\nONESHOT=\"0\"" >> /etc/default/irqbalance
 echo "IRQ Balance has been disabled."
 
 clear
-cp /etc/sysctl.conf /home/newt/Desktop/backups/
+cp /etc/sysctl.conf /home/scriptuser/backups/
 echo > /etc/sysctl.conf
 echo -e "#Enable ASLR\nkernel.randomize_va_space = 2\n\n# Controls IP packet forwarding\nnet.ipv4.ip_forward = 0\n\n# IP Spoofing protection\nnet.ipv4.conf.all.rp_filter = 1\nnet.ipv4.conf.default.rp_filter = 1\n\n# Ignore ICMP broadcast requests\nnet.ipv4.icmp_echo_ignore_broadcasts = 1\n\n# Disable source packet routing\nnet.ipv4.conf.all.accept_source_route = 0\nnet.ipv6.conf.all.accept_source_route = 0\nnet.ipv4.conf.default.accept_source_route = 0\nnet.ipv6.conf.default.accept_source_route = 0\n\n# Ignore send redirects\nnet.ipv4.conf.all.send_redirects = 0\nnet.ipv4.conf.default.send_redirects = 0\n\n# Block SYN attacks\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_max_syn_backlog = 2048\nnet.ipv4.tcp_synack_retries = 2\nnet.ipv4.tcp_syn_retries = 5\n\n# Log Martians\nnet.ipv4.conf.all.log_martians = 1\nnet.ipv4.icmp_ignore_bogus_error_responses = 1\n\n# Ignore ICMP redirects\nnet.ipv4.conf.all.accept_redirects = 0\nnet.ipv6.conf.all.accept_redirects = 0\nnet.ipv4.conf.default.accept_redirects = 0\nnet.ipv6.conf.default.accept_redirects = 0\n\n# Ignore Directed pings\nnet.ipv4.icmp_echo_ignore_all = 1\n\n# Accept Redirects? No, this is not router\nnet.ipv4.conf.all.secure_redirects = 0\n\n# Log packets with impossible addresses to kernel log? yes\nnet.ipv4.conf.default.secure_redirects = 0\n\n########## IPv6 networking start ##############\n# Number of Router Solicitations to send until assuming no routers are present.\n# This is host and not router\nnet.ipv6.conf.default.router_solicitations = 0\n\n# Accept Router Preference in RA?\nnet.ipv6.conf.default.accept_ra_rtr_pref = 0\n\n# Learn Prefix Information in Router Advertisement\nnet.ipv6.conf.default.accept_ra_pinfo = 0\n\n# Setting controls whether the system will accept Hop Limit settings from a router advertisement\nnet.ipv6.conf.default.accept_ra_defrtr = 0\n\n#router advertisements can cause the system to assign a global unicast address to an interface\nnet.ipv6.conf.default.autoconf = 0\n\n#how many neighbor solicitations to send out per address?\nnet.ipv6.conf.default.dad_transmits = 0\n\n# How many global unicast IPv6 addresses can be assigned to each interface?
 net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends ##############\n\nkernel.sysrq=0" > /etc/sysctl.conf
@@ -401,7 +404,7 @@ then
 	ufw allow microsoft-ds
 	apt-get install samba -y -qq
 	apt-get install system-config-samba -y -qq
-	cp /etc/samba/smb.conf /home/newt/Desktop/backups/
+	cp /etc/samba/smb.conf /home/scriptuser/backups/
 	if [ "$(grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
 	then
 		sed -i 's/####### Authentication #######/####### Authentication #######\nsecurity = user/g' /etc/samba/smb.conf
@@ -440,8 +443,8 @@ then
 	ufw allow ftps-data 
 	ufw allow ftps
 	apt-get install vsftpd -y -qq
-	cp /etc/vsftpd/vsftpd.conf /home/newt/Desktop/backups/
-	cp /etc/vsftpd.conf /home/newt/Desktop/backups/
+	cp /etc/vsftpd/vsftpd.conf /home/scriptuser/backups/
+	cp /etc/vsftpd.conf /home/scriptuser/backups/
 	gedit /etc/vsftpd/vsftpd.conf&gedit /etc/vsftpd.conf
 	systemctl restart vsftpd
 	echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
@@ -461,9 +464,9 @@ elif [ $sshYN == yes ]
 then
 	apt-get install openssh-server -y -qq
 	ufw allow ssh
-	cp /etc/ssh/sshd_config /home/newt/Desktop/backups/	
+	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
 	usersSSH=$readmeusers
-	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 22\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	%h/.ssh/authorized_keys\n\n# Don't read the user's /home/newt/.rhosts and /home/newt/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/newt/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication yes\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nDenyUsers\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 0\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
+	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 22\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	%h/.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication yes\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nDenyUsers\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 0\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
 	systemctl restart sshd
 	mkdir /home/$(whoami)/.ssh
 	chmod 700 /home/$(whoami)/.ssh
@@ -567,15 +570,15 @@ then
 	ufw allow mysql 
 	ufw allow mysql-proxy
 	apt-get install mysql-server-* -y -qq
-	cp /etc/my.cnf /home/newt/Desktop/backups/
-	cp /etc/mysql/my.cnf /home/newt/Desktop/backups/
-	cp /usr/etc/my.cnf /home/newt/Desktop/backups/
-	cp /home/newt/.my.cnf /home/newt/Desktop/backups/
+	cp /etc/my.cnf /home/scriptuser/backups/
+	cp /etc/mysql/my.cnf /home/scriptuser/backups/
+	cp /usr/etc/my.cnf /home/scriptuser/backups/
+	cp /home/scriptuser/.my.cnf /home/scriptuser/backups/
 	if grep -q "bind-address" "/etc/mysql/my.cnf"
 	then
 		sed -i "s/bind-address\t\t=.*/bind-address\t\t= 127.0.0.1/g" /etc/mysql/my.cnf
 	fi
-	gedit /etc/my.cnf&gedit /etc/mysql/my.cnf&gedit /usr/etc/my.cnf&gedit /home/newt/.my.cnf
+	gedit /etc/my.cnf&gedit /etc/mysql/my.cnf&gedit /usr/etc/my.cnf&gedit /home/scriptuser/.my.cnf
 	systemctl restart mysql
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been allowed on the firewall. MySQL has been installed. MySQL config file has been secured. MySQL systemctl has been restarted."
 else
@@ -598,7 +601,7 @@ then
 	apt-get install apache2 -y -qq
 	ufw allow https 
 	ufw allow https
-	cp /etc/apache2/apache2.conf /home/newt/Desktop/backups/
+	cp /etc/apache2/apache2.conf /home/scriptuser/backups/
 	if [ -e /etc/apache2/apache2.conf ]
 	then
   	  echo -e '\<Directory \>\n\t AllowOverride None\n\t Order Deny,Allow\n\t Deny from all\n\<Directory \/\>\nUserDir disabled root' >> /etc/apache2/apache2.conf
@@ -634,90 +637,90 @@ clear
 if [ $mediaFilesYN == no ]
 then
 	mv $(pwd)/../Pictures/CyberTaipan_Background_WIDE.jpg /
-	find /home -iname "*.midi" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mid" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mod" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mp3" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mp2" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mpa" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.abs" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mpega" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.au" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.snd" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.wav" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.aiff" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.aif" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.sid" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.flac" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.ogg" -type f -delete >> /home/newt/Desktop/badfiles.log
+	find /home -iname "*.midi" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mid" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mod" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mp3" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mp2" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mpa" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.abs" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mpega" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.au" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.snd" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.wav" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.aiff" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.aif" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.sid" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.flac" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.ogg" -type f -delete >> /home/scriptuser/badfiles.log
 	clear
 	echo "All audio files has been listed."
 
-	find /home -iname "*.mpeg" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mpg" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mpe" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.dl" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.movie" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.movi" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mv" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.iff" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.anim5" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.anim3" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.anim7" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.avi" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.vfw" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.avx" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.fli" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.flc" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mov" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.qt" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.spl" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.swf" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.dcr" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.dir" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.dxr" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.rpm" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.rm" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.smi" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.ra" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.ram" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.rv" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.wmv" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.asf" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.asx" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.wma" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.wax" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.wmv" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.wmx" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.3gp" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mov" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.mp4" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.avi" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.swf" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.flv" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.m4v" -type f -delete >> /home/newt/Desktop/badfiles.log
+	find /home -iname "*.mpeg" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mpg" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mpe" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.dl" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.movie" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.movi" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mv" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.iff" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.anim5" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.anim3" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.anim7" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.avi" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.vfw" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.avx" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.fli" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.flc" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mov" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.qt" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.spl" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.swf" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.dcr" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.dir" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.dxr" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.rpm" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.rm" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.smi" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.ra" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.ram" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.rv" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.wmv" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.asf" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.asx" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.wma" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.wax" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.wmv" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.wmx" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.3gp" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mov" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.mp4" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.avi" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.swf" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.flv" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.m4v" -type f -delete >> /home/scriptuser/badfiles.log
 	clear
 	echo "All video files have been listed."
 	
-	find /home -iname "*.tiff" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.tif" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.rs" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.im1" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.gif" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.jpeg" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.jpg" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.jpe" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.png" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.rgb" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.xwd" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.xpm" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.ppm" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.pbm" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.pgm" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.pcx" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.ico" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.svg" -type f -delete >> /home/newt/Desktop/badfiles.log
-	find /home -iname "*.svgz" -type f -delete >> /home/newt/Desktop/badfiles.log
+	find /home -iname "*.tiff" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.tif" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.rs" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.im1" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.gif" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.jpeg" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.jpg" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.jpe" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.png" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.rgb" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.xwd" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.xpm" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.ppm" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.pbm" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.pgm" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.pcx" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.ico" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.svg" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -iname "*.svgz" -type f -delete >> /home/scriptuser/badfiles.log
 	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/CyberTaipan_Background_WIDE.jpg
 	clear
 	echo "All image files have been listed."
@@ -726,83 +729,93 @@ else
 fi
 echo "Media files are complete."
 
-find / -type f -perm 777 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 776 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 775 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 774 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 773 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 772 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 771 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 770 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 767 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 766 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 765 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 764 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 763 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 762 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 761 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 760 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 757 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 756 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 755 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 754 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 753 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 752 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 751 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 750 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 747 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 746 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 745 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 744 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 743 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 742 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 741 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 740 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 737 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 736 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 735 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 734 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 733 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 732 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 731 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 730 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 727 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 726 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 725 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 724 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 723 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 722 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 721 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 720 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 717 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 716 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 715 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 714 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 713 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 712 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 711 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 710 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 707 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 706 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 705 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 704 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 703 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 702 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 701 >> /home/newt/Desktop/badfiles.log
-find / -type f -perm 700 >> /home/newt/Desktop/badfiles.log
+find / -type f -perm 777 >> /home/scriptuser/badfiles.log
+find / -type f -perm 776 >> /home/scriptuser/badfiles.log
+find / -type f -perm 775 >> /home/scriptuser/badfiles.log
+find / -type f -perm 774 >> /home/scriptuser/badfiles.log
+find / -type f -perm 773 >> /home/scriptuser/badfiles.log
+find / -type f -perm 772 >> /home/scriptuser/badfiles.log
+find / -type f -perm 771 >> /home/scriptuser/badfiles.log
+find / -type f -perm 770 >> /home/scriptuser/badfiles.log
+find / -type f -perm 767 >> /home/scriptuser/badfiles.log
+find / -type f -perm 766 >> /home/scriptuser/badfiles.log
+find / -type f -perm 765 >> /home/scriptuser/badfiles.log
+find / -type f -perm 764 >> /home/scriptuser/badfiles.log
+find / -type f -perm 763 >> /home/scriptuser/badfiles.log
+find / -type f -perm 762 >> /home/scriptuser/badfiles.log
+find / -type f -perm 761 >> /home/scriptuser/badfiles.log
+find / -type f -perm 760 >> /home/scriptuser/badfiles.log
+find / -type f -perm 757 >> /home/scriptuser/badfiles.log
+find / -type f -perm 756 >> /home/scriptuser/badfiles.log
+find / -type f -perm 755 >> /home/scriptuser/badfiles.log
+find / -type f -perm 754 >> /home/scriptuser/badfiles.log
+find / -type f -perm 753 >> /home/scriptuser/badfiles.log
+find / -type f -perm 752 >> /home/scriptuser/badfiles.log
+find / -type f -perm 751 >> /home/scriptuser/badfiles.log
+find / -type f -perm 750 >> /home/scriptuser/badfiles.log
+find / -type f -perm 747 >> /home/scriptuser/badfiles.log
+find / -type f -perm 746 >> /home/scriptuser/badfiles.log
+find / -type f -perm 745 >> /home/scriptuser/badfiles.log
+find / -type f -perm 744 >> /home/scriptuser/badfiles.log
+find / -type f -perm 743 >> /home/scriptuser/badfiles.log
+find / -type f -perm 742 >> /home/scriptuser/badfiles.log
+find / -type f -perm 741 >> /home/scriptuser/badfiles.log
+find / -type f -perm 740 >> /home/scriptuser/badfiles.log
+find / -type f -perm 737 >> /home/scriptuser/badfiles.log
+find / -type f -perm 736 >> /home/scriptuser/badfiles.log
+find / -type f -perm 735 >> /home/scriptuser/badfiles.log
+find / -type f -perm 734 >> /home/scriptuser/badfiles.log
+find / -type f -perm 733 >> /home/scriptuser/badfiles.log
+find / -type f -perm 732 >> /home/scriptuser/badfiles.log
+find / -type f -perm 731 >> /home/scriptuser/badfiles.log
+find / -type f -perm 730 >> /home/scriptuser/badfiles.log
+find / -type f -perm 727 >> /home/scriptuser/badfiles.log
+find / -type f -perm 726 >> /home/scriptuser/badfiles.log
+find / -type f -perm 725 >> /home/scriptuser/badfiles.log
+find / -type f -perm 724 >> /home/scriptuser/badfiles.log
+find / -type f -perm 723 >> /home/scriptuser/badfiles.log
+find / -type f -perm 722 >> /home/scriptuser/badfiles.log
+find / -type f -perm 721 >> /home/scriptuser/badfiles.log
+find / -type f -perm 720 >> /home/scriptuser/badfiles.log
+find / -type f -perm 717 >> /home/scriptuser/badfiles.log
+find / -type f -perm 716 >> /home/scriptuser/badfiles.log
+find / -type f -perm 715 >> /home/scriptuser/badfiles.log
+find / -type f -perm 714 >> /home/scriptuser/badfiles.log
+find / -type f -perm 713 >> /home/scriptuser/badfiles.log
+find / -type f -perm 712 >> /home/scriptuser/badfiles.log
+find / -type f -perm 711 >> /home/scriptuser/badfiles.log
+find / -type f -perm 710 >> /home/scriptuser/badfiles.log
+find / -type f -perm 707 >> /home/scriptuser/badfiles.log
+find / -type f -perm 706 >> /home/scriptuser/badfiles.log
+find / -type f -perm 705 >> /home/scriptuser/badfiles.log
+find / -type f -perm 704 >> /home/scriptuser/badfiles.log
+find / -type f -perm 703 >> /home/scriptuser/badfiles.log
+find / -type f -perm 702 >> /home/scriptuser/badfiles.log
+find / -type f -perm 701 >> /home/scriptuser/badfiles.log
+find / -type f -perm 700 >> /home/scriptuser/badfiles.log
 echo "All files with perms 700-777 have been logged."
 
 clear
-for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/${i} ] && chmod -R 750 /home/${i}; done
+apt install mawk
+for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/${i} ] && chmod -R 750 /home/${i}/; done
 echo "Home directory permissions set."
 
 clear
-find / -iname "*.php" -type f >> /home/newt/Desktop/badfiles.log
+for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/${i} ] && chown -R ${i}:${i} /home/${i}/; done
+echo "Home directory owner set."
+
+clear
+find / -iname "*.php" -type f >> /home/scriptuser/badfiles.log
 echo "All PHP files have been listed above. ('/var/cache/dictionaries-common/sqspell.php' is a system PHP file)"
 
 clear
-find / -perm -4000 >> /home/newt/Desktop/badfiles.log
-find / -perm -2000 >> /home/newt/Desktop/badfiles.log
+find / -perm -4000 >> /home/scriptuser/badfiles.log
+find / -perm -2000 >> /home/scriptuser/badfiles.log
+echo "All files with perms 4000 and 2000 have been logged."
+
+clear
+find / -nogroup -nouser >> /home/scriptuser/badfiles.log
+echo "All files with no owner have been logged."
 
 clear
 apt-get purge netcat -y -qq
@@ -924,12 +937,18 @@ echo "SNMP has been removed."
 
 clear
 apt-get install lynis -y -qq
-( lynis -c -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
+( lynis audit system -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
 disown; sleep 2;
 echo "Running Lynis."
 
 clear
-cp /etc/login.defs /home/newt/Desktop/backups/
+apt-get install chkrootkit -y -qq
+( chkrootkit -q >> ChkrootkitOutput.txt; echo "Finished ChkRootKit" ) &
+disown; sleep 2;
+echo "Running ChkRootKit."
+
+clear
+cp /etc/login.defs /home/scriptuser/backups/
 sed -i '160s/.*/PASS_MAX_DAYS\o01130/' /etc/login.defs
 sed -i '161s/.*/PASS_MIN_DAYS\o0113/' /etc/login.defs
 sed -i '163s/.*/PASS_WARN_AGE\o0117/' /etc/login.defs
@@ -937,8 +956,8 @@ echo "Password policies have been set with /etc/login.defs."
 
 clear
 apt-get install libpam-cracklib -y -qq
-cp /etc/pam.d/common-auth /home/newt/Desktop/backups/
-cp /etc/pam.d/common-password /home/newt/Desktop/backups/
+cp /etc/pam.d/common-auth /home/scriptuser/backups/
+cp /etc/pam.d/common-password /home/scriptuser/backups/
 echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so nullok\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
 echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=8 difok=3 reject_username minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
 echo "If password policies are not correctly configured, try this for /etc/pam.d/common-password:\npassword requisite pam_cracklib.so retry=3 minlen=8 difok=3 reject_us11ername minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root"
@@ -952,7 +971,7 @@ iptables -A INPUT -p all -s localhost  -i eth0 -j DROP
 echo "All outside packets from internet claiming to be from loopback are denied."
 
 clear
-cp /etc/init/control-alt-delete.conf /home/newt/Desktop/backups/
+cp /etc/init/control-alt-delete.conf /home/scriptuser/backups/
 sed '/^exec/ c\exec false' /etc/init/control-alt-delete.conf
 echo "Reboot using Ctrl-Alt-Delete has been disabled."
 
@@ -961,7 +980,7 @@ apt-get install apparmor apparmor-profiles clamav -y -qq
 echo "AppArmor and ClamAV has been installed."
 
 clear
-crontab -l > /home/newt/Desktop/backups/crontab-old
+crontab -l > /home/scriptuser/backups/crontab-old
 crontab -r
 echo "Crontab has been backed up. All startup tasks have been removed from crontab."
 
@@ -977,7 +996,7 @@ echo "Only root allowed in cron."
 
 clear
 chmod 777 /etc/apt/apt.conf.d/10periodic
-cp /etc/apt/apt.conf.d/10periodic /home/newt/Desktop/backups/
+cp /etc/apt/apt.conf.d/10periodic /home/scriptuser/backups/
 echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Download-Upgradeable-Packages \"1\";\nAPT::Periodic::AutocleanInterval \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";" > /etc/apt/apt.conf.d/10periodic
 chmod 644 /etc/apt/apt.conf.d/10periodic
 echo "Daily update checks, download upgradeable packages, autoclean interval, and unattended upgrade enabled."
