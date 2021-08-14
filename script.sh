@@ -1034,4 +1034,9 @@ else
 fi
 
 clear
-echo "Script is complete."
+apt-get install ecryptfs-utils cryptsetup -y -qq
+
+clear
+echo "Script is complete. Logging user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
+read -rsp $'Press any key to continue...\n' -n1 key
+gnome-session-quit
