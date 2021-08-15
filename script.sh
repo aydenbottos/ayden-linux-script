@@ -368,6 +368,16 @@ net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends #####
 sysctl -p >> /dev/null
 echo "Sysctl has been configured."
 
+clear
+echo "Disable IPv6?"
+read ipv6YN
+if [ $ipv6YN == yes ]
+then
+	echo -e "\n\n# Disable IPv6\nnet.ipv6.conf.all.disable_ipv6 = 1\nnet.ipv6.conf.default.disable_ipv6 = 1\nnet.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
+	sysctl -p >> /dev/null
+	echo "IPv6 has been disabled."
+fi
+
 chown root:root /etc/securetty
 chmod 0600 /etc/securetty
 chmod 644 /etc/crontab
@@ -824,6 +834,7 @@ echo "All files with no owner have been logged."
 clear
 apt-get purge netcat -y -qq
 apt-get purge netcat-openbsd -y -qq
+apt-get purge minetest -y -qq
 apt-get purge netcat-traditional -y -qq
 apt-get purge gcc g++ -y -qq
 apt-get purge ncat -y -qq
