@@ -48,7 +48,7 @@ if grep -q /etc/*-release "Debian"
 then
 	echo -e "deb https://deb.debian.org/debian/ jessie main contrib\ndeb https://deb.debian.org/debian/ jessie-updates main contrib\ndeb https://deb.debian.org/debian-security jessie/updates main" > /etc/apt/sources.list	
 else
-	echo -e "deb https://mirror.aarnet.edu.au/ubuntu/ xenial main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ xenial-security main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ xenial-updates main universe" > /etc/apt/sources.list
+	echo -e "deb https://mirror.aarnet.edu.au/ubuntu/ bionic main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ bionic-security main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ bionic-updates main universe" > /etc/apt/sources.list
 fi
 chmod 644 /etc/apt/sources.list
 echo "Sources reset to default."
