@@ -343,12 +343,21 @@ apt purge *tftpd* -y -qq
 echo "TFTP has been removed."
 
 clear
-chmod 777 /etc/lightdm/lightdm.conf
-cp /etc/lightdm/lightdm.conf /home/scriptuser/backups/
-echo > /etc/lightdm/lightdm.conf
-echo -e '[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\ngreeter-show-manual-login=true' >> /etc/lightdm/lightdm.conf
-chmod 644 /etc/lightdm/lightdm.conf
-echo "LightDM has been secured."
+echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm/custom.conf
+gnome-terminal -- /bin/sh -c 'echo "# Type the following to get the value of the DISPLAY variable, we will need in in a couple of steps.
+echo \$DISPLAY;
+# It will print out :0 or :1 or similar
+# Give temporary access to user gdm to access control list and to applications that need a monitor:
+sudo xhost +SI:localuser:gdm;
+# Output will be something like the following:
+# localuser:gdm being added to access control list
+# Switch to the user (su) gdm using bash shell
+su gdm -l -s /bin/bash;
+# Set the DISPLAY variable to the value you got before (could be :0 or :1 or similar):
+export DISPLAY=:0;
+# Disable the user list by setting the disable-user-list flag to true:
+gsettings set org.gnome.login-screen disable-user-list true;"; exec bash'
+echo "User list has been hidden and autologin has been disabled."
 
 clear
 find /bin/ -name "*.sh" -type f -delete
