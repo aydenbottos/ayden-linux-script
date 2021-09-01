@@ -452,7 +452,7 @@ then
 	ufw deny saft 
 	ufw deny ftps-data 
 	ufw deny ftps
-	apt-get purge vsftpd proftpd *ftpd -y -qq
+	apt-get purge vsftpd proftpd *ftpd* -y -qq
 	echo "vsFTPd has been removed. ftp, sftp, saft, ftps-data, and ftps ports have been denied on the firewall."
 elif [ $ftpYN == yes ]
 then
