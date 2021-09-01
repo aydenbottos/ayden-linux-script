@@ -66,14 +66,14 @@ if test -f "users.txt"
 then
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do	
-        	if grep -qi users.txt "$line"; then
+        	if grep -qi "$line" users.txt; then
 			echo -e "$pw\n$pw" | passwd "$line"
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
 			usermod -U $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
 		else
-			deluser -r $line
+			deluser --remove-home $line
 			echo "Deleted unauthorised user $line."
 		fi
 	done
