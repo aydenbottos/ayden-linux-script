@@ -16,7 +16,7 @@ pw=CyberTaipan123!
 echo "Universal password set."
 
 echo "Opening forensics questions."
-gnome-terminal
+sudo gnome-terminal
 gedit "Forensics Question 1.txt"
 gedit "Forensics Question 2.txt"
 gedit "Forensics Question 3.txt"
@@ -344,7 +344,7 @@ echo "TFTP has been removed."
 
 clear
 echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm/custom.conf
-gnome-terminal -- /bin/sh -c 'echo "# Type the following to get the value of the DISPLAY variable, we will need in in a couple of steps.
+sudo gnome-terminal -- /bin/sh -c 'echo "# Type the following to get the value of the DISPLAY variable, we will need in in a couple of steps.
 echo \$DISPLAY;
 # It will print out :0 or :1 or similar
 # Give temporary access to user gdm to access control list and to applications that need a monitor:
