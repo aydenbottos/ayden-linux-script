@@ -44,7 +44,7 @@ apt-get install apt-transport-https dirmngr -y -qq
 chmod 777 /etc/apt/sources.list
 cp /etc/apt/sources.list /home/scriptuser/backups/
 
-if grep -q /etc/*-release "Debian"
+if grep -qi "Debian" /etc/*-release
 then
 	echo -e "deb https://deb.debian.org/debian/ jessie main contrib\ndeb https://deb.debian.org/debian/ jessie-updates main contrib\ndeb https://deb.debian.org/debian-security jessie/updates main" > /etc/apt/sources.list	
 else
@@ -89,7 +89,7 @@ then
 		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
 	done
 	
-	readmeusers2="$(grep -qi users.txt "Admin" | cut -d ' ' -f1)"
+	readmeusers2="$(grep -qi "Admin" users.txt | cut -d ' ' -f1)"
 	
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
