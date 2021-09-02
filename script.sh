@@ -841,9 +841,15 @@ find / -nogroup -nouser >> /home/scriptuser/badfiles.log
 echo "All files with no owner have been logged."
 
 clear
+apt install tree
+tree >> /home/scriptuser/directorytree.txt
+echo "Directory tree saved to file."
+
+clear
 apt-get purge netcat -y -qq
 apt-get purge netcat-openbsd -y -qq
 apt-get purge minetest -y -qq
+apt-get purge wesnoth -y -qq
 apt-get purge netcat-traditional -y -qq
 apt-get purge gcc g++ -y -qq
 apt-get purge ncat -y -qq
