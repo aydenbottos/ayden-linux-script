@@ -82,7 +82,7 @@ then
 	
 	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 	do
-		useradd $readmeusersfor
+		useradd -m $readmeusersfor
 		echo Created missing user from ReadMe.
 		passwd -x30 -n3 -w7 $readmeusersfor
 		usermod -U $readmeusersfor
