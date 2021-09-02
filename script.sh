@@ -16,7 +16,7 @@ pw=CyberTaipan123!
 echo "Universal password set."
 
 echo "Opening forensics questions."
-sudo gnome-terminal
+gnome-terminal
 gedit "Forensics Question 1.txt"
 gedit "Forensics Question 2.txt"
 gedit "Forensics Question 3.txt"
@@ -89,7 +89,7 @@ then
 		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
 	done
 	
-	readmeusers2="$(grep -qi "Admin" users.txt | cut -d ' ' -f1)"
+	readmeusers2="$(grep -i "Admin" users.txt | cut -d ' ' -f1)"
 	
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
@@ -344,7 +344,7 @@ echo "TFTP has been removed."
 
 clear
 echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm/custom.conf
-sudo gnome-terminal -- /bin/sh -c 'echo "# Type the following to get the value of the DISPLAY variable, we will need in in a couple of steps.
+gnome-terminal -- /bin/sh -c 'echo "# Type the following to get the value of the DISPLAY variable, we will need in in a couple of steps.
 echo \$DISPLAY;
 # It will print out :0 or :1 or similar
 # Give temporary access to user gdm to access control list and to applications that need a monitor:
