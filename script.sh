@@ -78,7 +78,7 @@ then
 		fi
 	done
 	
-	readmeusers="$(cat users.txt)"
+	readmeusers="$(cat users.txt | cut -d ' ' -f1)"
 	
 	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 	do
