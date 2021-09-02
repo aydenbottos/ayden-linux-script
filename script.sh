@@ -44,7 +44,7 @@ apt-get install apt-transport-https dirmngr -y -qq
 chmod 777 /etc/apt/sources.list
 cp /etc/apt/sources.list /home/scriptuser/backups/
 
-if grep -qi "Debian" /etc/*-release
+if (uname -a | grep -qi "Debian")
 then
 	echo -e "deb https://deb.debian.org/debian/ jessie main contrib\ndeb https://deb.debian.org/debian/ jessie-updates main contrib\ndeb https://deb.debian.org/debian-security jessie/updates main" > /etc/apt/sources.list	
 else
