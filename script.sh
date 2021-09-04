@@ -1010,9 +1010,8 @@ apt-get install apparmor apparmor-profiles clamav -y -qq
 echo "AppArmor and ClamAV has been installed."
 
 clear
-crontab -l > /home/scriptuser/backups/crontab-old
-crontab -r
-echo "Crontab has been backed up. All startup tasks have been removed from crontab."
+for user in $(cut -f1 -d: /etc/passwd); do echo $user; crontab -u $user -l; done >> CronTabs.txt
+echo "All crontabs have been listed."
 
 clear
 cd /etc/
