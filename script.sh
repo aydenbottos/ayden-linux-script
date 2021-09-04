@@ -17,8 +17,9 @@ echo "Universal password set."
 
 echo "Opening forensics questions."
 sudo gnome-terminal
-gedit "forensics1.txt"
-gedit "forensics2.txt"
+gedit "Forensics Question 1.txt"
+gedit "Forensics Question 2.txt"
+gedit "Forensics Question 3.txt"
 test -f "Forensics Question 4.txt" && gedit "Forensics Question 4.txt"
 test -f "Forensics Question 5.txt" && gedit "Forensics Question 5.txt"
 test -f "Forensics Question 6.txt" && gedit "Forensics Question 6.txt"
