@@ -343,7 +343,7 @@ apt purge *tftpd* -y -qq
 echo "TFTP has been removed."
 
 clear
-echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm/custom.conf
+echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm3/custom.conf
 sudo gnome-terminal -- /bin/sh -c 'echo "# Type the following to get the value of the DISPLAY variable, we will need in in a couple of steps.
 echo \$DISPLAY;
 # It will print out :0 or :1 or similar
