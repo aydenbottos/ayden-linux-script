@@ -1006,7 +1006,11 @@ sed '/^exec/ c\exec false' /etc/init/control-alt-delete.conf
 echo "Reboot using Ctrl-Alt-Delete has been disabled."
 
 clear
-apt-get install apparmor apparmor-profiles clamav -y -qq
+apt-get install apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* -y -qq
+systemctl start clamav-freshclam && systemctl enable clamav-freshclam
+systemctl start clamav-daemon && systemctl enable clamav-daemon
+aa-enforce /etc/apparmor.d/*
+systemctl reload apparmor
 echo "AppArmor and ClamAV has been installed."
 
 clear
@@ -1063,10 +1067,6 @@ echo "OpenSSL heart bleed bug has been fixed."
 clear
 export $(cat /etc/environment)
 echo "PATH reset to normal."
-
-clear
-apt-get install selinux-policy-default -y -qq
-echo "SELinux has been installed."
 
 clear
 apt-get install auditd -y -qq
