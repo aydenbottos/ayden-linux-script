@@ -41,15 +41,11 @@ apt-get update
 echo "Installing apt-transport-https for apt https"
 apt-get install apt-transport-https dirmngr -y -qq
 
-chmod 777 /etc/apt/sources.list
-cp /etc/apt/sources.list /home/scriptuser/backups/
+clear
+echo "Check to verify that all update settings are correct."
+update-manager
 
-if (uname -a | grep -qi "Debian")
-then
-	echo -e "deb https://deb.debian.org/debian/ jessie main contrib\ndeb https://deb.debian.org/debian/ jessie-updates main contrib\ndeb https://deb.debian.org/debian-security jessie/updates main" > /etc/apt/sources.list	
-else
-	echo -e "deb https://mirror.aarnet.edu.au/ubuntu/ bionic main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ bionic-security main universe\ndeb https://mirror.aarnet.edu.au/ubuntu/ bionic-updates main universe" > /etc/apt/sources.list
-fi
+clear
 chmod 644 /etc/apt/sources.list
 echo "Sources reset to default."
 
@@ -1029,13 +1025,6 @@ cd ..
 echo "Only root allowed in cron."
 
 clear
-chmod 777 /etc/apt/apt.conf.d/10periodic
-cp /etc/apt/apt.conf.d/10periodic /home/scriptuser/backups/
-echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Download-Upgradeable-Packages \"1\";\nAPT::Periodic::AutocleanInterval \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";" > /etc/apt/apt.conf.d/10periodic
-chmod 644 /etc/apt/apt.conf.d/10periodic
-echo "Daily update checks, download upgradeable packages, autoclean interval, and unattended upgrade enabled."
-
-clear
 apt-get update -qq
 apt-get upgrade -qq
 echo "Ubuntu OS has checked for updates and has been upgraded."
@@ -1054,16 +1043,6 @@ apt-get autoremove -y -qq
 apt-get autoclean -y -qq
 apt-get clean -y -qq
 echo "All unused packages have been removed."
-
-clear
-echo "Check to verify that all update settings are correct."
-update-manager
-
-clear
-apt-get update
-apt-get upgrade openssl libssl-dev
-apt-cache policy openssl libssl-dev
-echo "OpenSSL heart bleed bug has been fixed."
 
 clear
 export $(cat /etc/environment)
