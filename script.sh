@@ -850,6 +850,7 @@ apt-get purge netcat -y -qq
 apt-get purge netcat-openbsd -y -qq
 apt-get purge minetest -y -qq
 apt-get purge wesnoth -y -qq
+apt-get purge manaplus gameconqueror -y -qq
 apt-get purge netcat-traditional -y -qq
 apt-get purge gcc g++ -y -qq
 apt-get purge ncat -y -qq
