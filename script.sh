@@ -357,6 +357,14 @@ gsettings set org.gnome.login-screen disable-user-list true;"; exec bash'
 echo "User list has been hidden and autologin has been disabled."
 
 clear
+chmod 777 /etc/lightdm/lightdm.conf
+cp /etc/lightdm/lightdm.conf /home/newt/Desktop/backups/
+echo > /etc/lightdm/lightdm.conf
+echo -e '[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\ngreeter-show-manual-login=true' >> /etc/lightdm/lightdm.conf
+chmod 644 /etc/lightdm/lightdm.conf
+echo "LightDM has been secured."
+
+clear
 find /bin/ -name "*.sh" -type f -delete
 echo "badfiles in bin have been removed."
 
