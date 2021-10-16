@@ -766,70 +766,7 @@ else
 fi
 echo "Media files are complete."
 
-find / -type f -perm 777 >> /home/scriptuser/badfiles.log
-find / -type f -perm 776 >> /home/scriptuser/badfiles.log
-find / -type f -perm 775 >> /home/scriptuser/badfiles.log
-find / -type f -perm 774 >> /home/scriptuser/badfiles.log
-find / -type f -perm 773 >> /home/scriptuser/badfiles.log
-find / -type f -perm 772 >> /home/scriptuser/badfiles.log
-find / -type f -perm 771 >> /home/scriptuser/badfiles.log
-find / -type f -perm 770 >> /home/scriptuser/badfiles.log
-find / -type f -perm 767 >> /home/scriptuser/badfiles.log
-find / -type f -perm 766 >> /home/scriptuser/badfiles.log
-find / -type f -perm 765 >> /home/scriptuser/badfiles.log
-find / -type f -perm 764 >> /home/scriptuser/badfiles.log
-find / -type f -perm 763 >> /home/scriptuser/badfiles.log
-find / -type f -perm 762 >> /home/scriptuser/badfiles.log
-find / -type f -perm 761 >> /home/scriptuser/badfiles.log
-find / -type f -perm 760 >> /home/scriptuser/badfiles.log
-find / -type f -perm 757 >> /home/scriptuser/badfiles.log
-find / -type f -perm 756 >> /home/scriptuser/badfiles.log
-find / -type f -perm 755 >> /home/scriptuser/badfiles.log
-find / -type f -perm 754 >> /home/scriptuser/badfiles.log
-find / -type f -perm 753 >> /home/scriptuser/badfiles.log
-find / -type f -perm 752 >> /home/scriptuser/badfiles.log
-find / -type f -perm 751 >> /home/scriptuser/badfiles.log
-find / -type f -perm 750 >> /home/scriptuser/badfiles.log
-find / -type f -perm 747 >> /home/scriptuser/badfiles.log
-find / -type f -perm 746 >> /home/scriptuser/badfiles.log
-find / -type f -perm 745 >> /home/scriptuser/badfiles.log
-find / -type f -perm 744 >> /home/scriptuser/badfiles.log
-find / -type f -perm 743 >> /home/scriptuser/badfiles.log
-find / -type f -perm 742 >> /home/scriptuser/badfiles.log
-find / -type f -perm 741 >> /home/scriptuser/badfiles.log
-find / -type f -perm 740 >> /home/scriptuser/badfiles.log
-find / -type f -perm 737 >> /home/scriptuser/badfiles.log
-find / -type f -perm 736 >> /home/scriptuser/badfiles.log
-find / -type f -perm 735 >> /home/scriptuser/badfiles.log
-find / -type f -perm 734 >> /home/scriptuser/badfiles.log
-find / -type f -perm 733 >> /home/scriptuser/badfiles.log
-find / -type f -perm 732 >> /home/scriptuser/badfiles.log
-find / -type f -perm 731 >> /home/scriptuser/badfiles.log
-find / -type f -perm 730 >> /home/scriptuser/badfiles.log
-find / -type f -perm 727 >> /home/scriptuser/badfiles.log
-find / -type f -perm 726 >> /home/scriptuser/badfiles.log
-find / -type f -perm 725 >> /home/scriptuser/badfiles.log
-find / -type f -perm 724 >> /home/scriptuser/badfiles.log
-find / -type f -perm 723 >> /home/scriptuser/badfiles.log
-find / -type f -perm 722 >> /home/scriptuser/badfiles.log
-find / -type f -perm 721 >> /home/scriptuser/badfiles.log
-find / -type f -perm 720 >> /home/scriptuser/badfiles.log
-find / -type f -perm 717 >> /home/scriptuser/badfiles.log
-find / -type f -perm 716 >> /home/scriptuser/badfiles.log
-find / -type f -perm 715 >> /home/scriptuser/badfiles.log
-find / -type f -perm 714 >> /home/scriptuser/badfiles.log
-find / -type f -perm 713 >> /home/scriptuser/badfiles.log
-find / -type f -perm 712 >> /home/scriptuser/badfiles.log
-find / -type f -perm 711 >> /home/scriptuser/badfiles.log
-find / -type f -perm 710 >> /home/scriptuser/badfiles.log
-find / -type f -perm 707 >> /home/scriptuser/badfiles.log
-find / -type f -perm 706 >> /home/scriptuser/badfiles.log
-find / -type f -perm 705 >> /home/scriptuser/badfiles.log
-find / -type f -perm 704 >> /home/scriptuser/badfiles.log
-find / -type f -perm 703 >> /home/scriptuser/badfiles.log
-find / -type f -perm 702 >> /home/scriptuser/badfiles.log
-find / -type f -perm 701 >> /home/scriptuser/badfiles.log
-find / -type f -perm 700 >> /home/scriptuser/badfiles.log
+find / -type f -perm /700 >> /home/scriptuser/badfiles.log
 echo "All files with perms 700-777 have been logged."
 
 clear
