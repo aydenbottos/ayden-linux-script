@@ -291,6 +291,8 @@ clear
 visudo
 echo "Sudoers file secured."
 
+echo ' ' > /etc/sudoers.d/README
+
 clear
 cp /etc/rc.local /home/scriptuser/backups/
 echo > /etc/rc.local
@@ -812,7 +814,7 @@ apt-get purge socket -y -qq
 apt-get purge sbd -y -qq
 apt-get purge transmission -y -qq
 apt-get purge transmission-daemon -y -qq
-apt-get purge deluge -y -qq
+apt-get purge deluge yersinia -y -qq
 rm /usr/bin/nc
 rm /usr/bin/local/nc
 clear
