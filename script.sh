@@ -6,7 +6,7 @@ echo "Linux script"
 echo "The password used is CyberTaipan123!"
 
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/send-to-slack.sh
-chmod +x send-to-slack.sh && ./send-to-slack.sh "scriptlog.txt" "https://hooks.slack.com/services/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" >> /dev/null &
+chmod +x send-to-slack.sh && ./send-to-slack.sh "scriptlog.txt" "https://hooks.slack.com/services/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" >> /dev/null &
 
 if [[ $EUID -ne 0 ]]
 then
