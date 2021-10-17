@@ -5,6 +5,7 @@ echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
 
+apt install curl
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/send-to-slack.sh
 chmod +x send-to-slack.sh && ./send-to-slack.sh "scriptlog.txt" "https://hooks.slack.com/services/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" >> /dev/null &
 
