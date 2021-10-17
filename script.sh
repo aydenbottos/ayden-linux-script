@@ -5,7 +5,8 @@ echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
 
-dir=$(pwd)
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/send-to-slack.sh
+./send-to-slack.sh "scriptlog.txt" "https://hooks.slack.com/services/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"
 
 if [[ $EUID -ne 0 ]]
 then
@@ -13,12 +14,6 @@ then
   exit
 fi
 echo "Script is being run as root."
-
-if [[ $dir != ~/Desktop ]]
-then
-  echo "Don't try to do it yourself. Please, please use the one-line command."
-  exit
-fi
 
 pw=CyberTaipan123!
 echo "Universal password set."
