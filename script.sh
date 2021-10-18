@@ -5,6 +5,9 @@ echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
 ps -A | grep unattended-upgrades | awk '{print $1}' | xargs -r kill -9 $1
+dpkg --configure -a
+apt -y purge unattended-upgrades
+apt -y update
 
 apt install curl
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/send-to-slack.sh
