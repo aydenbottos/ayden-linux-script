@@ -800,6 +800,26 @@ tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
 clear
+parse_dpkg_log() {
+  {
+    for FN in `ls -1 /var/log/dpkg.log*` ; do
+      CMD="cat"
+      [ ${FN##*.} == "gz" ] && CMD="zcat" 
+      $CMD $FN | egrep "[0-9] install" | awk '{print $4}' \
+        | awk -F":" '{print $1}'
+    done
+  } | sort | uniq
+}
+
+## all packages installed with apt-get/aptitude
+list_installed=$(parse_dpkg_log)
+## packages that were not marked as auto installed
+list_manual=$(apt-mark showmanual | sort)
+
+## output intersection of 2 lists
+comm -12 <(echo "$list_installed") <(echo "$list_manual")
+
+clear
 apt-get purge netcat -y
 apt-get purge netcat-openbsd -y
 apt-get purge minetest -y
