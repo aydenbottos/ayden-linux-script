@@ -50,7 +50,7 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing apt-transport-https for apt https"
-apt-get install apt-transport-https dirmngr -y -qq
+apt-get install apt-transport-https dirmngr -y 
 
 clear
 echo "Check to verify that all update settings are correct."
@@ -303,9 +303,10 @@ echo 'exit 0' >> /etc/rc.local
 echo "Any startup scripts have been removed."
 
 clear
-apt-get install ufw -y -qq
+apt-get install ufw -y
 ufw enable
 ufw default deny incoming
+ufw status verbose
 echo "Firewall enabled and all ports blocked."
 
 clear
@@ -316,9 +317,10 @@ fi
 echo "Shellshock Bash vulnerability has been fixed."
 
 clear
-apt-get install stubby -y -qq
+apt-get install stubby -y 
 systemctl start stubby
 systemctl enable stubby
+systemctl status stubby
 echo "DNS-over-TLS has been enabled"
 
 echo "netcat backdoors:" > backdoors.txt
@@ -349,7 +351,7 @@ chmod 644 /etc/hosts
 echo "HOSTS file has been set to defaults."
 
 clear
-apt purge *tftpd* -y -qq
+apt purge *tftpd* -y
 echo "TFTP has been removed."
 
 clear
@@ -393,6 +395,7 @@ echo > /etc/sysctl.conf
 echo -e "#Enable ASLR\nkernel.randomize_va_space = 2\n\n# Controls IP packet forwarding\nnet.ipv4.ip_forward = 0\n\n# IP Spoofing protection\nnet.ipv4.conf.all.rp_filter = 1\nnet.ipv4.conf.default.rp_filter = 1\n\n# Ignore ICMP broadcast requests\nnet.ipv4.icmp_echo_ignore_broadcasts = 1\n\n# Disable source packet routing\nnet.ipv4.conf.all.accept_source_route = 0\nnet.ipv6.conf.all.accept_source_route = 0\nnet.ipv4.conf.default.accept_source_route = 0\nnet.ipv6.conf.default.accept_source_route = 0\n\n# Ignore send redirects\nnet.ipv4.conf.all.send_redirects = 0\nnet.ipv4.conf.default.send_redirects = 0\n\n# Block SYN attacks\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_max_syn_backlog = 2048\nnet.ipv4.tcp_synack_retries = 2\nnet.ipv4.tcp_syn_retries = 5\n\n# Log Martians\nnet.ipv4.conf.all.log_martians = 1\nnet.ipv4.icmp_ignore_bogus_error_responses = 1\n\n# Ignore ICMP redirects\nnet.ipv4.conf.all.accept_redirects = 0\nnet.ipv6.conf.all.accept_redirects = 0\nnet.ipv4.conf.default.accept_redirects = 0\nnet.ipv6.conf.default.accept_redirects = 0\n\n# Ignore Directed pings\nnet.ipv4.icmp_echo_ignore_all = 1\n\n# Accept Redirects? No, this is not router\nnet.ipv4.conf.all.secure_redirects = 0\n\n# Log packets with impossible addresses to kernel log? yes\nnet.ipv4.conf.default.secure_redirects = 0\n\n########## IPv6 networking start ##############\n# Number of Router Solicitations to send until assuming no routers are present.\n# This is host and not router\nnet.ipv6.conf.default.router_solicitations = 0\n\n# Accept Router Preference in RA?\nnet.ipv6.conf.default.accept_ra_rtr_pref = 0\n\n# Learn Prefix Information in Router Advertisement\nnet.ipv6.conf.default.accept_ra_pinfo = 0\n\n# Setting controls whether the system will accept Hop Limit settings from a router advertisement\nnet.ipv6.conf.default.accept_ra_defrtr = 0\n\n#router advertisements can cause the system to assign a global unicast address to an interface\nnet.ipv6.conf.default.autoconf = 0\n\n#how many neighbor solicitations to send out per address?\nnet.ipv6.conf.default.dad_transmits = 0\n\n# How many global unicast IPv6 addresses can be assigned to each interface?
 net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends ##############\n\nkernel.sysrq=0" > /etc/sysctl.conf
 sysctl -p >> /dev/null
+cat /etc/sysctl.conf
 echo "Sysctl has been configured."
 
 clear
@@ -427,10 +430,10 @@ then
 	ufw deny netbios-dgm
 	ufw deny netbios-ssn
 	ufw deny microsoft-ds
-	apt-get purge samba -y -qq
-	apt-get purge samba-common -y  -qq
-	apt-get purge samba-common-bin -y -qq
-	apt-get purge samba4 -y -qq
+	apt-get purge samba -y
+	apt-get purge samba-common -y
+	apt-get purge samba-common-bin -y
+	apt-get purge samba4 -y
 	clear
 	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been denied. Samba has been removed."
 elif [ $sambaYN == yes ]
@@ -439,8 +442,10 @@ then
 	ufw allow netbios-dgm
 	ufw allow netbios-ssn
 	ufw allow microsoft-ds
-	apt-get install samba -y -qq
-	apt-get install system-config-samba -y -qq
+	apt-get install samba -y
+	apt-get install system-config-samba -y
+	systemctl start samba
+	systemctl status samba
 	cp /etc/samba/smb.conf /home/scriptuser/backups/
 	if [ "$(grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
 	then
@@ -470,7 +475,7 @@ then
 	ufw deny saft 
 	ufw deny ftps-data 
 	ufw deny ftps
-	apt-get purge vsftpd proftpd *ftpd* -y -qq
+	apt-get purge vsftpd proftpd *ftpd* -y
 	echo "vsFTPd has been removed. ftp, sftp, saft, ftps-data, and ftps ports have been denied on the firewall."
 elif [ $ftpYN == yes ]
 then
@@ -479,11 +484,12 @@ then
 	ufw allow saft 
 	ufw allow ftps-data 
 	ufw allow ftps
-	apt-get install vsftpd -y -qq
+	apt-get install vsftpd -y
 	cp /etc/vsftpd/vsftpd.conf /home/scriptuser/backups/
 	cp /etc/vsftpd.conf /home/scriptuser/backups/
 	gedit /etc/vsftpd/vsftpd.conf&gedit /etc/vsftpd.conf
 	systemctl restart vsftpd
+	systemctl status vsftpd
 	echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
 else
 	echo Response not recognized.
@@ -495,17 +501,18 @@ clear
 if [ $sshYN == no ]
 then
 	ufw deny ssh
-	apt-get purge openssh-server -y -qq
+	apt-get purge openssh-server -y
 	rm -R ~/.ssh
 	echo "SSH port has been denied on the firewall. Open-SSH has been removed."
 elif [ $sshYN == yes ]
 then
-	apt-get install openssh-server -y -qq
+	apt-get install openssh-server -y
 	ufw allow ssh
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
 	usersSSH=$readmeusers
 	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication yes\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nDenyUsers\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 0\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
 	systemctl restart sshd
+	systemctl status sshd
 	mkdir ~/.ssh
 	chmod 700 ~/.ssh
 	ssh-keygen -t rsa
@@ -521,17 +528,17 @@ then
 	ufw deny telnet 
 	ufw deny rtelnet 
 	ufw deny telnets
-	apt-get purge telnet -y -qq
-	apt-get purge telnetd -y -qq
-	apt-get purge inetutils-telnetd -y -qq
-	apt-get purge telnetd-ssl -y -qq
+	apt-get purge telnet -y
+	apt-get purge telnetd -y
+	apt-get purge inetutils-telnetd -y
+	apt-get purge telnetd-ssl -y
 	echo "Telnet port has been denied on the firewall and Telnet has been removed."
 elif [ $telnetYN == yes ]
 then
 	ufw allow telnet 
 	ufw allow rtelnet 
 	ufw allow telnets
-	apt-get install telnetd -y -qq
+	apt-get install telnetd -y
 	echo "Telnet port has been allowed on the firewall."
 else
 	echo Response not recognized.
@@ -541,7 +548,7 @@ echo "Telnet is complete."
 clear
 if [ $vpnYN == no ]
 then
-	apt-get purge openvpn -y -qq
+	apt-get purge openvpn wireguard -y
 fi
 clear
 if [ $mailYN == no ]
@@ -561,7 +568,7 @@ then
 	ufw allow imap2 
 	ufw allow imaps 
 	ufw allow pop3s
-	apt-get install postfix dovecot -y -qq
+	apt-get install postfix dovecot -y
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been allowed on the firewall."
 else
 	echo Response not recognized.
@@ -597,8 +604,8 @@ then
 	ufw deny ms-sql-m 
 	ufw deny mysql 
 	ufw deny mysql-proxy
-	apt-get purge mysql* -y -qq
-	apt-get purge mariadb* -y -qq
+	apt-get purge mysql* -y
+	apt-get purge mariadb* -y
 	apt-get purge postgresql*
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been denied on the firewall. MySQL has been removed."
 elif [ $dbYN == yes ]
@@ -607,7 +614,7 @@ then
 	ufw allow ms-sql-m 
 	ufw allow mysql 
 	ufw allow mysql-proxy
-	apt-get install mysql-server-* -y -qq
+	apt-get install mysql-server-* -y
 	cp /etc/my.cnf /home/scriptuser/backups/
 	cp /etc/mysql/my.cnf /home/scriptuser/backups/
 	cp /usr/etc/my.cnf /home/scriptuser/backups/
@@ -631,12 +638,12 @@ if [ $httpsYN == no ]
 then
 	ufw deny https
 	ufw deny https
-	apt-get purge apache2 nginx -y -qq
+	apt-get purge apache2 nginx -y
 	rm -r /var/www/*
 	echo "https and https ports have been denied on the firewall. Apache2 has been removed. Web server files have been removed."
 elif [ $httpsYN == yes ]
 then
-	apt-get install apache2 -y -qq
+	apt-get install apache2 -y
 	ufw allow https 
 	ufw allow https
 	cp /etc/apache2/apache2.conf /home/scriptuser/backups/
@@ -658,13 +665,15 @@ clear
 if [ $dnsYN == no ]
 then
 	ufw deny domain
-	apt-get purge bind9 -qq -y
+	apt-get purge bind9 -y
 	echo "domain port has been denied on the firewall. DNS name binding has been removed."
 elif [ $dnsYN == yes ]
 then
-	apt-get install bind9 -y -qq
+	apt-get install bind9 -y
 	ufw allow domain
 	echo "domain port has been allowed on the firewall and bind9 installed."
+	systemctl start bind9
+	systemctl status bind9
 else
 	echo Response not recognized.
 fi
@@ -802,147 +811,154 @@ tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
 clear
-apt-get purge netcat -y -qq
-apt-get purge netcat-openbsd -y -qq
-apt-get purge minetest -y -qq
-apt-get purge wesnoth -y -qq
-apt-get purge manaplus gameconqueror -y -qq
-apt-get purge netcat-traditional -y -qq
-apt-get purge gcc g++ -y -qq
-apt-get purge ncat -y -qq
-apt-get purge pnetcat -y -qq
-apt-get purge socat -y -qq
-apt-get purge sock -y -qq
-apt-get purge socket -y -qq
-apt-get purge sbd -y -qq
-apt-get purge transmission -y -qq
-apt-get purge transmission-daemon -y -qq
-apt-get purge deluge yersinia -y -qq
+apt-get purge netcat -y
+apt-get purge netcat-openbsd -y
+apt-get purge minetest -y
+apt-get purge wesnoth -y
+apt-get purge manaplus gameconqueror -y
+apt-get purge netcat-traditional -y
+apt-get purge gcc g++ -y
+apt-get purge ncat -y
+apt-get purge pnetcat -y
+apt-get purge socat -y
+apt-get purge sock -y
+apt-get purge socket -y
+apt-get purge sbd -y
+apt-get purge transmission -y
+apt-get purge transmission-daemon -y
+apt-get purge deluge yersinia -y
 rm /usr/bin/nc
 rm /usr/bin/local/nc
 clear
 echo "Netcat and all other instances have been removed."
 
-apt-get purge john -y -qq
-apt-get purge john-data -y -qq
+apt-get purge john -y
+apt-get purge john-data -y
 clear
 echo "John the Ripper has been removed."
 
-apt-get purge hydra -y -qq
-apt-get purge hydra-gtk -y -qq
+apt-get purge hydra -y
+apt-get purge hydra-gtk -y
 clear
 echo "Hydra has been removed."
 
-apt-get purge aircrack-ng -y -qq
+apt-get purge aircrack-ng -y
 clear
 echo "Aircrack-NG has been removed."
 
-apt-get purge fcrackzip -y -qq
+apt-get purge fcrackzip -y
 clear
 echo "FCrackZIP has been removed."
 
-apt-get purge lcrack -y -qq
+apt-get purge lcrack -y
 clear
 echo "LCrack has been removed."
 
-apt-get purge ophcrack -y -qq
-apt-get purge ophcrack-cli -y -qq
+apt-get purge ophcrack -y
+apt-get purge ophcrack-cli -y
 clear
 echo "OphCrack has been removed."
 
-apt-get purge pdfcrack -y -qq
+apt-get purge pdfcrack -y
 clear
 echo "PDFCrack has been removed."
 
-apt-get purge pyrit -y -qq
+apt-get purge pyrit -y
 clear
 echo "Pyrit has been removed."
 
-apt-get purge rarcrack -y -qq
+apt-get purge rarcrack -y
 clear
 echo "RARCrack has been removed."
 
-apt-get purge sipcrack -y -qq
+apt-get purge sipcrack -y
 clear
 echo "SipCrack has been removed."
 
-apt-get purge irpas -y -qq
+apt-get purge irpas -y
 clear
 echo "IRPAS has been removed."
 
-apt-get purge wireshark* tshark kismet zenmap nmap wireguard -y -qq
+apt-get purge wireshark* tshark kismet zenmap nmap wireguard -y
 clear
 echo "Wireshark, TShark, Kismet, and Zenmap have been removed."
 
-apt-get purge logkeys -y -qq
+apt-get purge logkeys -y
 clear 
 echo "LogKeys has been removed."
 
-apt-get purge zeitgeist-core -y -qq
-apt-get purge zeitgeist-datahub -y -qq
-apt-get purge python-zeitgeist -y -qq
-apt-get purge rhythmbox-plugin-zeitgeist -y -qq
-apt-get purge zeitgeist -y -qq
+apt-get purge zeitgeist-core -y
+apt-get purge zeitgeist-datahub -y
+apt-get purge python-zeitgeist -y
+apt-get purge rhythmbox-plugin-zeitgeist -y
+apt-get purge zeitgeist -y
 echo "Zeitgeist has been removed."
 
-apt-get purge nfs-kernel-server -y -qq
-apt-get purge nfs-common -y -qq
-apt-get purge portmap -y -qq
-apt-get purge rpcbind -y -qq
-apt-get purge autofs -y -qq
+apt-get purge nfs-kernel-server -y
+apt-get purge nfs-common -y
+apt-get purge portmap -y
+apt-get purge rpcbind -y
+apt-get purge autofs -y 
 echo "NFS has been removed."
 
-apt-get purge nginx -y -qq
-apt-get purge nginx-common -y -qq
+apt-get purge nginx -y 
+apt-get purge nginx-common -y 
 echo "NGINX has been removed."
 
-apt-get purge inetd -y -qq
-apt-get purge openbsd-inetd -y -qq
-apt-get purge xinetd -y -qq
-apt-get purge inetutils-ftp -y -qq
-apt-get purge inetutils-ftpd -y -qq
-apt-get purge inetutils-inetd -y -qq
-apt-get purge inetutils-ping -y -qq
-apt-get purge inetutils-syslogd -y -qq
-apt-get purge inetutils-talk -y -qq
-apt-get purge inetutils-talkd -y -qq
-apt-get purge inetutils-telnet -y -qq
-apt-get purge inetutils-telnetd -y -qq
-apt-get purge inetutils-tools -y -qq
-apt-get purge inetutils-traceroute -y -qq
+apt-get purge inetd -y 
+apt-get purge openbsd-inetd -y 
+apt-get purge xinetd -y 
+apt-get purge inetutils-ftp -y 
+apt-get purge inetutils-ftpd -y 
+apt-get purge inetutils-inetd -y 
+apt-get purge inetutils-ping -y 
+apt-get purge inetutils-syslogd -y 
+apt-get purge inetutils-talk -y 
+apt-get purge inetutils-talkd -y 
+apt-get purge inetutils-telnet -y 
+apt-get purge inetutils-telnetd -y 
+apt-get purge inetutils-tools -y 
+apt-get purge inetutils-traceroute -y 
 echo "Inetd (super-server) and all inet utilities have been removed."
 
 clear
-apt-get purge vnc4server -y -qq
-apt-get purge vncsnapshot -y -qq
-apt-get purge vtgrab -y -qq
+apt-get purge vnc4server -y 
+apt-get purge vncsnapshot -y 
+apt-get purge vtgrab -y 
 echo "VNC has been removed."
 
 clear
-apt-get purge snmp -y -qq
+apt-get purge snmp -y 
 echo "SNMP has been removed."
 
 clear
-apt-get install lynis -y -qq
+apt-get install lynis -y 
 ( lynis audit system -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
 disown; sleep 2;
 echo "Running Lynis."
 
 clear
-apt-get install chkrootkit -y -qq
+apt-get install chkrootkit -y 
 ( chkrootkit -q >> ChkrootkitOutput.txt; echo "Finished ChkRootKit" ) &
 disown; sleep 2;
 echo "Running ChkRootKit."
+
+clear
+apt-get install rkhunter -y 
+( rkhunter -c >> RkHunterOutput.txt; echo "Finished RkHunter" ) &
+disown; sleep 2;
+echo "Running RkHunter."
 
 clear
 cp /etc/login.defs /home/scriptuser/backups/
 sed -i '160s/.*/PASS_MAX_DAYS\o01130/' /etc/login.defs
 sed -i '161s/.*/PASS_MIN_DAYS\o0113/' /etc/login.defs
 sed -i '163s/.*/PASS_WARN_AGE\o0117/' /etc/login.defs
+cat /etc/login.defs
 echo "Password policies have been set with /etc/login.defs."
 
 clear
-apt-get install libpam-cracklib -y -qq
+apt-get install libpam-cracklib -y 
 cp /etc/pam.d/common-auth /home/scriptuser/backups/
 cp /etc/pam.d/common-password /home/scriptuser/backups/
 echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so nullok\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
@@ -953,7 +969,7 @@ getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
 echo "All users now need passwords to login"
 
 clear
-apt-get install iptables -y -qq
+apt-get install iptables -y 
 iptables -A INPUT -p all -s localhost  -i eth0 -j DROP
 echo "All outside packets from internet claiming to be from loopback are denied."
 
@@ -963,11 +979,12 @@ sed '/^exec/ c\exec false' /etc/init/control-alt-delete.conf
 echo "Reboot using Ctrl-Alt-Delete has been disabled."
 
 clear
-apt-get install apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* -y -qq
+apt-get install apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* -y 
 systemctl start clamav-freshclam && systemctl enable clamav-freshclam
 systemctl start clamav-daemon && systemctl enable clamav-daemon
 aa-enforce /etc/apparmor.d/*
 systemctl reload apparmor
+systemctl status apparmor
 echo "AppArmor and ClamAV has been installed."
 
 clear
@@ -981,16 +998,16 @@ echo root >cron.allow
 echo root >at.allow
 /bin/chown root:root cron.allow at.allow
 /bin/chmod 400 cron.allow at.allow
-cd ..
+cd ~/Desktop
 echo "Only root allowed in cron."
 
 clear
-apt-get update -qq
-apt-get upgrade -qq
+apt-get update 
+apt-get upgrade 
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 clear
-apt-get install firefox -y -qq
+apt-get install firefox -y 
 echo "Installed Firefox."
 
 clear
@@ -999,9 +1016,9 @@ echo "Popup blocker enabled in Firefox"
 
 
 clear
-apt-get autoremove -y -qq
-apt-get autoclean -y -qq
-apt-get clean -y -qq
+apt-get autoremove -y 
+apt-get autoclean -y 
+apt-get clean -y 
 echo "All unused packages have been removed."
 
 clear
@@ -1009,8 +1026,9 @@ export $(cat /etc/environment)
 echo "PATH reset to normal."
 
 clear
-apt-get install auditd -y -qq
+apt-get install auditd -y 
 auditctl -e 1
+auditctl -s
 
 clear
 if [[ $(grep root /etc/passwd | wc -l) -gt 1 ]]
@@ -1022,7 +1040,7 @@ else
 fi
 
 clear
-apt-get install ecryptfs-utils cryptsetup -y -qq
+apt-get install ecryptfs-utils cryptsetup -y 
 
 clear
 echo "Script is complete. Logging user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
