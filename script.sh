@@ -92,9 +92,9 @@ then
 		useradd -m $readmeusersfor
 		echo Created missing user from ReadMe.
 		passwd -x30 -n3 -w7 $readmeusersfor
-		usermod -U $readmeusersfor
 		echo -e "$pw\n$pw" | passwd "$readmeusersfor"
-		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days. ${users[${i}]}'s account has been locked."
+		usermod -U $readmeusersfor
+		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
 	done
 	
 	readmeusers2="$(grep -i "Admin" users.txt | cut -d ' ' -f1)"
