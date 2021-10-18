@@ -1012,7 +1012,7 @@ echo "Only root allowed in cron."
 
 clear
 apt-get update 
-apt-get upgrade 
+apt-get upgrade -y
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 clear
