@@ -362,7 +362,7 @@ echo "User list has been hidden and autologin has been disabled."
 
 clear
 chmod 777 /etc/lightdm/lightdm.conf
-cp /etc/lightdm/lightdm.conf /home/newt/Desktop/backups/
+cp /etc/lightdm/lightdm.conf /home/scriptuser/Desktop/backups/
 echo > /etc/lightdm/lightdm.conf
 echo -e '[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\ngreeter-show-manual-login=true' >> /etc/lightdm/lightdm.conf
 chmod 644 /etc/lightdm/lightdm.conf
