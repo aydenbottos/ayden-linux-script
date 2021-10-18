@@ -14,7 +14,7 @@ apt -y update
 
 apt install curl
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/send-to-slack.sh
-chmod +x send-to-slack.sh && ./send-to-slack.sh "scriptlog.txt" "https://hooks.slack.com/services/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" >> slackcurl.txt &
+chmod +x send-to-slack.sh && ./send-to-slack.sh "scriptlog.txt" "https://hooks.slack.com/services/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" >> slackcurl.txt &
 
 if [[ $EUID -ne 0 ]]
 then
