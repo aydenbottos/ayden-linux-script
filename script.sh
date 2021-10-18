@@ -4,17 +4,6 @@ echo "Created by Ayden Bottos"
 echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
-ps ax | grep unattended-upgrade | awk '{print $1}' | xargs -r kill -9 $1
-ps ax | grep unattended-upgrade | awk '{print $1}' | xargs -r kill -9 $1
-ps ax | grep unattended-upgrade | awk '{print $1}' | xargs -r kill -9 $1
-ps ax | grep unattended-upgrade | awk '{print $1}' | xargs -r kill -9 $1
-dpkg --configure -a
-apt -y purge unattended-upgrades
-apt -y update
-
-apt install curl
-wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/send-to-slack.sh
-chmod +x send-to-slack.sh && ./send-to-slack.sh "scriptlog.txt" $(echo aHR0cHM6Ly9ob29rcy5zbGFjay5jb20vc2VydmljZXMvVEg3U0pLNUg5L0IwMko0SjZGRFJTLzlCMUZiS2dZOFJ2aTdDTmdURkdHVXhPZg== | base64 -d) >> slackcurl.txt &
 
 if [[ $EUID -ne 0 ]]
 then
@@ -1043,6 +1032,6 @@ clear
 apt-get install ecryptfs-utils cryptsetup -y 
 
 clear
-echo "Script is complete. Logging user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
-read -rsp $'Press any key to continue...\n' -n1 key
-sudo -E -u $(stat -c "%U" .) gnome-session-quit
+echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
+url=$(cat scriptlog.txt | curl -F 'sprunge=<-' http://sprunge.us)
+wget -O/dev/null --header 'Content-type: application/json' --post-data '{"text":"<'$url'|Linux script results>"}' https://hooks.slack.com/services/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 > /dev/null 2>&1
