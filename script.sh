@@ -4,6 +4,7 @@ echo "Created by Ayden Bottos"
 echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
+killall python3
 
 apt install curl
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/send-to-slack.sh
