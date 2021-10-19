@@ -859,6 +859,11 @@ list_manual=$(apt-mark showmanual | sort)
 comm -12 <(echo "$list_installed") <(echo "$list_manual")
 echo "All manually installed packages have been listed"
 
+apt install fail2ban
+systemctl enable fail2ban
+systemctl start fail2ban
+echo "Fail2Ban enabled."
+
 clear
 lsof -Pnl +M -i > /home/scriptuser/runningProcesses.log
 ## Removing the default running processes
