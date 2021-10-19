@@ -281,10 +281,38 @@ echo "Check for any files for users that should not be administrators in /etc/su
 ls -a /etc/sudoers.d >> /home/scriptuser/badfiles.log
 
 clear
-visudo
+for f in /etc/sudoers /etc/sudoers.d/* ; do
+	if [ ! -e "$f" ] ; then
+    		continue
+  	fi
+  	matching_list=$(grep -P '^(?!#).*[\s]+\!authenticate.*$' $f | uniq )
+  	if ! test -z "$matching_list"; then
+    		while IFS= read -r entry; do
+      			# comment out "!authenticate" matches to preserve user data
+      			sed -i "s/^${entry}$/# &/g" $f
+    		done <<< "$matching_list"
+
+    		/usr/sbin/visudo -cf $f &> /dev/null || echo "Fail to validate $f with visudo"
+  	fi
+done
+
+for f in /etc/sudoers /etc/sudoers.d/* ; do
+	if [ ! -e "$f" ] ; then
+    		continue
+  	fi
+  	matching_list=$(grep -P '^(?!#).*[\s]+NOPASSWD[\s]*\:.*$' $f | uniq )
+  	if ! test -z "$matching_list"; then
+    		while IFS= read -r entry; do
+      			# comment out "NOPASSWD" matches to preserve user data
+      			sed -i "s/^${entry}$/# &/g" $f
+    		done <<< "$matching_list"
+
+    		/usr/sbin/visudo -cf $f &> /dev/null || echo "Fail to validate $f with visudo"
+  	fi
+done
 echo "Sudoers file secured."
 
-echo 'Defaults use_pty\nDefaults logfile=/var/log/sudo.log' > /etc/sudoers.d/README
+echo 'Defaults use_pty\nDefaults logfile=/var/log/sudo.log' > /etc/sudoers.d/custom
 echo "PTY and logfile set up for sudo."
 
 clear
@@ -388,9 +416,7 @@ clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
 echo > /etc/sysctl.conf
 echo -e "#Enable ASLR\nkernel.randomize_va_space = 2\n\n# Controls IP packet forwarding\nnet.ipv4.ip_forward = 0\n\n# IP Spoofing protection\nnet.ipv4.conf.all.rp_filter = 1\nnet.ipv4.conf.default.rp_filter = 1\n\n# Ignore ICMP broadcast requests\nnet.ipv4.icmp_echo_ignore_broadcasts = 1\n\n# Disable source packet routing\nnet.ipv4.conf.all.accept_source_route = 0\nnet.ipv6.conf.all.accept_source_route = 0\nnet.ipv4.conf.default.accept_source_route = 0\nnet.ipv6.conf.default.accept_source_route = 0\n\n# Ignore send redirects\nnet.ipv4.conf.all.send_redirects = 0\nnet.ipv4.conf.default.send_redirects = 0\n\n# Block SYN attacks\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_max_syn_backlog = 2048\nnet.ipv4.tcp_synack_retries = 2\nnet.ipv4.tcp_syn_retries = 5\n\n# Log Martians\nnet.ipv4.conf.all.log_martians = 1\nnet.ipv4.icmp_ignore_bogus_error_responses = 1\n\n# Ignore ICMP redirects\nnet.ipv4.conf.all.accept_redirects = 0\nnet.ipv6.conf.all.accept_redirects = 0\nnet.ipv4.conf.default.accept_redirects = 0\nnet.ipv6.conf.default.accept_redirects = 0\n\n# Ignore Directed pings\nnet.ipv4.icmp_echo_ignore_all = 1\n\n# Accept Redirects? No, this is not router\nnet.ipv4.conf.all.secure_redirects = 0\n\n# Log packets with impossible addresses to kernel log? yes\nnet.ipv4.conf.default.secure_redirects = 0\n\n########## IPv6 networking start ##############\n# Number of Router Solicitations to send until assuming no routers are present.\n# This is host and not router\nnet.ipv6.conf.default.router_solicitations = 0\n\n# Accept Router Preference in RA?\nnet.ipv6.conf.default.accept_ra_rtr_pref = 0\n\n# Learn Prefix Information in Router Advertisement\nnet.ipv6.conf.default.accept_ra_pinfo = 0\n\n# Setting controls whether the system will accept Hop Limit settings from a router advertisement\nnet.ipv6.conf.default.accept_ra_defrtr = 0\n\n#router advertisements can cause the system to assign a global unicast address to an interface\nnet.ipv6.conf.default.autoconf = 0\n\n#how many neighbor solicitations to send out per address?\nnet.ipv6.conf.default.dad_transmits = 0\n\n# How many global unicast IPv6 addresses can be assigned to each interface?
-net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends ##############\n\nkernel.sysrq=0" > /etc/sysctl.conf
-sysctl -w net.ipv4.conf.all.accept_source_route=0
-sysctl -w net.ipv4.conf.default.accept_source_route=0
+net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends ##############\n\nkernel.sysrq=0\nkernel.exec-shield=2" > /etc/sysctl.conf
 sysctl -p >> /dev/null
 cat /etc/sysctl.conf
 echo "Sysctl has been configured."
