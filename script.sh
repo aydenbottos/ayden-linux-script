@@ -953,6 +953,11 @@ echo "All systemctl services listed."
 clear
 ls /etc/init/ >> /home/scriptuser/initFiles.log
 ls /etc/init.d/ >> /home/scriptuser/initFiles.log
+echo "Listed all files in the init directory."
+
+clear
+echo '' > /etc/securetty
+echo "Removed any TTYs listed in /etc/securetty."
 
 clear
 apt-get purge netcat -y
@@ -1103,6 +1108,7 @@ echo "Password policies have been set with /etc/login.defs."
 
 echo "umask 027" >> /etc/bash.bashrc
 echo "umask 027" >> /etc/profile
+echo "Set a very strict umask."
 
 clear
 apt-get install libpam-cracklib -y 
@@ -1180,6 +1186,7 @@ auditctl -e 1
 auditctl -s
 systemctl --now enable auditd
 systemctl start auditd
+echo "Auditd and audit rules have been set and enabled."
 
 
 clear
