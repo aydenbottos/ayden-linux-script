@@ -4,6 +4,7 @@ echo "Created by Ayden Bottos"
 echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
+echo "Running at $(date)"
 
 if [[ $EUID -ne 0 ]]
 then
@@ -283,7 +284,8 @@ clear
 visudo
 echo "Sudoers file secured."
 
-echo ' ' > /etc/sudoers.d/README
+echo 'Defaults use_pty\nDefaults logfile=/var/log/sudo.log' > /etc/sudoers.d/README
+echo "PTY and logfile set up for sudo."
 
 clear
 cp /etc/rc.local /home/scriptuser/backups/
@@ -379,10 +381,16 @@ echo -e "#Configuration for the irqbalance daemon\n\n#Should irqbalance be enabl
 echo "IRQ Balance has been disabled."
 
 clear
+apt install tcpd
+echo "TCP Wrappers have been installed."
+
+clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
 echo > /etc/sysctl.conf
 echo -e "#Enable ASLR\nkernel.randomize_va_space = 2\n\n# Controls IP packet forwarding\nnet.ipv4.ip_forward = 0\n\n# IP Spoofing protection\nnet.ipv4.conf.all.rp_filter = 1\nnet.ipv4.conf.default.rp_filter = 1\n\n# Ignore ICMP broadcast requests\nnet.ipv4.icmp_echo_ignore_broadcasts = 1\n\n# Disable source packet routing\nnet.ipv4.conf.all.accept_source_route = 0\nnet.ipv6.conf.all.accept_source_route = 0\nnet.ipv4.conf.default.accept_source_route = 0\nnet.ipv6.conf.default.accept_source_route = 0\n\n# Ignore send redirects\nnet.ipv4.conf.all.send_redirects = 0\nnet.ipv4.conf.default.send_redirects = 0\n\n# Block SYN attacks\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_max_syn_backlog = 2048\nnet.ipv4.tcp_synack_retries = 2\nnet.ipv4.tcp_syn_retries = 5\n\n# Log Martians\nnet.ipv4.conf.all.log_martians = 1\nnet.ipv4.icmp_ignore_bogus_error_responses = 1\n\n# Ignore ICMP redirects\nnet.ipv4.conf.all.accept_redirects = 0\nnet.ipv6.conf.all.accept_redirects = 0\nnet.ipv4.conf.default.accept_redirects = 0\nnet.ipv6.conf.default.accept_redirects = 0\n\n# Ignore Directed pings\nnet.ipv4.icmp_echo_ignore_all = 1\n\n# Accept Redirects? No, this is not router\nnet.ipv4.conf.all.secure_redirects = 0\n\n# Log packets with impossible addresses to kernel log? yes\nnet.ipv4.conf.default.secure_redirects = 0\n\n########## IPv6 networking start ##############\n# Number of Router Solicitations to send until assuming no routers are present.\n# This is host and not router\nnet.ipv6.conf.default.router_solicitations = 0\n\n# Accept Router Preference in RA?\nnet.ipv6.conf.default.accept_ra_rtr_pref = 0\n\n# Learn Prefix Information in Router Advertisement\nnet.ipv6.conf.default.accept_ra_pinfo = 0\n\n# Setting controls whether the system will accept Hop Limit settings from a router advertisement\nnet.ipv6.conf.default.accept_ra_defrtr = 0\n\n#router advertisements can cause the system to assign a global unicast address to an interface\nnet.ipv6.conf.default.autoconf = 0\n\n#how many neighbor solicitations to send out per address?\nnet.ipv6.conf.default.dad_transmits = 0\n\n# How many global unicast IPv6 addresses can be assigned to each interface?
 net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends ##############\n\nkernel.sysrq=0" > /etc/sysctl.conf
+sysctl -w net.ipv4.conf.all.accept_source_route=0
+sysctl -w net.ipv4.conf.default.accept_source_route=0
 sysctl -p >> /dev/null
 cat /etc/sysctl.conf
 echo "Sysctl has been configured."
@@ -409,8 +417,72 @@ chmod 440 /etc/sudoers
 chmod 640 /etc/shadow
 chmod 644 /etc/passwd
 chown root:root /etc/passwd
-chown root:root /etc/shadow
+chmod u-x,go-wx /etc/passwd
+chown root:shadow /etc/shadow
+chmod o-rwx,g-wx /etc/shadow
+chown root:root /etc/crontab
 echo "Finished changing permissions."
+
+clear
+grep -E -v '^(halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' | while read -r user dir; do
+  	if [ ! -d "$dir" ]; then
+		echo "The home directory \"$dir\" of user \"$user\" does not exist."
+	else
+		for file in "$dir"/.[A-Za-z0-9]*; do
+			if [ ! -h "$file" ] && [ -f "$file" ]; then
+				fileperm="$(ls -ld "$file" | cut -f1 -d" ")"
+				if [ "$(echo "$fileperm" | cut -c6)" != "-" ]; then
+					echo "Group Write permission set on file $file"
+				fi
+				if [ "$(echo "$fileperm" | cut -c9)" != "-" ]; then
+					echo "Other Write permission set on file \"$file\""
+				fi
+			fi
+		done
+	fi
+done
+echo "Checked that all users have home directories."
+
+clear
+awk -F: '{print $4}' /etc/passwd | while read -r gid; do
+	if ! grep -E -q "^.*?:[^:]*:$gid:" /etc/group; then
+		echo "The group ID \"$gid\" does not exist in /etc/group"
+	fi
+done
+echo "Confirmed that all groups in /etc/passwd are also in /etc/group"
+
+clear
+awk -F: '{print $3}' /etc/passwd | sort -n | uniq -c | while read -r uid; do
+	[ -z "$uid" ] && break
+	set - $uid
+	if [ $1 -gt 1 ]; then
+		users=$(awk -F: '($3 == n) { print $1 }' n="$2" /etc/passwd | xargs)
+		echo "Duplicate UID \"$2\": \"$users\""
+	fi
+done
+echo "Confirmed that all users have a unique UID."
+
+clear
+cut -d: -f3 /etc/group | sort | uniq -d | while read x ; do
+	echo "Duplicate GID ($x) in /etc/group"
+done
+echo "Confirmed that all groups have a unique GID."
+
+clear
+cut -d: -f1 /etc/passwd | sort | uniq -d | while read -r usr; do
+	echo "Duplicate login name \"$usr\" in /etc/passwd"
+done
+echo "Confirmed that all users have a unique name."
+
+clear
+cut -d: -f1 /etc/group | sort | uniq -d | while read -r grp; do
+	echo "Duplicate group name \"$grp\" exists in /etc/group"
+done
+echo "Confirmed that all groups have a unique name."
+
+clear
+grep ^shadow:[^:]*:[^:]*:[^:]+ /etc/group
+echo "If any users are printed above this and below confirmed that all groups have a unique name, get Ayden!"
 
 clear
 touch /zerouidusers
@@ -898,7 +970,7 @@ apt-get purge socket -y
 apt-get purge sbd -y
 apt-get purge transmission -y
 apt-get purge transmission-daemon -y
-apt-get purge deluge yersinia -y
+apt-get purge deluge yersinia nis rsh-client talk ldap-utils -y
 rm /usr/bin/nc
 rm /usr/bin/local/nc
 clear
@@ -1029,13 +1101,16 @@ sed -i '163s/.*/PASS_WARN_AGE\o0117/' /etc/login.defs
 cat /etc/login.defs
 echo "Password policies have been set with /etc/login.defs."
 
+echo "umask 027" >> /etc/bash.bashrc
+echo "umask 027" >> /etc/profile
+
 clear
 apt-get install libpam-cracklib -y 
 cp /etc/pam.d/common-auth /home/scriptuser/backups/
 cp /etc/pam.d/common-password /home/scriptuser/backups/
-echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so nullok\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
-echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=8 difok=3 reject_username minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
-echo "If password policies are not correctly configured, try this for /etc/pam.d/common-password:\npassword requisite pam_cracklib.so retry=3 minlen=8 difok=3 reject_us11ername minclass=3 maxrepeat=2 dcredit=1 ucredit=1 lcredit=1 ocredit=1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root"
+echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
+echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_username minclass=4 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
+echo "If password policies are not correctly configured, try this for /etc/pam.d/common-password:\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_us11ername minclass=4 maxrepeat=2 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root"
 echo "Password policies have been set with and /etc/pam.d."
 getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
 echo "All users now need passwords to login"
@@ -1098,9 +1173,14 @@ export $(cat /etc/environment)
 echo "PATH reset to normal."
 
 clear
-apt-get install auditd -y 
+apt-get install auditd audispd-plugins -y
+wget https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
+mv audit.rules /etc/audit/audit.rules
 auditctl -e 1
 auditctl -s
+systemctl --now enable auditd
+systemctl start auditd
+
 
 clear
 apt-get install ecryptfs-utils cryptsetup -y 
