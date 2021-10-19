@@ -1023,7 +1023,7 @@ apt-get purge irpas -y
 clear
 echo "IRPAS has been removed."
 
-apt-get purge wireshark* tshark kismet zenmap nmap wireguard -y
+apt-get purge wireshark* tshark kismet zenmap nmap wireguard *torrent -y
 clear
 echo "Wireshark, TShark, Kismet, and Zenmap have been removed."
 
