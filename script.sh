@@ -818,6 +818,25 @@ list_manual=$(apt-mark showmanual | sort)
 
 ## output intersection of 2 lists
 comm -12 <(echo "$list_installed") <(echo "$list_manual")
+echo "All manually installed packages have been listed"
+
+clear
+lsof -Pnl +M -i > /home/scriptuser/runningProcesses.log
+## Removing the default running processes
+sed -i '/avahi-dae/ d' /home/scriptuser/runningProcesses.log
+sed -i '/cups-brow/ d' /home/scriptuser/runningProcesses.log
+sed -i '/dhclient/ d' /home/scriptuser/runningProcesses.log
+sed -i '/dnsmasq/ d' /home/scriptuser/runningProcesses.log
+sed -i '/cupsd/ d' /home/scriptuser/runningProcesses.log
+echo "All running processes listed."
+
+clear
+systemctl >> /home/scriptuser/systemctlUnits.log
+echo "All systemctl services listed."
+
+clear
+ls /etc/init/ >> /home/scriptuser/initFiles.log
+ls /etc/init.d/ >> /home/scriptuser/initFiles.log
 
 clear
 apt-get purge netcat -y
