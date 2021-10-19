@@ -413,6 +413,45 @@ chown root:root /etc/shadow
 echo "Finished changing permissions."
 
 clear
+touch /zerouidusers
+touch /uidusers
+
+cut -d: -f1,3 /etc/passwd | egrep ':0$' | cut -d: -f1 | grep -v root > /zerouidusers
+
+if [ -s /zerouidusers ]
+then
+	echo "There are Zero UID Users! I'm fixing it now!"
+
+	while IFS='' read -r line || [[ -n "$line" ]]; do
+		thing=1
+		while true; do
+			rand=$(( ( RANDOM % 999 ) + 1000))
+			cut -d: -f1,3 /etc/passwd | egrep ":$rand$" | cut -d: -f1 > /uidusers
+			if [ -s /uidusers ]
+			then
+				echo "Couldn't find unused UID. Trying Again... "
+			else
+				break
+			fi
+		done
+		sed -i "s/$line:x:0:0/$line:x:$rand:$rand/g" /etc/passwd
+		echo "ZeroUID User: $line"
+		echo "Assigned UID: $rand"
+	done < "/zerouidusers"
+	update-passwd
+	cut -d: -f1,3 /etc/passwd | egrep ':0$' | cut -d: -f1 | grep -v root > /zerouidusers
+
+	if [ -s /zerouidusers ]
+	then
+		echo "WARNING: UID CHANGE UNSUCCESSFUL!"
+	else
+		echo "Successfully Changed Zero UIDs!"
+	fi
+else
+	echo "No Zero UID Users"
+fi
+
+clear
 if [ $sambaYN == no ]
 then
 	ufw deny netbios-ns
@@ -1057,15 +1096,6 @@ clear
 apt-get install auditd -y 
 auditctl -e 1
 auditctl -s
-
-clear
-if [[ $(grep root /etc/passwd | wc -l) -gt 1 ]]
-then
-	grep root /etc/passwd | wc -l
-	echo -e "UID 0 is not correctly set to root. Please fix."
-else
-	echo "UID 0 is correctly set to root."
-fi
 
 clear
 apt-get install ecryptfs-utils cryptsetup -y 
