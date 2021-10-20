@@ -321,7 +321,7 @@ for f in /etc/sudoers /etc/sudoers.d/* ; do
 done
 echo "Sudoers file secured."
 
-echo 'Defaults use_pty\nDefaults logfile=/var/log/sudo.log' > /etc/sudoers.d/custom
+echo -e "Defaults use_pty\nDefaults logfile=/var/log/sudo.log" > /etc/sudoers.d/custom
 echo "PTY and logfile set up for sudo."
 
 clear
