@@ -40,7 +40,7 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr ufw stubby tcpd lynis chkrootkit rkhunter iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* auditd audispd-plugins ecryptfs-utils cryptsetup -y
+apt-get install apt-transport-https dirmngr ufw tcpd lynis chkrootkit rkhunter iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* auditd audispd-plugins ecryptfs-utils cryptsetup -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 apt-get purge $(cat packages.txt)
@@ -52,7 +52,7 @@ if echo $(lsb_release -a) | grep -qi Debian; then
 	apt install firefox-esr
 else 
 	update-manager
-	apt install firefox
+	apt install firefox stubby
 fi
 
 clear
