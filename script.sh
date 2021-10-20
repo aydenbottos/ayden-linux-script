@@ -880,7 +880,7 @@ list_manual=$(apt-mark showmanual | sort)
 comm -12 <(echo "$list_installed") <(echo "$list_manual")
 echo "All manually installed packages have been listed"
 
-apt install fail2ban
+apt install fail2ban -y
 systemctl enable fail2ban
 systemctl start fail2ban
 echo "Fail2Ban enabled."
@@ -909,6 +909,7 @@ echo '' > /etc/securetty
 echo "Removed any TTYs listed in /etc/securetty."
 
 find / -depth -type d -name '.john' -exec rm -r '{}' \;
+ls -al ~/.john/*
 clear
 echo "John the Ripper files have been removed."
 
