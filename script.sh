@@ -40,7 +40,11 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr ufw stubby tcpd lynis chkrootkit rkhunter iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* firefox auditd audispd-plugins ecryptfs-utils cryptsetup -y 
+apt-get install apt-transport-https dirmngr ufw stubby tcpd lynis chkrootkit rkhunter iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* firefox auditd audispd-plugins ecryptfs-utils cryptsetup -y
+
+echo "Deleting all bad software."
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
+apt-get purge $(cat packages.txt)
 
 clear
 echo "Check to verify that all update settings are correct."
@@ -666,11 +670,6 @@ fi
 echo "Telnet is complete."
 
 clear
-if [ $vpnYN == no ]
-then
-	apt-get purge openvpn wireguard -y
-fi
-clear
 if [ $mailYN == no ]
 then
 	ufw deny smtp 
@@ -904,127 +903,9 @@ clear
 echo '' > /etc/securetty
 echo "Removed any TTYs listed in /etc/securetty."
 
-clear
-apt-get purge netcat -y
-apt-get purge netcat-openbsd -y
-apt-get purge minetest -y
-apt-get purge wesnoth -y
-apt-get purge manaplus gameconqueror -y
-apt-get purge netcat-traditional -y
-apt-get purge gcc g++ -y
-apt-get purge ncat -y
-apt-get purge pnetcat -y
-apt-get purge socat -y
-apt-get purge sock -y
-apt-get purge socket -y
-apt-get purge sbd -y
-apt-get purge transmission -y
-apt-get purge transmission-daemon -y
-apt-get purge deluge yersinia nis rsh-client talk ldap-utils -y
-rm /usr/bin/nc
-rm /usr/bin/local/nc
-clear
-echo "Netcat and all other instances have been removed."
-
-apt-get purge john -y
-apt-get purge john-data -y
 find / -depth -type d -name '.john' -exec rm -r '{}' \;
 clear
-echo "John the Ripper has been removed."
-
-apt-get purge hydra -y
-apt-get purge hydra-gtk -y
-clear
-echo "Hydra has been removed."
-
-apt-get purge aircrack-ng -y
-clear
-echo "Aircrack-NG has been removed."
-
-apt-get purge fcrackzip -y
-clear
-echo "FCrackZIP has been removed."
-
-apt-get purge lcrack -y
-clear
-echo "LCrack has been removed."
-
-apt-get purge ophcrack -y
-apt-get purge ophcrack-cli -y
-clear
-echo "OphCrack has been removed."
-
-apt-get purge pdfcrack -y
-clear
-echo "PDFCrack has been removed."
-
-apt-get purge pyrit -y
-clear
-echo "Pyrit has been removed."
-
-apt-get purge rarcrack -y
-clear
-echo "RARCrack has been removed."
-
-apt-get purge sipcrack -y
-clear
-echo "SipCrack has been removed."
-
-apt-get purge irpas -y
-clear
-echo "IRPAS has been removed."
-
-apt-get purge wireshark* tshark kismet zenmap nmap wireguard *torrent -y
-clear
-echo "Wireshark, TShark, Kismet, and Zenmap have been removed."
-
-apt-get purge logkeys -y
-clear 
-echo "LogKeys has been removed."
-
-apt-get purge zeitgeist-core -y
-apt-get purge zeitgeist-datahub -y
-apt-get purge python-zeitgeist -y
-apt-get purge rhythmbox-plugin-zeitgeist -y
-apt-get purge zeitgeist -y
-echo "Zeitgeist has been removed."
-
-apt-get purge nfs-kernel-server -y
-apt-get purge nfs-common -y
-apt-get purge portmap -y
-apt-get purge rpcbind -y
-apt-get purge autofs -y 
-echo "NFS has been removed."
-
-apt-get purge nginx -y 
-apt-get purge nginx-common -y 
-echo "NGINX has been removed."
-
-apt-get purge inetd -y 
-apt-get purge openbsd-inetd -y 
-apt-get purge xinetd -y 
-apt-get purge inetutils-ftp -y 
-apt-get purge inetutils-ftpd -y 
-apt-get purge inetutils-inetd -y 
-apt-get purge inetutils-ping -y 
-apt-get purge inetutils-syslogd -y 
-apt-get purge inetutils-talk -y 
-apt-get purge inetutils-talkd -y 
-apt-get purge inetutils-telnet -y 
-apt-get purge inetutils-telnetd -y 
-apt-get purge inetutils-tools -y 
-apt-get purge inetutils-traceroute -y 
-echo "Inetd (super-server) and all inet utilities have been removed."
-
-clear
-apt-get purge vnc4server -y 
-apt-get purge vncsnapshot -y 
-apt-get purge vtgrab -y 
-echo "VNC has been removed."
-
-clear
-apt-get purge snmp -y 
-echo "SNMP has been removed."
+echo "John the Ripper files have been removed."
 
 clear
 ( lynis audit system -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
