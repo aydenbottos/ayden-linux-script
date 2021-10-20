@@ -39,8 +39,8 @@ echo "Backups folder created on the Desktop."
 echo "Running apt-get update"
 apt-get update
 
-echo "Installing apt-transport-https for apt https"
-apt-get install apt-transport-https dirmngr -y 
+echo "Installing all neccessary software."
+apt-get install apt-transport-https dirmngr ufw stubby tcpd lynis chkrootkit rkhunter iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* firefox auditd audispd-plugins ecryptfs-utils cryptsetup -y 
 
 clear
 echo "Check to verify that all update settings are correct."
@@ -322,7 +322,6 @@ echo 'exit 0' >> /etc/rc.local
 echo "Any startup scripts have been removed."
 
 clear
-apt-get install ufw -y
 ufw enable
 ufw default deny incoming
 ufw status verbose
@@ -336,7 +335,6 @@ fi
 echo "Shellshock Bash vulnerability has been fixed."
 
 clear
-apt-get install stubby -y 
 systemctl start stubby
 systemctl enable stubby
 systemctl status stubby
@@ -407,10 +405,6 @@ cp /etc/default/irqbalance /home/scriptuser/backups/
 echo > /etc/default/irqbalance
 echo -e "#Configuration for the irqbalance daemon\n\n#Should irqbalance be enabled?\nENABLED=\"0\"\n#Balance the IRQs only once?\nONESHOT=\"0\"" >> /etc/default/irqbalance
 echo "IRQ Balance has been disabled."
-
-clear
-apt install tcpd
-echo "TCP Wrappers have been installed."
 
 clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
@@ -1033,19 +1027,16 @@ apt-get purge snmp -y
 echo "SNMP has been removed."
 
 clear
-apt-get install lynis -y 
 ( lynis audit system -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
 disown; sleep 2;
 echo "Running Lynis."
 
 clear
-apt-get install chkrootkit -y 
 ( chkrootkit -q >> ChkrootkitOutput.txt; echo "Finished ChkRootKit" ) &
 disown; sleep 2;
 echo "Running ChkRootKit."
 
 clear
-apt-get install rkhunter -y 
 ( rkhunter -c >> RkHunterOutput.txt; echo "Finished RkHunter" ) &
 disown; sleep 2;
 echo "Running RkHunter."
@@ -1063,7 +1054,6 @@ echo "umask 027" >> /etc/profile
 echo "Set a very strict umask."
 
 clear
-apt-get install libpam-cracklib -y 
 cp /etc/pam.d/common-auth /home/scriptuser/backups/
 cp /etc/pam.d/common-password /home/scriptuser/backups/
 echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
@@ -1074,7 +1064,6 @@ getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
 echo "All users now need passwords to login"
 
 clear
-apt-get install iptables -y 
 iptables -A INPUT -p all -s localhost  -i eth0 -j DROP
 echo "All outside packets from internet claiming to be from loopback are denied."
 
@@ -1083,8 +1072,7 @@ cp /etc/init/control-alt-delete.conf /home/scriptuser/backups/
 sed '/^exec/ c\exec false' /etc/init/control-alt-delete.conf
 echo "Reboot using Ctrl-Alt-Delete has been disabled."
 
-clear
-apt-get install apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* -y 
+clear 
 systemctl start clamav-freshclam && systemctl enable clamav-freshclam
 systemctl start clamav-daemon && systemctl enable clamav-daemon
 aa-enforce /etc/apparmor.d/*
@@ -1112,13 +1100,8 @@ apt-get upgrade -y
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 clear
-apt-get install firefox -y 
-echo "Installed Firefox."
-
-clear
 su - $(stat -c "%U" .) -c 'firefox --preferences'
 echo "Popup blocker enabled in Firefox"
-
 
 clear
 apt-get autoremove -y 
@@ -1131,7 +1114,6 @@ export $(cat /etc/environment)
 echo "PATH reset to normal."
 
 clear
-apt-get install auditd audispd-plugins -y
 wget https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
 mv audit.rules /etc/audit/audit.rules
 auditctl -e 1
@@ -1139,10 +1121,6 @@ auditctl -s
 systemctl --now enable auditd
 systemctl start auditd
 echo "Auditd and audit rules have been set and enabled."
-
-
-clear
-apt-get install ecryptfs-utils cryptsetup -y 
 
 clear
 echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
