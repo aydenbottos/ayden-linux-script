@@ -878,7 +878,13 @@ list_manual=$(apt-mark showmanual | sort)
 
 ## output intersection of 2 lists
 comm -12 <(echo "$list_installed") <(echo "$list_manual")
-echo "All manually installed packages have been listed"
+echo "All manually installed packages have been listed If using Debian, ignore above."
+
+grep -oP "Unpacking \K[^: ]+" /var/log/installer/syslog | sort -u | comm -13 /dev/stdin <(apt-mark showmanual | sort)
+echo "If using Debian, ignore the first list of packages and refer to the second one."
+
+apt list --installed >> /home/scriptuser/allInstalledPackages.log
+echo "Listed all installed packages, not just manual ones."
 
 apt install fail2ban -y
 systemctl enable fail2ban
