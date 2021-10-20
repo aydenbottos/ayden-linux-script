@@ -810,95 +810,15 @@ clear
 if [ $mediaFilesYN == no ]
 then
 	mv $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg /
-	find /home -iname "*.midi" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mid" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mod" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mp3" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mp2" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mpa" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.abs" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mpega" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.au" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.snd" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.wav" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.aiff" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.aif" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.sid" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.flac" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.ogg" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -regextype posix-extended -regex '.*\.(midi|mid|mod|mp3|mp2|mpa|abs|mpega|au|snd|wav|aiff|aif|sid|flac|ogg)$' -delete
 	clear
 	echo "All audio files has been listed."
 
-	find /home -iname "*.mpeg" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mpg" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mpe" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.dl" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.movie" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.movi" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mv" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.iff" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.anim5" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.anim3" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.anim7" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.avi" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.vfw" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.avx" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.fli" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.flc" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mov" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.qt" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.spl" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.swf" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.dcr" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.dir" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.dxr" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.rpm" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.rm" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.smi" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.ra" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.ram" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.rv" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.wmv" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.asf" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.asx" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.wma" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.wax" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.wmv" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.wmx" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.3gp" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mov" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.mp4" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.avi" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.swf" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.flv" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.m4v" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.txt" -type f >> /home/scriptuser/badfiles.log
-	find /home -iname "*.xlsx" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.pptx" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.docx" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -regextype posix-extended -regex '.*\.(mpeg|mpg|mpe|dl|movie|movi|mv|iff|anim5|anim3|anim7|avi|vfw|avx|fli|flc|mov|qt|spl|swf|dcr|dir|dxr|rpm|rm|smi|ra|ram|rv|wmv|asf|asx|wma|wax|wmv|wmx|3gp|mov|mp4|flv|m4v|txt|xlsx|pptx|docx)$'
 	clear
 	echo "All video files have been listed."
 	
-	find /home -iname "*.tiff" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.tif" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.rs" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.im1" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.gif" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.jpeg" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.jpg" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.jpe" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.png" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.rgb" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.xwd" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.xpm" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.ppm" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.pbm" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.pgm" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.pcx" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.ico" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.svg" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.svgz" -type f -delete >> /home/scriptuser/badfiles.log
-	find /home -iname "*.pot" -type f -delete >> /home/scriptuser/badfiles.log
+	find /home -regextype posix-extended -regex '.*\.(tiff|tif|rs|iml|gif|jpeg|jpg|jpe|png|rgb|xwd|xpm|ppm|pbm|pgm|pcx|ico|svg|svgz|pot|xml|pl)$'
 	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg
 	clear
 	echo "All image files have been listed."
@@ -921,7 +841,11 @@ echo "Home directory owner set."
 
 clear
 find / -iname "*.php" -type f >> /home/scriptuser/badfiles.log
-echo "All PHP files have been listed above. ('/var/cache/dictionaries-common/sqspell.php' is a system PHP file)"
+echo "All PHP files have been listed. ('/var/cache/dictionaries-common/sqspell.php' is a system PHP file)"
+
+clear
+find / -iname "*.sh" -type f >> /home/scriptuser/badfiles.log
+echo "All shell scripts have been listed. Note: there are a lot of system ones too."
 
 clear
 find / -perm -4000 >> /home/scriptuser/badfiles.log
