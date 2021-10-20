@@ -48,7 +48,11 @@ apt-get purge $(cat packages.txt)
 
 clear
 echo "Check to verify that all update settings are correct."
-update-manager
+if echo $(lsb_release -a) | grep -qi Debian; then
+	software-properties-gtk
+else 
+	update-manager
+fi
 
 clear
 chmod 644 /etc/apt/sources.list
