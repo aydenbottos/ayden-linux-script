@@ -809,7 +809,7 @@ echo "DNS is complete."
 clear
 if [ $mediaFilesYN == no ]
 then
-	mv $(pwd)/../Pictures/CyberTaipan_Background_WIDE.jpg /
+	mv $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg /
 	find /home -iname "*.midi" -type f -delete >> /home/scriptuser/badfiles.log
 	find /home -iname "*.mid" -type f -delete >> /home/scriptuser/badfiles.log
 	find /home -iname "*.mod" -type f -delete >> /home/scriptuser/badfiles.log
@@ -898,7 +898,8 @@ then
 	find /home -iname "*.ico" -type f -delete >> /home/scriptuser/badfiles.log
 	find /home -iname "*.svg" -type f -delete >> /home/scriptuser/badfiles.log
 	find /home -iname "*.svgz" -type f -delete >> /home/scriptuser/badfiles.log
-	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/CyberTaipan_Background_WIDE.jpg
+	find /home -iname "*.pot" -type f -delete >> /home/scriptuser/badfiles.log
+	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg
 	clear
 	echo "All image files have been listed."
 else
@@ -1009,6 +1010,7 @@ echo "Netcat and all other instances have been removed."
 
 apt-get purge john -y
 apt-get purge john-data -y
+find / -depth -type d -name '.john' -exec rm -r '{}' \;
 clear
 echo "John the Ripper has been removed."
 
