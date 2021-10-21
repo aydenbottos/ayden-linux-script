@@ -616,7 +616,7 @@ then
 	apt-get install vsftpd -y
 	cp /etc/vsftpd/vsftpd.conf /home/scriptuser/backups/
 	cp /etc/vsftpd.conf /home/scriptuser/backups/
-	gedit /etc/vsftpd/vsftpd.conf&gedit /etc/vsftpd.conf
+	gedit /etc/vsftpd/vsftpd.conf && gedit /etc/vsftpd.conf
 	systemctl restart vsftpd
 	systemctl status vsftpd
 	echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
@@ -747,7 +747,7 @@ then
 	then
 		sed -i "s/bind-address\t\t=.*/bind-address\t\t= 127.0.0.1/g" /etc/mysql/my.cnf
 	fi
-	gedit /etc/my.cnf&gedit /etc/mysql/my.cnf&gedit /usr/etc/my.cnf&gedit /home/scriptuser/.my.cnf
+	gedit /etc/my.cnf && gedit /etc/mysql/my.cnf && gedit /usr/etc/my.cnf && gedit /home/scriptuser/.my.cnf
 	systemctl restart mysql
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been allowed on the firewall. MySQL has been installed. MySQL config file has been secured. MySQL systemctl has been restarted."
 else
