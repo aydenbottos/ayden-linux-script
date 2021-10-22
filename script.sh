@@ -140,7 +140,7 @@ then
 	if grep -qi telnet services.txt; then
 		telnetYN=yes
 	fi
-	if grep -qi mail services; then
+	if grep -qi mail services.txt; then
 		mailYN=yes
 	fi
 	if grep -qi print services.txt; then
@@ -445,6 +445,7 @@ chmod 644 /etc/hosts.allow
 chmod 440 /etc/sudoers
 chmod 640 /etc/shadow
 chmod 644 /etc/passwd
+chmod 4750 /bin/su
 chown root:root /etc/passwd
 chmod u-x,go-wx /etc/passwd
 chown root:shadow /etc/shadow
@@ -616,7 +617,10 @@ then
 	apt-get install vsftpd -y
 	cp /etc/vsftpd/vsftpd.conf /home/scriptuser/backups/
 	cp /etc/vsftpd.conf /home/scriptuser/backups/
-	gedit /etc/vsftpd/vsftpd.conf && gedit /etc/vsftpd.conf
+	sed -i 's/anonymous_enable=.*/anonymous_enable=NO/' /etc/vsftpd.conf
+	sed -i 's/local_enable=.*/local_enable=YES/' /etc/vsftpd.conf
+	sed -i 's/#write_enable=.*/write_enable=YES/' /etc/vsftpd.conf
+	sed -i 's/#chroot_local_user=.*/chroot_local_user=YES/' /etc/vsftpd.conf
 	systemctl restart vsftpd
 	systemctl status vsftpd
 	echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
@@ -738,16 +742,16 @@ then
 	ufw allow ms-sql-m 
 	ufw allow mysql 
 	ufw allow mysql-proxy
-	apt-get install mysql-server-* -y
-	cp /etc/my.cnf /home/scriptuser/backups/
+	apt-get install mariadb-server-10.1 -y
+	mysql_secure_configuration
 	cp /etc/mysql/my.cnf /home/scriptuser/backups/
-	cp /usr/etc/my.cnf /home/scriptuser/backups/
-	cp /home/scriptuser/.my.cnf /home/scriptuser/backups/
 	if grep -q "bind-address" "/etc/mysql/my.cnf"
 	then
 		sed -i "s/bind-address\t\t=.*/bind-address\t\t= 127.0.0.1/g" /etc/mysql/my.cnf
+		sed -i "s/local-infile\t\t=.*/local-infile\t\t=0/g" /etc/mysql/my.cnf
+		
 	fi
-	gedit /etc/my.cnf && gedit /etc/mysql/my.cnf && gedit /usr/etc/my.cnf && gedit /home/scriptuser/.my.cnf
+	gedit /etc/mysql/my.cnf
 	systemctl restart mysql
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been allowed on the firewall. MySQL has been installed. MySQL config file has been secured. MySQL systemctl has been restarted."
 else
@@ -776,6 +780,8 @@ then
   	  echo -e '\<Directory \>\n\t AllowOverride None\n\t Order Deny,Allow\n\t Deny from all\n\<Directory \/\>\nUserDir disabled root' >> /etc/apache2/apache2.conf
 	fi
 	chown -R root:root /etc/apache2
+	systemctl start apache2
+	systemctl status apache2
 
 	echo "https and https ports have been allowed on the firewall. Apache2 config file has been configured. Only root can now access the Apache2 folder."
 else
