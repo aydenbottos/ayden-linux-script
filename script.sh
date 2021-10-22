@@ -5,7 +5,7 @@ echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
 echo "Running at $(date)"
-echo "Running on $(lsb_release -a)
+echo "Running on $(lsb_release -is)
 
 if [[ $EUID -ne 0 ]]
 then
@@ -48,7 +48,7 @@ apt-get purge $(cat packages.txt)
 
 clear
 echo "Check to verify that all update settings are correct."
-if echo $(lsb_release -a) | grep -qi Debian; then
+if echo $(lsb_release -is) | grep -qi Debian; then
 	software-properties-gtk
 	apt install firefox-esr
 else 
