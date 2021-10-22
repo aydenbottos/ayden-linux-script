@@ -425,6 +425,9 @@ sysctl -p >> /dev/null
 cat /etc/sysctl.conf
 echo "Sysctl has been configured."
 
+ip -a
+echo "IP info logged."
+
 clear
 echo "Disable IPv6?"
 read ipv6YN
