@@ -428,6 +428,9 @@ echo "Sysctl has been configured."
 ip -a
 echo "IP info logged."
 
+netstat -pnola
+echo "All active ports logged."
+
 clear
 echo "Disable IPv6?"
 read ipv6YN
