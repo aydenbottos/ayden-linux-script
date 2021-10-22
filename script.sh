@@ -5,7 +5,7 @@ echo "Last Modified on July 26, 2021"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
 echo "Running at $(date)"
-echo "Running on $(lsb_release -is)
+echo "Running on $(lsb_release -is)"
 
 if [[ $EUID -ne 0 ]]
 then
