@@ -777,7 +777,12 @@ then
 	cp /etc/apache2/apache2.conf /home/scriptuser/backups/
 	if [ -e /etc/apache2/apache2.conf ]
 	then
-  	  echo -e '\<Directory \>\n\t AllowOverride None\n\t Order Deny,Allow\n\t Deny from all\n\<Directory \/\>\nUserDir disabled root' >> /etc/apache2/apache2.conf
+  		echo "<Directory />" >> /etc/apache2/apache2.conf
+		echo "        AllowOverride None" >> /etc/apache2/apache2.conf
+		echo "        Order Deny,Allow" >> /etc/apache2/apache2.conf
+		echo "        Deny from all" >> /etc/apache2/apache2.conf
+		echo "</Directory>" >> /etc/apache2/apache2.conf
+		echo "UserDir disabled root" >> /etc/apache2/apache2.conf
 	fi
 	chown -R root:root /etc/apache2
 	systemctl start apache2
