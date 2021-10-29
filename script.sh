@@ -51,10 +51,10 @@ clear
 echo "Check to verify that all update settings are correct."
 if echo $(lsb_release -is) | grep -qi Debian; then
 	software-properties-gtk
-	apt install firefox-esr
+	apt install firefox-esr -y
 else 
 	update-manager
-	apt install firefox stubby
+	apt install firefox stubby -y
 fi
 
 clear
