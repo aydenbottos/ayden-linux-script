@@ -6,6 +6,7 @@ echo "Linux script"
 echo "The password used is CyberTaipan123!"
 echo "Running at $(date)"
 echo "Running on $(lsb_release -is)"
+echo "Hostname: $(hostname)"
 
 if [[ $EUID -ne 0 ]]
 then
@@ -41,7 +42,7 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr ufw tcpd lynis chkrootkit rkhunter iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-* auditd audispd-plugins ecryptfs-utils cryptsetup -y
+apt-get install apt-transport-https dirmngr ufw tcpd lynis chkrootkit iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 apt-get purge $(cat packages.txt)
@@ -336,7 +337,7 @@ clear
 ufw enable
 ufw default deny incoming
 ufw status verbose
-echo "Firewall enabled and all ports blocked."
+echo "UFW Firewall enabled and all ports blocked."
 
 clear
 env i='() { :;}; echo vulnerable >> test' bash -c "echo this is a test"
@@ -545,7 +546,7 @@ then
 			fi
 		done
 		sed -i "s/$line:x:0:0/$line:x:$rand:$rand/g" /etc/passwd
-		echo "ZeroUID User: $line"
+		echo "ZeroUID User: $line"F
 		echo "Assigned UID: $rand"
 	done < "/zerouidusers"
 	update-passwd
@@ -831,11 +832,11 @@ then
 	clear
 	echo "All audio files has been listed."
 
-	find /home -regextype posix-extended -regex '.*\.(mpeg|mpg|mpe|dl|movie|movi|mv|iff|anim5|anim3|anim7|avi|vfw|avx|fli|flc|mov|qt|spl|swf|dcr|dir|dxr|rpm|rm|smi|ra|ram|rv|wmv|asf|asx|wma|wax|wmv|wmx|3gp|mov|mp4|flv|m4v|txt|xlsx|pptx|docx)$'
+	find /home -regextype posix-extended -regex '.*\.(mpeg|mpg|mpe|dl|movie|movi|mv|iff|anim5|anim3|anim7|avi|vfw|avx|fli|flc|mov|qt|spl|swf|dcr|dir|dxr|rpm|rm|smi|ra|ram|rv|wmv|asf|asx|wma|wax|wmv|wmx|3gp|mov|mp4|flv|m4v|txt|xlsx|pptx|docx)$' -delete
 	clear
 	echo "All video files have been listed."
 	
-	find /home -regextype posix-extended -regex '.*\.(tiff|tif|rs|iml|gif|jpeg|jpg|jpe|png|rgb|xwd|xpm|ppm|pbm|pgm|pcx|ico|svg|svgz|pot|xml|pl)$'
+	find /home -regextype posix-extended -regex '.*\.(tiff|tif|rs|iml|gif|jpeg|jpg|jpe|png|rgb|xwd|xpm|ppm|pbm|pgm|pcx|ico|svg|svgz|pot|xml|pl)$' -delete
 	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg
 	clear
 	echo "All image files have been listed."
@@ -897,7 +898,7 @@ list_manual=$(apt-mark showmanual | sort)
 
 ## output intersection of 2 lists
 comm -12 <(echo "$list_installed") <(echo "$list_manual")
-echo "All manually installed packages have been listed If using Debian, ignore above."
+echo "All manually installed packages have been listed. If using Debian, ignore above."
 
 grep -oP "Unpacking \K[^: ]+" /var/log/installer/syslog | sort -u | comm -13 /dev/stdin <(apt-mark showmanual | sort)
 echo "If using Debian, ignore the first list of packages and refer to the second one."
@@ -947,11 +948,6 @@ clear
 ( chkrootkit -q >> ChkrootkitOutput.txt; echo "Finished ChkRootKit" ) &
 disown; sleep 2;
 echo "Running ChkRootKit."
-
-clear
-( rkhunter -c >> RkHunterOutput.txt; echo "Finished RkHunter" ) &
-disown; sleep 2;
-echo "Running RkHunter."
 
 clear
 cp /etc/login.defs /home/scriptuser/backups/
