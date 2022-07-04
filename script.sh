@@ -622,14 +622,40 @@ then
 	ufw allow sftp 
 	ufw allow saft 
 	ufw allow ftps-data 
-	ufw allow ftps
-	apt-get install vsftpd -y
-	cp /etc/vsftpd/vsftpd.conf /home/scriptuser/backups/
-	cp /etc/vsftpd.conf /home/scriptuser/backups/
-	sed -i 's/anonymous_enable=.*/anonymous_enable=NO/' /etc/vsftpd.conf
-	sed -i 's/local_enable=.*/local_enable=YES/' /etc/vsftpd.conf
-	sed -i 's/#write_enable=.*/write_enable=YES/' /etc/vsftpd.conf
-	sed -i 's/#chroot_local_user=.*/chroot_local_user=YES/' /etc/vsftpd.conf
+    ufw allow ftps
+    apt-get install vsftpd -y
+    cp /etc/vsftpd/vsftpd.conf /home/scriptuser/backups/
+    cp /etc/vsftpd.conf /home/scriptuser/backups/
+    config_file="/etc/vsftpd/vsftpd.conf"
+
+    # Jail users to home directory (user will need a home dir to exist)
+    echo "chroot_local_user=YES"                        | sudo tee $config_file > /dev/null
+    echo "chroot_list_enable=YES"                       | sudo tee -a $config_file > /dev/null
+    echo "chroot_list_file=/etc/vsftpd.chroot_list"     | sudo tee -a $config_file > /dev/null
+    echo "allow_writeable_chroot=YES"                   | sudo tee -a $config_file > /dev/null # Only enable if you want files to be editable
+
+    # Allow or deny users
+    echo "userlist_enable=YES"                  | sudo tee -a $config_file > /dev/null
+    echo "userlist_file=/etc/vsftpd.userlist"   | sudo tee -a $config_file > /dev/null
+    echo "userlist_deny=NO"                     | sudo tee -a $config_file > /dev/null
+
+    # General config
+    echo "anonymous_enable=NO"          | sudo tee -a $config_file > /dev/null # disable  anonymous login
+    echo "local_enable=YES"             | sudo tee -a $config_file > /dev/null # permit local logins
+    echo "write_enable=YES"             | sudo tee -a $config_file > /dev/null # enable FTP commands which change the filesystem
+    echo "local_umask=022"              | sudo tee -a $config_file > /dev/null # value of umask for file creation for local users
+    echo "dirmessage_enable=YES"        | sudo tee -a $config_file > /dev/null # enable showing of messages when users first enter a new directory
+    echo "xferlog_enable=YES"           | sudo tee -a $config_file > /dev/null # a log file will be maintained detailing uploads and downloads
+    echo "connect_from_port_20=YES"     | sudo tee -a $config_file > /dev/null # use port 20 (ftp-data) on the server machine for PORT style connections
+    echo "xferlog_std_format=YES"       | sudo tee -a $config_file > /dev/null # keep standard log file format
+    echo "listen=NO"                    | sudo tee -a $config_file > /dev/null # prevent vsftpd from running in standalone mode
+    echo "listen_ipv6=YES"              | sudo tee -a $config_file > /dev/null # vsftpd will listen on an IPv6 socket instead of an IPv4 one
+    echo "pam_service_name=vsftpd"      | sudo tee -a $config_file > /dev/null # name of the PAM service vsftpd will use
+    echo "userlist_enable=YES"          | sudo tee -a $config_file > /dev/null # enable vsftpd to load a list of usernames
+    echo "tcp_wrappers=YES"             | sudo tee -a $config_file > /dev/null # turn on tcp wrappers
+
+    echo "ascii_upload_enable=NO"   | sudo tee -a $config_file > /dev/null 
+    echo "ascii_download_enable=NO" | sudo tee -a $config_file > /dev/null
 	systemctl restart vsftpd
 	systemctl status vsftpd
 	echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
@@ -653,6 +679,8 @@ then
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
 	usersSSH=$readmeusers
 	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication yes\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nDenyUsers\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 0\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
+	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
+	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
 	systemctl restart sshd
 	systemctl status sshd
 	mkdir ../.ssh
@@ -782,16 +810,88 @@ elif [ $httpsYN == yes ]
 then
 	apt-get install apache2 -y
 	ufw allow https 
-	ufw allow https
+	ufw allow http
+	ufw allow apache
+	apt-get install libapache2-mod-security2 -y
 	cp /etc/apache2/apache2.conf /home/scriptuser/backups/
 	if [ -e /etc/apache2/apache2.conf ]
 	then
-  		echo "<Directory />" >> /etc/apache2/apache2.conf
-		echo "        AllowOverride None" >> /etc/apache2/apache2.conf
-		echo "        Order Deny,Allow" >> /etc/apache2/apache2.conf
-		echo "        Deny from all" >> /etc/apache2/apache2.conf
-		echo "</Directory>" >> /etc/apache2/apache2.conf
-		echo "UserDir disabled root" >> /etc/apache2/apache2.conf
+  	    echo "HostnameLookups Off"              | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "LogLevel warn"                    | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "ServerTokens Prod"                | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "ServerSignature Off"              | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "Options all -Indexes"             | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "Header unset ETag"                | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "Header always unset X-Powered-By" | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "FileETag None"                    | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "TraceEnable off"                  | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "Timeout 60"                       | tee -a /etc/apache2/apache2.conf > /dev/null
+
+	    echo "RewriteEngine On"                         | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo 'RewriteCond %{THE_REQUEST} !HTTP/1\.1$'   | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo 'RewriteRule .* - [F]'                     | tee -a /etc/apache2/apache2.conf > /dev/null
+
+	    echo '<IfModule mod_headers.c>'                         | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo '    Header set X-XSS-Protection 1;'               | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo '</IfModule>'                                      | tee -a /etc/apache2/apache2.conf > /dev/null
+
+	    # Secure /
+	    echo "<Directory />"            | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "    Options -Indexes"     | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "    AllowOverride None"   | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "    Order Deny,Allow"     | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "    Options None"         | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "    Deny from all"        | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "</Directory>"             | tee -a /etc/apache2/apache2.conf > /dev/null
+
+	    # Secure /var/www/html
+	    echo "<Directory /var/www/html>"    | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "    Options -Indexes"         | tee -a /etc/apache2/apache2.conf > /dev/null
+	    echo "</Directory>"                 | tee -a /etc/apache2/apache2.conf > /dev/null
+
+	    # security.conf
+	    # Enable HTTPOnly and Secure Flags
+	    echo 'Header edit Set-Cookie ^(.*)\$ \$1;HttpOnly;Secure'                                   | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+
+	    # Clickjacking Attack Protection
+	    echo 'Header always append X-Frame-Options SAMEORIGIN'                                      | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+
+	    # XSS Protection
+	    echo 'Header set X-XSS-Protection "1; mode=block"'                                          | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+
+	    # Enforce secure connections to the server
+	    echo 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"'    | tee -a /etc/apache2/conf-available/security.conf > /dev/null  
+
+	    # MIME sniffing Protection
+	    echo 'Header set X-Content-Type-Options: "nosniff"'                                         | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+
+	    # Prevent Cross-site scripting and injections
+	    echo 'Header set Content-Security-Policy "default-src '"'self'"';"'                         | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+
+		# Secure root directory
+	    echo "<Directory />"            | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  Options -Indexes"       | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  AllowOverride None"     | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  Order Deny,Allow"       | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  Deny from all"          | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "</Directory>"             | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+
+	    # Secure html directory
+	    echo "<Directory /var/www/html>"        | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  Options -Indexes -Includes"     | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  AllowOverride None"             | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  Order Allow,Deny"               | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "  Allow from All"                 | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo "</Directory>"                     | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+
+	    # ssl.conf
+	    # TLS only
+	    sudo sed -i "s/SSLProtocol.*/SSLProtocol –ALL +TLSv1 +TLSv1.1 +TLSv1.2/" /etc/apache2/mods-available/ssl.conf
+	    # Stronger cipher suite
+	    sudo sed -i "s/SSLCipherSuite.*/SSLCipherSuite HIGH:\!MEDIUM:\!aNULL:\!MD5:\!RC4/" /etc/apache2/mods-available/ssl.conf
+
+	    sudo chown -R root:root /etc/apache2
+	    sudo chown -R root:root /etc/apache 2> /dev/null
 	fi
 	chown -R root:root /etc/apache2
 	systemctl start apache2
@@ -1032,6 +1132,19 @@ auditctl -s
 systemctl --now enable auditd
 systemctl start auditd
 echo "Auditd and audit rules have been set and enabled."
+
+if echo $(lsb_release -a) | grep -qi 20.04; then
+	wget https://launchpadlibrarian.net/570612664/scap-workbench_1.2.1-1ubuntu1_amd64.deb
+	apt-get install ./scap-workbench_1.2.1-1ubuntu1_amd64.deb
+else 
+	apt-get install scap-workbench -y
+fi
+
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg-ubuntu2004-ds.xml
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg-ubuntu2004-ds-tailoring.xml
+
+oscap xccdf fix --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
+oscap xccdf eval --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
 
 clear
 echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
