@@ -1407,6 +1407,15 @@ wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg
 
 oscap xccdf fix --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
 oscap xccdf eval --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
+echo "Ran OpenSCAP for CIS compliance."
+
+unhide -f procall sys
+echo "Looked for hidden processes."
+
+sed -i 's/\/messages/syslog/g' /etc/psad/psad.conf
+psad --sig-update
+systemctl start psad
+echo "PSAD started."
 
 clear
 echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
