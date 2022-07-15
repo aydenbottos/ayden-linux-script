@@ -448,8 +448,15 @@ echo "User list has been hidden and autologin has been disabled."
 clear
 chmod 777 /etc/lightdm/lightdm.conf
 cp /etc/lightdm/lightdm.conf /home/scriptuser/Desktop/backups/
-echo > /etc/lightdm/lightdm.conf
-echo -e '[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\ngreeter-show-manual-login=true' >> /etc/lightdm/lightdm.conf
+sudo touch /etc/lightdm/lightdm.conf.d/myconfig.conf
+echo "[SeatDefaults]"                   | tee /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
+echo "allow-guest=false"                | tee -a /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
+echo "greeter-hide-users=true"          | tee -a /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
+echo "greeter-show-manual-login=true"   | tee -a /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
+echo "greeter-allow-guest=false"        | tee -a /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
+echo "autologin-guest=false"            | tee -a /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
+echo "AutomaticLoginEnable=false"       | tee -a /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
+echo "xserver-allow-tcp=false"          | tee -a /etc/lightdm/lightdm.conf.d/myconfig.conf > /dev/null
 chmod 644 /etc/lightdm/lightdm.conf
 echo "LightDM has been secured."
 
@@ -565,7 +572,15 @@ echo "IP info logged."
 netstat -pnola
 echo "All active ports logged."
 
-chown root:root /etc/securetty
+chown root:root /etc/fstab     # Scored
+chmod 644 /etc/fstab           # Scored
+chown root:root /etc/group     # Scored
+chmod 644 /etc/group           # Scored
+chown root:root /etc/shadow    # Scored
+chmod 400 /etc/shadow  	    # Scored	
+chown root:root /etc/apache2   # Scored
+chmod 755 /etc/apache2         # Scored
+
 chmod 0600 /etc/securetty
 chmod 644 /etc/crontab
 chmod 640 /etc/ftpusers
@@ -573,15 +588,27 @@ chmod 440 /etc/inetd.conf
 chmod 440 /etc/xinetd.conf
 chmod 400 /etc/inetd.d
 chmod 644 /etc/hosts.allow
-chmod 440 /etc/sudoers
-chmod 640 /etc/shadow
-chmod 644 /etc/passwd
-chmod 4750 /bin/su
-chown root:root /etc/passwd
-chmod u-x,go-wx /etc/passwd
-chown root:shadow /etc/shadow
-chmod o-rwx,g-wx /etc/shadow
-chown root:root /etc/crontab
+chmod 440 /etc/ers
+chmod 640 /etc/shadow              # Scored
+chmod 600 /boot/grub/grub.cfg      # Scored
+chmod 600 /etc/ssh/sshd_config     # Scored
+chmod 600 /etc/gshadow-            # Scored
+chmod 600 /etc/group-              # Scored
+chmod 600 /etc/passwd-             # Scored
+
+chown root:root /etc/ssh/sshd_config # Scored
+chown root:root /etc/passwd-         # Scored
+chown root:root /etc/group-          # Scored
+chown root:root /etc/shadow          # Scored
+chown root:root /etc/securetty
+chown root:root /boot/grub/grub.cfg  # Scored
+
+chmod og-rwx /boot/grub/grub.cfg  	# Scored
+chown root:shadow /etc/shadow-
+chmod o-rwx,g-rw /etc/shadow-
+chown root:shadow /etc/gshadow-
+chmod o-rwx,g-rw /etc/gshadow-
+
 echo "Finished changing permissions."
 
 clear
@@ -721,6 +748,18 @@ then
 		echo -e "$pw\n$pw" | smbpasswd -a "${usersSMB[${i}]}"
 		echo "${usersSMB[${i}]} has been given the default password for Samba."
 	done
+        echo "restrict anonymous = 2"       | tee -a /etc/samba/smb.conf > /dev/null
+        echo "encrypt passwords = True"     | tee -a /etc/samba/smb.conf > /dev/null # Idk which one it takes
+        echo "encrypt passwords = yes"      | tee -a /etc/samba/smb.conf > /dev/null
+        echo "read only = Yes"              | tee -a /etc/samba/smb.conf > /dev/null
+        echo "ntlm auth = no"               | tee -a /etc/samba/smb.conf > /dev/null
+        echo "obey pam restrictions = yes"  | tee -a /etc/samba/smb.conf > /dev/null
+        echo "server signing = mandatory"   | tee -a /etc/samba/smb.conf > /dev/null
+        echo "smb encrypt = mandatory"      | tee -a /etc/samba/smb.conf > /dev/null
+        echo "min protocol = SMB2"          | tee -a /etc/samba/smb.conf > /dev/null
+        echo "protocol = SMB2"              | tee -a /etc/samba/smb.conf > /dev/null
+        echo "guest ok = no"                | tee -a /etc/samba/smb.conf > /dev/null
+        echo "max log size = 24"            | tee -a /etc/samba/smb.conf > /dev/null
 	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been denied. Samba config file has been configured."
 	clear
 else
@@ -803,12 +842,19 @@ then
 	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication yes\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nDenyUsers\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 0\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
 	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
+        echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256' | tee -a /etc/ssh/sshd_config > /dev/null
 	systemctl restart sshd
 	systemctl status sshd
 	mkdir ../.ssh
 	chmod 700 ../.ssh
 	ssh-keygen -t rsa
 	echo "SSH port has been allowed on the firewall. SSH config file has been configured. SSH RSA 2048 keys have been created."
+        GOODSYNTAX=$(sudo sshd -t)
+        if [[ ! -z $GOODSYNTAX ]]
+        then
+            echo "Sshd config has some faults, please check script or /etc/ssh/sshd_config"
+            read -rp ""
+        fi
 else
 	echo Response not recognized.
 fi
@@ -903,14 +949,33 @@ then
 	ufw allow mysql-proxy
 	apt-get install mariadb-server-10.1 -y
 	mysql_secure_configuration
-	cp /etc/mysql/my.cnf /home/scriptuser/backups/
-	if grep -q "bind-address" "/etc/mysql/my.cnf"
-	then
-		sed -i "s/bind-address\t\t=.*/bind-address\t\t= 127.0.0.1/g" /etc/mysql/my.cnf
-		sed -i "s/local-infile\t\t=.*/local-infile\t\t=0/g" /etc/mysql/my.cnf
-		
-	fi
-	gedit /etc/mysql/my.cnf
+	cp /etc/mysql/my.cnf /home/scriptuser/backups/ 
+
+        #Disables LOCAL INFILE
+        echo "local-infile=0" | tee -a /etc/mysql/my.cnf
+
+        #Lowers database privileges
+        echo "skip-show-database" | tee -a /etc/mysql/my.cnf
+
+        # Disable remote access
+        echo "bind-address=127.0.0.1" | tee -a /etc/mysql/my.cnf
+        sed -i '/bind-address/ c\bind-address = 127.0.0.1' /etc/mysql/my.cnf
+
+        #Disables symbolic links
+        echo "symbolic-links=0" | tee -a /etc/mysql/my.cnf
+
+        #Sets password expiration
+        echo "default_password_lifetime = 90" | tee -a /etc/mysql/my.cnf
+
+        #Sets root account password
+        echo "[mysqladmin]" | tee -a /etc/mysql/my.cnf
+        echo "user = root" | tee -a /etc/mysql/my.cnf
+        echo "password = CyberTaipan123!" | tee -a /etc/mysql/my.cnf
+
+        #Sets packet restrictions
+        echo "key_buffer_size         = 16M" | tee -a /etc/mysql/my.cnf
+        echo "max_allowed_packet      = 16M" | tee -a /etc/mysql/my.cnf
+
 	systemctl restart mysql
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been allowed on the firewall. MySQL has been installed. MySQL config file has been secured. MySQL systemctl has been restarted."
 else
@@ -1008,14 +1073,48 @@ then
 
 	    # ssl.conf
 	    # TLS only
-	    sudo sed -i "s/SSLProtocol.*/SSLProtocol –ALL +TLSv1 +TLSv1.1 +TLSv1.2/" /etc/apache2/mods-available/ssl.conf
+	    sed -i "s/SSLProtocol.*/SSLProtocol –ALL +TLSv1 +TLSv1.1 +TLSv1.2/" /etc/apache2/mods-available/ssl.conf
 	    # Stronger cipher suite
-	    sudo sed -i "s/SSLCipherSuite.*/SSLCipherSuite HIGH:\!MEDIUM:\!aNULL:\!MD5:\!RC4/" /etc/apache2/mods-available/ssl.conf
+	    sed -i "s/SSLCipherSuite.*/SSLCipherSuite HIGH:\!MEDIUM:\!aNULL:\!MD5:\!RC4/" /etc/apache2/mods-available/ssl.conf
 
-	    sudo chown -R root:root /etc/apache2
-	    sudo chown -R root:root /etc/apache 2> /dev/null
+	    chown -R root:root /etc/apache2
+	    chown -R root:root /etc/apache 2> /dev/null
 	fi
-	chown -R root:root /etc/apache2
+	
+        PHPCONFIG=/etc/php/7.3/apache2/php.ini
+
+        # Disable Global variables
+        echo 'register_globals = Off' | tee -a $PHPCONFIG
+
+        # Disable tracking, HTML, and display errors
+        sed -i "s/^;\?html_errors.*/html_errors = Off/" $PHPCONFIG
+        sed -i "s/^;\?display_errors.*/display_errors = Off/" $PHPCONFIG
+        sed -i "s/^;\?expose_php.*/expose_php = Off/" $PHPCONFIG
+        sed -i "s/^;\?mail\.add_x_header.*/mail\.add_x_header = Off/" $PHPCONFIG
+
+        # Disable Remote File Includes
+        sed -i "s/^;\?allow_url_fopen.*/allow_url_fopen = Off/" $PHPCONFIG
+
+        # Restrict File Uploads
+        sed -i "s/^;\?file_uploads.*/file_uploads = Off/" $PHPCONFIG
+
+        # Control POST/Upload size
+        sed -i "s/^;\?post_max_size.*/post_max_size = 1K/" $PHPCONFIG
+        sed -i "s/^;\?upload_max_filesize.*/upload_max_filesize = 2M/" $PHPCONFIG
+
+        # Protect sessions
+        sed -i "s/^;\?session\.cookie_httponly.*/session\.cookie_httponly = 1/" $PHPCONFIG
+
+        # General
+        sed -i "s/^;\?session\.use_strict_mode.*/session\.use_strict_mode = On/" $PHPCONFIG
+ 
+        sed -i "s/^;\?disable_functions.*/disable_functions = php_uname, getmyuid, getmypid, passthru,listen, diskfreespace, tmpfile, link, ignore_user_abort, shell_exec, dl, set_time_limit, exec, system, highlight_file, show_source, fpassthru, virtual, posix_ctermid, posix_getcwd, posix_getegid, posix_geteuid, posix_getgid, posix_getgrgid, posix_getgrnam, posix_getgroups, posix_getlogin, posix_getpgid, posix_getpgrp, posix_getpid, posix_getppid, posix_getpwnam, posix_getpwuid, posix_getrlimit, posix_getsid, posix_getuid, posix_isatty, posix_kill, posix_mkfifo, posix_setegid, posix_seteuid, posix_setgid, posix_setpgid, posix_setsid, posix_setuid, posix_times, posix_ttyname, posix_uname, proc_open, proc_close, proc_get_status, proc_nice, proc_terminate, phpinfo/" $PHPCONFIG
+        sed -i "s/^;\?max_execution_time.*/max_execution_time = 30/" $PHPCONFIG
+        sed -i "s/^;\?max_input_time.*/max_input_time = 30/" $PHPCONFIG
+        sed -i "s/^;\?memory_limit.*/memory_limit = 40M/" $PHPCONFIG
+        sed -i "s/^;\?open_basedir.*/open_basedir = \"c:inetpub\"/" $PHPCONFIG
+        
+        chown -R root:root /etc/apache2
 	systemctl start apache2
 	systemctl status apache2
 
