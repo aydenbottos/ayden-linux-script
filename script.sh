@@ -26,6 +26,11 @@ for FILE in $(debsums -ca);
     echo "" >> ~/Desktop/differences.log
 done
 echo "Outputted every change on the system since installation - this log is a must-check."
+popd
+
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
+find / -type f >> allfiles.log
+diff allfiles.log defaultfiles.log >> addedanddeletedfiles.log
 
 echo "Opening forensics questions."
 sudo gnome-terminal
