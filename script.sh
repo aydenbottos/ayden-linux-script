@@ -670,7 +670,7 @@ echo "Confirmed that all groups have a unique name."
 
 clear
 grep ^shadow:[^:]*:[^:]*:[^:]+ /etc/group
-echo "If any users are printed above this and below confirmed that all groups have a unique name, get Ayden!"
+echo "If any users are printed above this, they are part of the shadow group and need to be removed from the group IMMEDIATELY!"
 
 clear
 touch /zerouidusers
