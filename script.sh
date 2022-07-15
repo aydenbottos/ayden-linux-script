@@ -565,16 +565,6 @@ echo "IP info logged."
 netstat -pnola
 echo "All active ports logged."
 
-clear
-echo "Disable IPv6?"
-read ipv6YN
-if [ $ipv6YN == yes ]
-then
-	echo -e "\n\n# Disable IPv6\nnet.ipv6.conf.all.disable_ipv6 = 1\nnet.ipv6.conf.default.disable_ipv6 = 1\nnet.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
-	sysctl -p >> /dev/null
-	echo "IPv6 has been disabled."
-fi
-
 chown root:root /etc/securetty
 chmod 0600 /etc/securetty
 chmod 644 /etc/crontab
@@ -1159,6 +1149,12 @@ clear
 systemctl >> /home/scriptuser/systemctlUnits.log
 echo "All systemctl services listed."
 
+apt install nmap -y
+nmap -oN nmap.log -p- -v localhost 
+apt purge nmap -y
+clear
+echo "Logged ports with Nmap then deleted it again."
+
 clear
 ls /etc/init/ >> /home/scriptuser/initFiles.log
 ls /etc/init.d/ >> /home/scriptuser/initFiles.log
@@ -1185,11 +1181,18 @@ echo "Running ChkRootKit."
 
 clear
 cp /etc/login.defs /home/scriptuser/backups/
-sed -i '160s/.*/PASS_MAX_DAYS\o01130/' /etc/login.defs
-sed -i '161s/.*/PASS_MIN_DAYS\o0113/' /etc/login.defs
-sed -i '163s/.*/PASS_WARN_AGE\o0117/' /etc/login.defs
-cat /etc/login.defs
-echo "Password policies have been set with /etc/login.defs."
+sed -ie "s/PASS_MAX_DAYS.*/PASS_MAX_DAYS\\t30/" /etc/login.defs
+sed -ie "s/PASS_MIN_DAYS.*/PASS_MIN_DAYS\\t10/" /etc/login.defs
+sed -ie "s/PASS_WARN_AGE.*/PASS_WARN_AGE\\t7/" /etc/login.defs
+sed -ie "s/FAILLOG_ENAB.*/FAILLOG_ENAB\\tyes/" /etc/login.defs
+sed -ie "s/LOG_UNKFAIL_ENAB.*/LOG_UNKFAIL_ENAB\\tyes/" /etc/login.defs
+sed -ie "s/LOG_OK_LOGINS.*/LOG_OK_LOGINS\\tyes/" /etc/login.defs
+sed -ie "s/SYSLOG_SU_ENAB.*/SYSLOG_SU_ENAB\\tyes/" /etc/login.defs
+sed -ie "s/SYSLOG_SG_ENAB.*/SYSLOG_SG_ENAB\\tyes/" /etc/login.defs
+sed -ie "s/LOGIN_RETRIES.*/LOGIN_RETRIES\\t5/" /etc/login.defs
+sed -ie "s/ENCRYPT_METHOD.*/ENCRYPT_METHOD\\tSHA512/" /etc/login.defs
+sed -ie "s/LOGIN_TIMEOUT.*/LOGIN_TIMEOUT\\t60/" /etc/login.defs
+echo "Login settings set in login.defs"
 
 echo "umask 027" >> /etc/bash.bashrc
 echo "umask 027" >> /etc/profile
