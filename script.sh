@@ -27,10 +27,14 @@ for FILE in $(debsums -ca);
 done
 echo "Outputted every change on the system since installation - this log is a must-check."
 popd
+clear
 
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
 find / -type f >> allfiles.log
+sed -i "s/aydenbottos/$(stat -c "%U" .)/g" defaultfiles.log
 diff allfiles.log defaultfiles.log >> addedanddeletedfiles.log
+echo "This log could be interesting - added and deleted files since installation."
+clear
 
 echo "Opening forensics questions."
 sudo gnome-terminal
