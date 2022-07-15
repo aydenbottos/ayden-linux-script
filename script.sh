@@ -18,6 +18,15 @@ echo "Script is being run as root."
 pw=CyberTaipan123!
 echo "Universal password set."
 
+pushd /tmp
+for FILE in $(debsums -ca);
+    do echo $FILE >> ~/Desktop/differences.log;
+    PKG=$(dpkg -S $FILE | cut -d: -f1);
+    diff <(apt-get download $PKG;dpkg-deb --fsys-tarfile $PKG*.deb | tar xOf - .$FILE) $FILE | tee -a ~/Desktop/differences.log;
+    echo "" >> ~/Desktop/differences.log
+done
+echo "Outputted every change on the system since installation - this log is a must-check."
+
 echo "Opening forensics questions."
 sudo gnome-terminal
 gedit "Forensics Question 1.txt"
