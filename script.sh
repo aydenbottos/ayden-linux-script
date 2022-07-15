@@ -42,7 +42,7 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr ufw tcpd lynis chkrootkit iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup -y
+apt-get install apt-transport-https dirmngr ufw tcpd lynis chkrootkit iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup aide unhide psad -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 apt-get purge $(cat packages.txt)
@@ -334,10 +334,55 @@ echo 'exit 0' >> /etc/rc.local
 echo "Any startup scripts have been removed."
 
 clear
+iptables -F
+iptables -X
+iptables -Z
+
 ufw enable
 ufw default deny incoming
 ufw status verbose
 echo "UFW Firewall enabled and all ports blocked."
+    
+# Iptables specific
+    
+# Block null packets (DoS)
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+    
+# Block syn-flood attacks (DoS)
+iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+#Drop incoming packets with fragments
+iptables -A INPUT -f -j DROP
+
+# Block XMAS packets (DoS)
+iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+
+# Allow internal traffic on the loopback device
+sudo iptables -A INPUT -i lo -j ACCEPT
+
+# Allow established connections
+iptables -I INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow outgoing connections
+iptables -P OUTPUT ACCEPT
+
+#Block NFS
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 2049 -j DROP
+
+#Block X-Windows
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 6000:6009 -j DROP
+
+#Block X-Windows font server
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 7100 -j DROP
+
+#Block printer port
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 515 -j DROP
+
+#Block Sun rpc/NFS
+iptables -A INPUT -p udp -s 0/0 -d 0/0 --dport 111 -j DROP
+
+# Deny outside packets from internet which claim to be from your loopback interface.
+sudo iptables -A INPUT -p all -s localhost  -i eth0 -j DROP
 
 clear
 env i='() { :;}; echo vulnerable >> test' bash -c "echo this is a test"
@@ -420,12 +465,99 @@ echo "IRQ Balance has been disabled."
 
 clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
-echo > /etc/sysctl.conf
-echo -e "#Enable ASLR\nkernel.randomize_va_space = 2\n\n# Controls IP packet forwarding\nnet.ipv4.ip_forward = 0\n\n# IP Spoofing protection\nnet.ipv4.conf.all.rp_filter = 1\nnet.ipv4.conf.default.rp_filter = 1\n\n# Ignore ICMP broadcast requests\nnet.ipv4.icmp_echo_ignore_broadcasts = 1\n\n# Disable source packet routing\nnet.ipv4.conf.all.accept_source_route = 0\nnet.ipv6.conf.all.accept_source_route = 0\nnet.ipv4.conf.default.accept_source_route = 0\nnet.ipv6.conf.default.accept_source_route = 0\n\n# Ignore send redirects\nnet.ipv4.conf.all.send_redirects = 0\nnet.ipv4.conf.default.send_redirects = 0\n\n# Block SYN attacks\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_max_syn_backlog = 2048\nnet.ipv4.tcp_synack_retries = 2\nnet.ipv4.tcp_syn_retries = 5\n\n# Log Martians\nnet.ipv4.conf.all.log_martians = 1\nnet.ipv4.icmp_ignore_bogus_error_responses = 1\n\n# Ignore ICMP redirects\nnet.ipv4.conf.all.accept_redirects = 0\nnet.ipv6.conf.all.accept_redirects = 0\nnet.ipv4.conf.default.accept_redirects = 0\nnet.ipv6.conf.default.accept_redirects = 0\n\n# Ignore Directed pings\nnet.ipv4.icmp_echo_ignore_all = 1\n\n# Accept Redirects? No, this is not router\nnet.ipv4.conf.all.secure_redirects = 0\n\n# Log packets with impossible addresses to kernel log? yes\nnet.ipv4.conf.default.secure_redirects = 0\n\n########## IPv6 networking start ##############\n# Number of Router Solicitations to send until assuming no routers are present.\n# This is host and not router\nnet.ipv6.conf.default.router_solicitations = 0\n\n# Accept Router Preference in RA?\nnet.ipv6.conf.default.accept_ra_rtr_pref = 0\n\n# Learn Prefix Information in Router Advertisement\nnet.ipv6.conf.default.accept_ra_pinfo = 0\n\n# Setting controls whether the system will accept Hop Limit settings from a router advertisement\nnet.ipv6.conf.default.accept_ra_defrtr = 0\n\n#router advertisements can cause the system to assign a global unicast address to an interface\nnet.ipv6.conf.default.autoconf = 0\n\n#how many neighbor solicitations to send out per address?\nnet.ipv6.conf.default.dad_transmits = 0\n\n# How many global unicast IPv6 addresses can be assigned to each interface?
-net.ipv6.conf.default.max_addresses = 1\n\n########## IPv6 networking ends ##############\n\nkernel.sysrq=0\nkernel.exec-shield=2" > /etc/sysctl.conf
-sysctl -p >> /dev/null
-cat /etc/sysctl.conf
-echo "Sysctl has been configured."
+touch /etc/sysctl.d/cybertai-system.conf
+
+# Add these configs
+echo kernel.dmesg_restrict=1            | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored
+echo fs.suid_dumpable=0                 | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Core dumps # Scored
+echo kernel.msgmnb=65536                | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.msgmax=65536                | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.sysrq=0                     | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.maps_protect=1              | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.core_uses_pid=1             | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.shmmax=68719476736          | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.shmall=4294967296           | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.exec_shield=1               | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.panic=10                    | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.kptr_restrict=2             | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo vm.panic_on_oom=1                  | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo fs.protected_hardlinks=1           | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo fs.protected_symlinks=1            | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.randomize_va_space=2        | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored ASLR; 2 = full; 1 = semi; 0 = none
+echo kernel.unprivileged_userns_clone=0 | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored
+echo kernel.ctrl-alt-del=0              | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored CTRL-ALT-DEL disable
+
+sysctl --system
+clear
+echo "Sysctl system settings set."
+
+sudo touch /etc/sysctl.d/cybertai-networking.conf 
+
+# IPv4 TIME-WAIT assassination protection
+echo net.ipv4.tcp_rfc1337=1 | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+# IP Spoofing protection, Source route verification  
+# Scored
+echo net.ipv4.conf.all.rp_filter=1      | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.default.rp_filter=1  | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+# Ignore ICMP broadcast requests
+echo net.ipv4.icmp_echo_ignore_broadcasts=1 | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+# Ignore Directed pings
+echo net.ipv4.icmp_echo_ignore_all=1 | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+# Log Martians
+echo net.ipv4.conf.all.log_martians=1               | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.icmp_ignore_bogus_error_responses=1   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+# Disable source packet routing
+echo net.ipv4.conf.all.accept_source_route=0        | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.default.accept_source_route=0    | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.all.accept_source_route=0        | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.accept_source_route=0    | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+# Block SYN attacks
+echo net.ipv4.tcp_syncookies=1          | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.tcp_max_syn_backlog=2048  | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.tcp_synack_retries=2      | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+    
+# Ignore ICMP redirects
+echo net.ipv4.conf.all.send_redirects=0         | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.default.send_redirects=0     | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.all.accept_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.default.accept_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.all.secure_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.default.secure_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+echo net.ipv6.conf.all.send_redirects=0         | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
+echo net.ipv6.conf.default.send_redirects=0     | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
+echo net.ipv6.conf.all.accept_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.accept_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.all.secure_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
+echo net.ipv6.conf.default.secure_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
+
+# Note disabling ipv6 means you dont need the majority of the ipv6 settings
+
+# General options
+echo net.ipv6.conf.default.router_solicitations=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.accept_ra_rtr_pref=0     | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.accept_ra_pinfo=0        | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.accept_ra_defrtr=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.autoconf=0               | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.dad_transmits=0          | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.max_addresses=1          | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.all.disable_ipv6=1               | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.lo.disable_ipv6=1                | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+
+# Reload the configs 
+sysctl --system
+
+# Disable IPV6
+sed -i '/^IPV6=yes/ c\IPV6=no\' /etc/default/ufw
+echo 'blacklist ipv6' | tee -a /etc/modprobe.d/blacklist > /dev/null
+clear
+echo "Sysctl network settings set."
 
 ip -a
 echo "IP info logged."
@@ -1041,12 +1173,12 @@ ls -al ~/.john/*
 clear
 echo "John the Ripper files have been removed."
 
+wget https://raw.githubusercontent.com/bcoles/linux-audit/master/linux-audit.sh
+chmod a+x linux-audit.sh
+./linux-audit.sh
 clear
-( lynis audit system -Q >> LynisOutput.txt; echo "Finished Lynis" ) &
-disown; sleep 2;
-echo "Running Lynis."
+echo "Ran Linux auditing tools."
 
-clear
 ( chkrootkit -q >> ChkrootkitOutput.txt; echo "Finished ChkRootKit" ) &
 disown; sleep 2;
 echo "Running ChkRootKit."
