@@ -8,9 +8,7 @@ netcat-traditional
 gcc
 g++
 ncat
-pnetcat
 socat
-sock
 socket
 sbd
 transmission
@@ -27,11 +25,9 @@ hydra
 hydra-gtk
 aircrack-ng
 fcrackzip
-lcrack
 ophcrack
 ophcrack-cli
 pdfcrack
-pyrit
 rarcrack
 sipcrack
 irpas
@@ -43,10 +39,8 @@ nmap
 wireguard
 *torrent
 openvpn
-logkeys
 zeitgeist-core
 zeitgeist-datahub
-python-zeitgeist
 rhythmbox-plugin-zeitgeist
 zeitgeist
 nfs-kernel-server
