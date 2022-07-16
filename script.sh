@@ -18,14 +18,6 @@ echo "Script is being run as root."
 pw=CyberTaipan123!
 echo "Universal password set."
 
-apt install rsync -y
-pushd /tmp
-wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/systemarchive.tar.gz
-tar -xf systemarchive.tar.gz
-pushd systemarchive
-rsync -ani --exclude {'/var', '/proc', '/sys', '/dev', '/run'} --delete / . > /rsyncresults.txt 2>&1
-echo "Ran rsync to find all changes made to any file - log is at root."
-
 wget https://github.com/tclahr/uac/releases/download/v2.2.0/uac-2.2.0.tar.gz
 tar -xf uac-2.2.0.tar.gz
 pushd uac-2.2.0
