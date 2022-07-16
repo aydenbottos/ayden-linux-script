@@ -27,7 +27,7 @@ mkdir results
 popd
 echo "Ran UAC - check its folder for results."
 
-apt install p7zip -y
+apt install p7zip debsums -y
 mkdir thor
 pushd thor
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/thor10.7lite-linux-pack.7z
