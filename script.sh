@@ -54,7 +54,7 @@ clear
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
 find / -type f >> allfiles.log
 sed -i "s/aydenbottos/$mainUser/g" defaultfiles.log
-sed -i '/\/cache/d' allfiles.log
+sed -i '/cache/d' allfiles.log
 sed -i '/\/sys/d' allfiles.log
 sed -i '/\/run/d' allfiles.log
 sed -i '/\/dev/d' allfiles.log
