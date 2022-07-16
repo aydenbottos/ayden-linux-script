@@ -37,15 +37,13 @@ p7zip -d thor10.7lite-linux-pack.7z
 popd
 echo "Ran THOR IOC and YARA scanner."
 
-pushd /tmp
 for FILE in $(debsums -ca);
-    do echo $FILE >> ~/Desktop/differences.log;
+    do echo $FILE >> differences.log;
     PKG=$(dpkg -S $FILE | cut -d: -f1);
-    diff <(apt-get download $PKG;dpkg-deb --fsys-tarfile $PKG*.deb | tar xOf - .$FILE) $FILE | tee -a ~/Desktop/differences.log;
-    echo "" >> ~/Desktop/differences.log
+    diff <(apt-get download $PKG;dpkg-deb --fsys-tarfile $PKG*.deb | tar xOf - .$FILE) $FILE | tee -a differences.log;
+    echo "" >> differences.log
 done
 echo "Outputted every change on the system since installation - this log is a must-check."
-popd
 clear
 
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
