@@ -7,6 +7,8 @@ echo "The password used is CyberTaipan123!"
 echo "Running at $(date)"
 echo "Running on $(lsb_release -is)"
 echo "Hostname: $(hostname)"
+echo "Main user: $(stat -c "%U" .)"
+mainUser=$(stat -c "%U" .)
 
 if [[ $EUID -ne 0 ]]
 then
@@ -38,18 +40,20 @@ popd
 echo "Ran THOR IOC and YARA scanner."
 
 touch differences.log
+pushd /tmp
 for FILE in $(debsums -ca);
-    do echo $FILE >> differences.log;
+    do echo $FILE >> /home/$mainUser/Desktop/differences.log;
     PKG=$(dpkg -S $FILE | cut -d: -f1);
-    diff <(apt-get download $PKG;dpkg-deb --fsys-tarfile $PKG*.deb | tar xOf - .$FILE) $FILE | tee -a differences.log;
-    echo "" >> differences.log
+    diff <(apt-get download $PKG;dpkg-deb --fsys-tarfile $PKG*.deb | tar xOf - .$FILE) $FILE | tee -a /home/$mainUser/Desktop/differences.log;
+    echo "" >> /home/$mainUser/Desktop/differences.log
 done
+popd
 echo "Outputted every change on the system since installation - this log is a must-check."
 clear
 
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
 find / -type f >> allfiles.log
-sed -i "s/aydenbottos/$(stat -c "%U" .)/g" defaultfiles.log
+sed -i "s/aydenbottos/$mainUser/g" defaultfiles.log
 diff allfiles.log defaultfiles.log >> addedanddeletedfiles.log
 echo "This log could be interesting - added and deleted files since installation."
 clear
@@ -456,7 +460,7 @@ clear
 chmod 777 /etc/hosts
 cp /etc/hosts /home/scriptuser/backups/
 echo > /etc/hosts
-echo -e "127.0.0.1 localhost\n127.0.1.1 $(stat -c "%U" .)\n::1 ip6-localhost ip6-loopback\nfe00::0 ip6-localnet\nff00::0 ip6-mcastprefix\nff02::1 ip6-allnodes\nff02::2 ip6-allrouters" >> /etc/hosts
+echo -e "127.0.0.1 localhost\n127.0.1.1 $mainUser\n::1 ip6-localhost ip6-loopback\nfe00::0 ip6-localnet\nff00::0 ip6-mcastprefix\nff02::1 ip6-allnodes\nff02::2 ip6-allrouters" >> /etc/hosts
 chmod 644 /etc/hosts
 echo "HOSTS file has been set to defaults."
 
@@ -1381,7 +1385,7 @@ apt-get upgrade -y
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 clear
-su - $(stat -c "%U" .) -c 'firefox --preferences'
+su - $mainUser -c 'firefox --preferences'
 echo "Popup blocker enabled in Firefox"
 
 clear
