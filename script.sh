@@ -37,6 +37,7 @@ p7zip -d thor10.7lite-linux-pack.7z
 popd
 echo "Ran THOR IOC and YARA scanner."
 
+touch differences.log
 for FILE in $(debsums -ca);
     do echo $FILE >> differences.log;
     PKG=$(dpkg -S $FILE | cut -d: -f1);
