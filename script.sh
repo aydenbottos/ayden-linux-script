@@ -59,6 +59,22 @@ sed -i '/\/sys/d' allfiles.log
 sed -i '/\/run/d' allfiles.log
 sed -i '/\/dev/d' allfiles.log
 sed -i '/\/proc/d' allfiles.log
+sed -i '/\/snap/d' allfiles.log
+sed -i '/apt/d' allfiles.log
+sed -i '/dpkg/d' allfiles.log
+sed -i '/man/d' allfiles.log
+sed -i '/doc/d' allfiles.log
+sed -i '/dpkg/d' defaultfiles.log
+sed -i '/cache/d' defaultfiles.log
+sed -i '/\/sys/d' defaultfiles.log
+sed -i '/\/run/d' defaultfiles.log
+sed -i '/\/dev/d' defaultfiles.log
+sed -i '/\/proc/d' defaultfiles.log
+sed -i '/\/snap/d' defaultfiles.log
+sed -i '/apt/d' defaultfiles.log
+sed -i '/dpkg/d' defaultfiles.log
+sed -i '/man/d' defaultfiles.log
+sed -i '/doc/d' defaultfiles.log
 diff allfiles.log defaultfiles.log >> addedanddeletedfiles.log
 echo "This log could be interesting - added and deleted files since installation."
 clear
