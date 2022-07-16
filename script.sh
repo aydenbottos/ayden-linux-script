@@ -53,6 +53,11 @@ clear
 
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
 find / -type f >> allfiles.log
+sed -i '/\/var/d' allfiles.log
+sed -i '/\/sys/d' allfiles.log
+sed -i '/\/run/d' allfiles.log
+sed -i '/\/dev/d' allfiles.log
+sed -i '/\/proc/d' allfiles.log
 sed -i "s/aydenbottos/$mainUser/g" defaultfiles.log
 diff allfiles.log defaultfiles.log >> addedanddeletedfiles.log
 echo "This log could be interesting - added and deleted files since installation."
