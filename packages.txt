@@ -33,7 +33,6 @@ sipcrack
 irpas
 wireshark*
 tshark
-kismet
 zenmap
 nmap
 wireguard
