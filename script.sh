@@ -106,7 +106,7 @@ echo "Installing all neccessary software."
 apt-get install apt-transport-https dirmngr ufw tcpd lynis chkrootkit iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup aide unhide psad -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
-apt-get purge $(cat packages.txt)
+apt-get purge $(cat packages.txt) -y --force
 
 clear
 echo "Check to verify that all update settings are correct."
