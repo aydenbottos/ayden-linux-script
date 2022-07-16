@@ -1199,7 +1199,7 @@ then
 	clear
 	echo "All video files have been listed."
 	
-	find /home -regextype posix-extended -regex '.*\.(tiff|tif|rs|iml|gif|jpeg|jpg|jpe|png|rgb|xwd|xpm|ppm|pbm|pgm|pcx|ico|svg|svgz|pot|xml|pl)$' -delete
+	find /home -regextype posix-extended -regex '.*\.(tiff|tif|rs|iml|gif|jpeg|exe|run|bat|jpg|jpe|png|rgb|xwd|xpm|ppm|pbm|pgm|pcx|ico|svg|svgz|pot|xml|pl)$' -delete
 	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg
 	clear
 	echo "All image files have been listed."
