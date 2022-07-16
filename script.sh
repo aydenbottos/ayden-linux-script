@@ -457,7 +457,7 @@ clear
 chmod 777 /etc/hosts
 cp /etc/hosts /home/scriptuser/backups/
 echo > /etc/hosts
-echo -e "127.0.0.1 localhost\n127.0.1.1 $USER\n::1 ip6-localhost ip6-loopback\nfe00::0 ip6-localnet\nff00::0 ip6-mcastprefix\nff02::1 ip6-allnodes\nff02::2 ip6-allrouters" >> /etc/hosts
+echo -e "127.0.0.1 localhost\n127.0.1.1 $(stat -c "%U" .)\n::1 ip6-localhost ip6-loopback\nfe00::0 ip6-localnet\nff00::0 ip6-mcastprefix\nff02::1 ip6-allnodes\nff02::2 ip6-allrouters" >> /etc/hosts
 chmod 644 /etc/hosts
 echo "HOSTS file has been set to defaults."
 
