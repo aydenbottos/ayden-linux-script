@@ -1206,8 +1206,12 @@ elif [ $dnsYN == yes ]
 then
 	apt-get install bind9 -y
 	ufw allow domain
-	echo "domain port has been allowed on the firewall and bind9 installed. When the text editor opens, add this to options: allow-transfer {"none";}; and version "BIND";"
-	gedit /etc/named.conf
+	ufw allow 53
+	echo "domain port has been allowed on the firewall and bind9 installed."
+	chsh -s /sbin/nologin bind
+	passwd -l bind
+	wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/named.conf.options
+	cp named.conf.options /etc/bind/named.conf.options
 	systemctl start bind9
 	systemctl status bind9
 else
