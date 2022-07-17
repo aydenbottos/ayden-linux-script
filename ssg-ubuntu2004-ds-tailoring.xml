@@ -34,7 +34,7 @@ Ubuntu 20.04 LTS Benchmark, v1.0.0, released 07-21-2020.</xccdf:description>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudo_remove_nopasswd" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudo_remove_no_authenticate" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudo_add_requiretty" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudo_add_noexec" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudo_add_noexec" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudo_vdsm_nopasswd" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudoers_explicit_command_args" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sudoers_no_command_negation" selected="false"/>
