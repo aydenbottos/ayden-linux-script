@@ -1273,34 +1273,8 @@ tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
 clear
-parse_dpkg_log() {
-  {
-    for FN in `ls -1 /var/log/dpkg.log*` ; do
-      CMD="cat"
-      [ ${FN##*.} == "gz" ] && CMD="zcat" 
-      $CMD $FN | egrep "[0-9] install" | awk '{print $4}' \
-        | awk -F":" '{print $1}'
-    done
-  } | sort | uniq
-}
-
-## all packages installed with apt-get/aptitude
-list_installed=$(parse_dpkg_log)
-## packages that were not marked as auto installed
-list_manual=$(apt-mark showmanual | sort)
-
-## output intersection of 2 lists
-comm -12 <(echo "$list_installed") <(echo "$list_manual")
-echo "All manually installed packages have been listed. If using Debian, ignore above. Less accurate but 100% working."
-
-grep -oP "Unpacking \K[^: ]+" /var/log/installer/syslog | sort -u | comm -13 /dev/stdin <(apt-mark showmanual | sort)
-echo "If using Debian, ignore the first list of packages and refer to the second one. Less accurate but 100% working."
-
-zgrep 'Commandline: apt' /var/log/apt/history.log /var/log/apt/history.log.*.gz
-echo "100% accurate list of manual packages but may not work."
-
 comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n 's/^Package: //p' | sort -u)
-echo "100% working list but accuracy is also undetermined."
+echo "Listed all packages that have been manually installed on the system."
 
 apt list --installed >> /home/scriptuser/allInstalledPackages.log
 echo "Listed all installed packages, not just manual ones."
