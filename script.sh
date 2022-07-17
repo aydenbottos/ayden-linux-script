@@ -801,22 +801,13 @@ then
 	ufw allow netbios-ssn
 	ufw allow microsoft-ds
 	apt-get install samba -y
-	apt-get install system-config-samba -y
-	systemctl start samba
-	systemctl status samba
+	systemctl start smbd
+	systemctl status smbd
 	cp /etc/samba/smb.conf /home/scriptuser/backups/
 	if [ "$(grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
 	then
 		sed -i 's/####### Authentication #######/####### Authentication #######\nsecurity = user/g' /etc/samba/smb.conf
 	fi
-	
-	usersSMB=$readmeusers
-	usersSMBLength=${#usersSMB[@]}	
-	for (( i=0;i<$usersSMBLength;i++))
-	do
-		echo -e "$pw\n$pw" | smbpasswd -a "${usersSMB[${i}]}"
-		echo "${usersSMB[${i}]} has been given the default password for Samba."
-	done
         echo "restrict anonymous = 2"       | tee -a /etc/samba/smb.conf > /dev/null
         echo "encrypt passwords = True"     | tee -a /etc/samba/smb.conf > /dev/null # Idk which one it takes
         echo "encrypt passwords = yes"      | tee -a /etc/samba/smb.conf > /dev/null
