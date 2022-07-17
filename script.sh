@@ -1447,8 +1447,8 @@ fi
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg-ubuntu2004-ds.xml
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg-ubuntu2004-ds-tailoring.xml
 
-oscap xccdf eval --remediate --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
-oscap xccdf eval --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
+oscap xccdf eval --remediate --verbose-log-file run1.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
+oscap xccdf eval --remediate --results results.xml --report cisreport.html --verbose-log-file run2.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
 echo "Ran OpenSCAP for CIS compliance."
 
 unhide -f procall sys
