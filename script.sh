@@ -318,14 +318,14 @@ else
 fi
 
 clear
-profileFiles=$(find / -type f -name .profile)
-for f in profileFiles; do cp /etc/skel/.profile $f; done
+profileFiles=$(find /home -type f -name .profile)
+for f in $profileFiles; do cp /etc/skel/.profile $f; done
 
-bashrcFiles=$(find / -type f -name .bashrc)
-for f in bashrcFiles; do cp /etc/skel/.bashrc $f; done
+bashrcFiles=$(find /home -type f -name .bashrc)
+for f in $bashrcFiles; do cp /etc/skel/.bashrc $f; done
 
-logoutFiles=$(find / -type f -name .bash_logout)
-for f in logoutFiles; do cp /etc/skel/.bash_logout $f; done
+logoutFiles=$(find /home -type f -name .bash_logout)
+for f in $logoutFiles; do cp /etc/skel/.bash_logout $f; done
 clear
 echo "Replaced .bash files with originals."
 
