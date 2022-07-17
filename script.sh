@@ -839,15 +839,14 @@ then
 	echo "vsFTPd has been removed. ftp, sftp, saft, ftps-data, and ftps ports have been denied on the firewall."
 elif [ $ftpYN == yes ]
 then
-	ufw allow ftp 
-	ufw allow sftp 
-	ufw allow saft 
-	ufw allow ftps-data 
+    ufw allow ftp 
+    ufw allow sftp 
+    ufw allow saft 
+    ufw allow ftps-data 
     ufw allow ftps
     apt-get install vsftpd -y
-    cp /etc/vsftpd/vsftpd.conf /home/scriptuser/backups/
     cp /etc/vsftpd.conf /home/scriptuser/backups/
-    config_file="/etc/vsftpd/vsftpd.conf"
+    config_file="/etc/vsftpd.conf"
 
     # Jail users to home directory (user will need a home dir to exist)
     echo "chroot_local_user=YES"                        | sudo tee $config_file > /dev/null
@@ -877,9 +876,9 @@ then
 
     echo "ascii_upload_enable=NO"   | sudo tee -a $config_file > /dev/null 
     echo "ascii_download_enable=NO" | sudo tee -a $config_file > /dev/null
-	systemctl restart vsftpd
-	systemctl status vsftpd
-	echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
+    systemctl restart vsftpd
+    systemctl status vsftpd
+    echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
 else
 	echo Response not recognized.
 fi
@@ -898,7 +897,6 @@ then
 	apt-get install openssh-server -y
 	ufw allow ssh
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
-	usersSSH=$readmeusers
 	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication yes\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nDenyUsers\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 0\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
 	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
@@ -909,12 +907,6 @@ then
 	chmod 700 ../.ssh
 	ssh-keygen -t rsa
 	echo "SSH port has been allowed on the firewall. SSH config file has been configured. SSH RSA 2048 keys have been created."
-        GOODSYNTAX=$(sudo sshd -t)
-        if [[ ! -z $GOODSYNTAX ]]
-        then
-            echo "Sshd config has some faults, please check script or /etc/ssh/sshd_config"
-            read -rp ""
-        fi
 else
 	echo Response not recognized.
 fi
@@ -1007,11 +999,14 @@ then
 	ufw allow ms-sql-m 
 	ufw allow mysql 
 	ufw allow mysql-proxy
-	apt-get install mariadb-server-10.1 -y
+	apt-get install mariadb-server-1* -y
 	mysql_secure_configuration
 	cp /etc/mysql/my.cnf /home/scriptuser/backups/ 
 
-        #Disables LOCAL INFILE
+	#Sets group
+	echo "[mariadb]" | tee -a /etc/mysql/my.cnf
+        
+	#Disables LOCAL INFILE
         echo "local-infile=0" | tee -a /etc/mysql/my.cnf
 
         #Lowers database privileges
@@ -1024,9 +1019,6 @@ then
         #Disables symbolic links
         echo "symbolic-links=0" | tee -a /etc/mysql/my.cnf
 
-        #Sets password expiration
-        echo "default_password_lifetime = 90" | tee -a /etc/mysql/my.cnf
-
         #Sets root account password
         echo "[mysqladmin]" | tee -a /etc/mysql/my.cnf
         echo "user = root" | tee -a /etc/mysql/my.cnf
@@ -1036,7 +1028,7 @@ then
         echo "key_buffer_size         = 16M" | tee -a /etc/mysql/my.cnf
         echo "max_allowed_packet      = 16M" | tee -a /etc/mysql/my.cnf
 
-	systemctl restart mysql
+	systemctl restart mariadb
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been allowed on the firewall. MySQL has been installed. MySQL config file has been secured. MySQL systemctl has been restarted."
 else
 	echo Response not recognized.
@@ -1060,6 +1052,8 @@ then
 	ufw allow http
 	ufw allow apache
 	apt-get install libapache2-mod-security2 -y
+	a2enmod headers
+	a2enmod rewrite
 	cp /etc/apache2/apache2.conf /home/scriptuser/backups/
 	if [ -e /etc/apache2/apache2.conf ]
 	then
@@ -1140,39 +1134,6 @@ then
 	    chown -R root:root /etc/apache2
 	    chown -R root:root /etc/apache 2> /dev/null
 	fi
-	
-        PHPCONFIG=/etc/php/7.3/apache2/php.ini
-
-        # Disable Global variables
-        echo 'register_globals = Off' | tee -a $PHPCONFIG
-
-        # Disable tracking, HTML, and display errors
-        sed -i "s/^;\?html_errors.*/html_errors = Off/" $PHPCONFIG
-        sed -i "s/^;\?display_errors.*/display_errors = Off/" $PHPCONFIG
-        sed -i "s/^;\?expose_php.*/expose_php = Off/" $PHPCONFIG
-        sed -i "s/^;\?mail\.add_x_header.*/mail\.add_x_header = Off/" $PHPCONFIG
-
-        # Disable Remote File Includes
-        sed -i "s/^;\?allow_url_fopen.*/allow_url_fopen = Off/" $PHPCONFIG
-
-        # Restrict File Uploads
-        sed -i "s/^;\?file_uploads.*/file_uploads = Off/" $PHPCONFIG
-
-        # Control POST/Upload size
-        sed -i "s/^;\?post_max_size.*/post_max_size = 1K/" $PHPCONFIG
-        sed -i "s/^;\?upload_max_filesize.*/upload_max_filesize = 2M/" $PHPCONFIG
-
-        # Protect sessions
-        sed -i "s/^;\?session\.cookie_httponly.*/session\.cookie_httponly = 1/" $PHPCONFIG
-
-        # General
-        sed -i "s/^;\?session\.use_strict_mode.*/session\.use_strict_mode = On/" $PHPCONFIG
- 
-        sed -i "s/^;\?disable_functions.*/disable_functions = php_uname, getmyuid, getmypid, passthru,listen, diskfreespace, tmpfile, link, ignore_user_abort, shell_exec, dl, set_time_limit, exec, system, highlight_file, show_source, fpassthru, virtual, posix_ctermid, posix_getcwd, posix_getegid, posix_geteuid, posix_getgid, posix_getgrgid, posix_getgrnam, posix_getgroups, posix_getlogin, posix_getpgid, posix_getpgrp, posix_getpid, posix_getppid, posix_getpwnam, posix_getpwuid, posix_getrlimit, posix_getsid, posix_getuid, posix_isatty, posix_kill, posix_mkfifo, posix_setegid, posix_seteuid, posix_setgid, posix_setpgid, posix_setsid, posix_setuid, posix_times, posix_ttyname, posix_uname, proc_open, proc_close, proc_get_status, proc_nice, proc_terminate, phpinfo/" $PHPCONFIG
-        sed -i "s/^;\?max_execution_time.*/max_execution_time = 30/" $PHPCONFIG
-        sed -i "s/^;\?max_input_time.*/max_input_time = 30/" $PHPCONFIG
-        sed -i "s/^;\?memory_limit.*/memory_limit = 40M/" $PHPCONFIG
-        sed -i "s/^;\?open_basedir.*/open_basedir = \"c:inetpub\"/" $PHPCONFIG
         
         chown -R root:root /etc/apache2
 	systemctl start apache2
@@ -1183,8 +1144,6 @@ else
 	echo Response not recognized.
 fi
 echo "Web Server is complete."
-
-
 
 clear
 if [ $dnsYN == no ]
