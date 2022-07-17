@@ -191,6 +191,7 @@ then
 	dnsYN=no
 	mediaFilesYN=no
 	vpnYN=no
+	phpYN=no
 	
 	if grep -qi 'smb\|samba' services.txt; then
 		sambaYN=yes
@@ -218,6 +219,9 @@ then
 	fi
 	if grep -qi 'bind9\|dns' services.txt; then
 		dnsYN=yes
+	fi
+	if grep -qi 'php' services.txt; then
+		phpYN=yes
 	fi
 else
 	find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
@@ -284,6 +288,7 @@ else
 	dnsYN=no
 	mediaFilesYN=no
 	vpnYN=no
+	phpYN=no
 
 	services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
 	echo $services >> services
@@ -314,7 +319,10 @@ else
 	fi
 	if grep -qi 'bind9\|dns' services; then
 		dnsYN=yes
-	fi	
+	fi
+	if grep -qi 'php' services; then
+		phpYN=yes
+	fi
 fi
 
 clear
@@ -1144,6 +1152,52 @@ else
 	echo Response not recognized.
 fi
 echo "Web Server is complete."
+
+if [ $phpYN == no ]
+then
+	apt-get purge *php* -y
+	echo "PHP has been purged."
+elif [ $phpYN == yes ]
+then
+	apt-get install php -y
+	PHPCONFIG=/etc/php/7.*/apache2/php.ini
+
+        # Disable Global variables
+        echo 'register_globals = Off' | tee -a $PHPCONFIG
+
+        # Disable tracking, HTML, and display errors
+        sed -i "s/^;\?html_errors.*/html_errors = Off/" $PHPCONFIG
+        sed -i "s/^;\?display_errors.*/display_errors = Off/" $PHPCONFIG
+        sed -i "s/^;\?expose_php.*/expose_php = Off/" $PHPCONFIG
+        sed -i "s/^;\?mail\.add_x_header.*/mail\.add_x_header = Off/" $PHPCONFIG
+
+        # Disable Remote File Includes
+        sed -i "s/^;\?allow_url_fopen.*/allow_url_fopen = Off/" $PHPCONFIG
+
+        # Restrict File Uploads
+        sed -i "s/^;\?file_uploads.*/file_uploads = Off/" $PHPCONFIG
+
+        # Control POST/Upload size
+        sed -i "s/^;\?post_max_size.*/post_max_size = 1K/" $PHPCONFIG
+        sed -i "s/^;\?upload_max_filesize.*/upload_max_filesize = 2M/" $PHPCONFIG
+
+        # Protect sessions
+        sed -i "s/^;\?session\.cookie_httponly.*/session\.cookie_httponly = 1/" $PHPCONFIG
+
+        # General
+        sed -i "s/^;\?session\.use_strict_mode.*/session\.use_strict_mode = On/" $PHPCONFIG
+ 
+        sed -i "s/^;\?disable_functions.*/disable_functions = php_uname, getmyuid, getmypid, passthru,listen, diskfreespace, tmpfile, link, ignore_user_abort, shell_exec, dl, set_time_limit, exec, system, highlight_file, show_source, fpassthru, virtual, posix_ctermid, posix_getcwd, posix_getegid, posix_geteuid, posix_getgid, posix_getgrgid, posix_getgrnam, posix_getgroups, posix_getlogin, posix_getpgid, posix_getpgrp, posix_getpid, posix_getppid, posix_getpwnam, posix_getpwuid, posix_getrlimit, posix_getsid, posix_getuid, posix_isatty, posix_kill, posix_mkfifo, posix_setegid, posix_seteuid, posix_setgid, posix_setpgid, posix_setsid, posix_setuid, posix_times, posix_ttyname, posix_uname, proc_open, proc_close, proc_get_status, proc_nice, proc_terminate, phpinfo/" $PHPCONFIG
+        sed -i "s/^;\?max_execution_time.*/max_execution_time = 30/" $PHPCONFIG
+        sed -i "s/^;\?max_input_time.*/max_input_time = 30/" $PHPCONFIG
+        sed -i "s/^;\?memory_limit.*/memory_limit = 40M/" $PHPCONFIG
+        sed -i "s/^;\?open_basedir.*/open_basedir = \"c:inetpub\"/" $PHPCONFIG
+	
+	echo "PHP is configured."
+else
+	echo "Response not recognised."
+fi
+echo "PHP is complete."
 
 clear
 if [ $dnsYN == no ]
