@@ -1402,7 +1402,7 @@ apt-get upgrade -y
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 clear
-su - $mainUser -c 'firefox --preferences'
+su - $mainUser -c 'DISPLAY=:0 firefox --preferences'
 echo "Popup blocker enabled in Firefox"
 
 clear
