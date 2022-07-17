@@ -809,7 +809,6 @@ then
 	then
 		sed -i 's/####### Authentication #######/####### Authentication #######\nsecurity = user/g' /etc/samba/smb.conf
 	fi
-	sed -i 's/usershare allow guests = no/usershare allow guests = yes/g' /etc/samba/smb.conf
 	
 	usersSMB=$readmeusers
 	usersSMBLength=${#usersSMB[@]}	
