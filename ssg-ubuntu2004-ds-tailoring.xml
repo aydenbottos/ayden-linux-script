@@ -67,7 +67,7 @@ Ubuntu 20.04 LTS Benchmark, v1.0.0, released 07-21-2020.</xccdf:description>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_prevent_direct_root_logins" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_restrict_serial_port_logins" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_securetty_root_login_console_only" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_logon_fail_delay" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_logon_fail_delay" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_max_concurrent_login_sessions" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_users_own_home_directories" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_file_permissions_home_dirs" selected="true"/>
