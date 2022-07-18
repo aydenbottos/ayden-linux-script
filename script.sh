@@ -20,6 +20,36 @@ echo "Script is being run as root."
 pw=CyberTaipan123!
 echo "Universal password set."
 
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
+find / -type f >> allfiles.log
+sed -i "s/aydenbottos/$mainUser/g" defaultfiles.log
+sed -i '/cache/d' allfiles.log
+sed -i '/\/sys/d' allfiles.log
+sed -i '/\/run/d' allfiles.log
+sed -i '/\/dev/d' allfiles.log
+sed -i '/\/proc/d' allfiles.log
+sed -i '/\/snap/d' allfiles.log
+sed -i '/apt/d' allfiles.log
+sed -i '/dpkg/d' allfiles.log
+sed -i '/man/d' allfiles.log
+sed -i '/doc/d' allfiles.log
+sed -i '/dpkg/d' defaultfiles.log
+sed -i '/cache/d' defaultfiles.log
+sed -i '/\/sys/d' defaultfiles.log
+sed -i '/\/run/d' defaultfiles.log
+sed -i '/\/dev/d' defaultfiles.log
+sed -i '/\/proc/d' defaultfiles.log
+sed -i '/\/snap/d' defaultfiles.log
+sed -i '/apt/d' defaultfiles.log
+sed -i '/dpkg/d' defaultfiles.log
+sed -i '/man/d' defaultfiles.log
+sed -i '/doc/d' defaultfiles.log
+sort allfiles.log >> allfiles2.log
+sort defaultfiles.log >> defaultfiles2.log
+diff allfiles2.log defaultfiles2.log >> addedanddeletedfiles.log
+echo "This log could be interesting - added and deleted files since installation."
+clear
+
 wget https://github.com/tclahr/uac/releases/download/v2.2.0/uac-2.2.0.tar.gz
 tar -xf uac-2.2.0.tar.gz
 pushd uac-2.2.0
@@ -49,34 +79,6 @@ for FILE in $(debsums -ca);
 done
 popd
 echo "Outputted every change on the system since installation - this log is a must-check."
-clear
-
-wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
-find / -type f >> allfiles.log
-sed -i "s/aydenbottos/$mainUser/g" defaultfiles.log
-sed -i '/cache/d' allfiles.log
-sed -i '/\/sys/d' allfiles.log
-sed -i '/\/run/d' allfiles.log
-sed -i '/\/dev/d' allfiles.log
-sed -i '/\/proc/d' allfiles.log
-sed -i '/\/snap/d' allfiles.log
-sed -i '/apt/d' allfiles.log
-sed -i '/dpkg/d' allfiles.log
-sed -i '/man/d' allfiles.log
-sed -i '/doc/d' allfiles.log
-sed -i '/dpkg/d' defaultfiles.log
-sed -i '/cache/d' defaultfiles.log
-sed -i '/\/sys/d' defaultfiles.log
-sed -i '/\/run/d' defaultfiles.log
-sed -i '/\/dev/d' defaultfiles.log
-sed -i '/\/proc/d' defaultfiles.log
-sed -i '/\/snap/d' defaultfiles.log
-sed -i '/apt/d' defaultfiles.log
-sed -i '/dpkg/d' defaultfiles.log
-sed -i '/man/d' defaultfiles.log
-sed -i '/doc/d' defaultfiles.log
-diff allfiles.log defaultfiles.log >> addedanddeletedfiles.log
-echo "This log could be interesting - added and deleted files since installation."
 clear
 
 echo "Opening forensics questions."
