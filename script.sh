@@ -103,11 +103,14 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup aide unhide psad -y
+apt-get install apt-transport-https dirmngr mfetp vlock ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup aide unhide psad -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
 sudo apt purge $(tr '\n' ' ' <packages-valid) -y
+
+sed -i '/AllowUnauthenticated/d' /etc/apt/**
+echo "Forced digital signing on APT."
 
 clear
 echo "Check to verify that all update settings are correct."
@@ -122,6 +125,8 @@ fi
 clear
 chmod 644 /etc/apt/sources.list
 echo "Sources reset to default."
+
+echo -e "Unattended-Upgrade::Remove-Unused-Dependencies 'true';\nUnattended-Upgrade::Remove-Unused-Kernel-Packages 'true';" >> /etc/apt/apt.conf.d/50unattended-upgrades
 
 echo "Running apt-get update with HTTPS"
 apt-get update
@@ -367,8 +372,27 @@ echo "Check for any user folders that do not belong to any users in /home/."
 ls -a /home/ >> /home/scriptuser/badfiles.log
 
 clear
+echo "install cramfs /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install freevxfs /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install jffs2 /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install hfs /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install hfsplus /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install squashfs /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install udf /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install vfat /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install dccp /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install sctp /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install rds /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install tipc /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "Disabled unused filesystems and network protocols."
+
+clear
 echo "Check for any files for users that should not be administrators in /etc/sudoers.d."
 ls -a /etc/sudoers.d >> /home/scriptuser/badfiles.log
+
+clear
+echo "TMOUT=600" > /etc/profile.d/99-terminal_tmout.sh
+echo "Set session timeout."
 
 clear
 for f in /etc/sudoers /etc/sudoers.d/* ; do
@@ -520,7 +544,9 @@ su gdm -l -s /bin/bash;
 # Set the DISPLAY variable to the value you got before (could be :0 or :1 or similar):
 export DISPLAY=:0;
 # Disable the user list by setting the disable-user-list flag to true:
-gsettings set org.gnome.login-screen disable-user-list true;"; exec bash'
+gsettings set org.gnome.login-screen disable-user-list true;
+# Session locking:
+gsettings set org.gnome.desktop.screensaver lock-enabled true;"; exec bash'
 echo "User list has been hidden and autologin has been disabled."
 
 clear
@@ -563,6 +589,8 @@ echo kernel.core_uses_pid=1             | tee -a /etc/sysctl.d/cybertai-system.c
 echo kernel.shmmax=68719476736          | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
 echo kernel.shmall=4294967296           | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
 echo kernel.exec_shield=1               | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo vm.mmap_min_addr = 65536           | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.pid_max = 65536             | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
 echo kernel.panic=10                    | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
 echo kernel.kptr_restrict=2             | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
 echo vm.panic_on_oom=1                  | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
@@ -571,6 +599,9 @@ echo fs.protected_symlinks=1            | tee -a /etc/sysctl.d/cybertai-system.c
 echo kernel.randomize_va_space=2        | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored ASLR; 2 = full; 1 = semi; 0 = none
 echo kernel.unprivileged_userns_clone=0 | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored
 echo kernel.ctrl-alt-del=0              | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored CTRL-ALT-DEL disable
+echo kernel.perf_event_paranoid = 2     | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.perf_event_max_sample_rate = 1   | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.perf_cpu_time_max_percent = 1    | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
 
 sysctl --system
 clear
@@ -686,6 +717,28 @@ chown root:shadow /etc/shadow-
 chmod o-rwx,g-rw /etc/shadow-
 chown root:shadow /etc/gshadow-
 chmod o-rwx,g-rw /etc/gshadow-
+
+find /var/log -perm /137 -type f -exec chmod 640 '{}' ;
+chgrp syslog /var/log
+chown root /var/log
+chmod 0750 /var/log
+chgrp adm /var/log/syslog
+chown syslog /var/log/syslog
+chmod 0640 /var/log/syslog
+
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type d -exec chmod -R 755 '{}' ;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type d -exec chown root '{}' ;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -group root -type d -exec chgrp root '{}' ;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type f -exec chmod 755 '{}' ;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type f -exec chown root '{}' ;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -group root -type f ! -perm /2000 -exec chgrp root '{}' ;
+
+find /lib /lib64 /usr/lib -perm /022 -type f -exec chmod 755 '{}' ;
+find /lib /lib64 /usr/lib -perm /022 -type d -exec chmod 755 '{}' ;
+find /lib /usr/lib /lib64 ! -user root -type f -exec chown root '{}' ;
+find /lib /usr/lib /lib64 ! -user root -type d -exec chown root '{}' ;
+find /lib /usr/lib /lib64 ! -group root -type f -exec chgrp root '{}' ;
+find /lib /usr/lib /lib64 ! -group root -type d -exec chgrp root '{}' ;
 
 echo "Finished changing permissions."
 
@@ -905,7 +958,7 @@ then
 	apt-get install openssh-server -y
 	ufw allow ssh
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
-	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication yes\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nDenyUsers\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 0\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
+	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication no\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 1\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
 	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
         echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256' | tee -a /etc/ssh/sshd_config > /dev/null
@@ -1286,10 +1339,41 @@ echo "Listed all packages that have been manually installed on the system."
 apt list --installed >> /home/scriptuser/allInstalledPackages.log
 echo "Listed all installed packages, not just manual ones."
 
+clear
+chmod 000 /usr/bin/as >/dev/null 2>&1
+chmod 000 /usr/bin/byacc >/dev/null 2>&1
+chmod 000 /usr/bin/yacc >/dev/null 2>&1
+chmod 000 /usr/bin/bcc >/dev/null 2>&1
+chmod 000 /usr/bin/kgcc >/dev/null 2>&1
+chmod 000 /usr/bin/cc >/dev/null 2>&1
+chmod 000 /usr/bin/gcc >/dev/null 2>&1
+chmod 000 /usr/bin/*c++ >/dev/null 2>&1
+chmod 000 /usr/bin/*g++ >/dev/null 2>&1
+echo "Disabled compilers."
+
+clear
 apt install fail2ban -y
 systemctl enable fail2ban
 systemctl start fail2ban
 echo "Fail2Ban enabled."
+
+clear
+apt install acct -y
+touch /var/log/wtmp
+echo "Enabled process accounting."
+
+clear
+apt install -y arpwatch
+systemctl enable --now arpwatch
+systemctl start arpwatch
+echo "Installed ARPWatch."
+
+clear
+echo -e "[org/gnome/settings-daemon/plugins/media-keys]\nlogout=\'\'" >> /etc/dconf/db/local.d/00-disable-CAD
+dconf update
+systemctl mask ctrl-alt-del.target
+systemctl daemon-reload
+echo "Disabled CTRL-ALT-DELETE reboot in Gnome."
 
 clear
 lsof -Pnl +M -i > /home/scriptuser/runningProcesses.log
@@ -1414,6 +1498,18 @@ echo "All unused packages have been removed."
 clear
 export $(cat /etc/environment)
 echo "PATH reset to normal."
+
+clear
+sed -i '1i\* hard maxlogins 10' /etc/security/limits.conf
+echo "Login limits set."
+
+clear
+apt install rsyslog -y
+systemctl enable --now rsyslog
+systemctl start rsyslog
+echo -e "auth.*,authpriv.* /var/log/secure\ndaemon.notice /var/log/messages" >> /etc/rsyslog.d/50-default.conf
+systemctl restart rsyslog
+echo "Installed rsyslog if it already wasn't installed and configured it."
 
 clear
 wget https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
