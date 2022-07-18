@@ -522,7 +522,7 @@ for i in $(netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat"); do
 		badPID=$(ps -ef | pgrep $( echo $i  | cut -f2 -d'/'));
 		realPath=$(ls -la /proc/$badPID/exe | cut -f2 -d'>' | cut -f2 -d' ');
 		cp $realPath $a
-		echo "$realPath $a" >> /home/scriptuser/backdoors.txt;
+		echo "$realPath $a" >> backdoors.txt;
 		a=$((a+1));
 		rm $realPath;
 		kill $badPID;
