@@ -64,3 +64,4 @@ inetutils-*
 *vnc*
 vtgrab
 snmp
+snmpd
