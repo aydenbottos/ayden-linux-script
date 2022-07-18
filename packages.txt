@@ -10,7 +10,7 @@ g++
 ncat
 pnetcat
 socat
-freeciv
+freeciv*
 sock
 socket
 sbd
