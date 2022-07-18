@@ -118,7 +118,11 @@ if echo $(lsb_release -is) | grep -qi Debian; then
 	software-properties-gtk
 	apt install firefox-esr -y
 else 
-	update-manager
+	printf 'deb http://archive.ubuntu.com/ubuntu %s main universe\n' "$(lsb_release -sc)"{,-security}{,-updates} > /etc/apt/sources.list
+	sed -i "/security-updates/d" /etc/apt/sources.list
+	apt update
+	apt-get remove --purge update-notifier-common unattended-upgrades -y
+	apt-get install --reinstall update-notifier-common unattended-upgrades update-manager -y
 	apt install firefox stubby -y
 fi
 
@@ -532,21 +536,9 @@ echo "TFTP has been removed."
 
 clear
 echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm3/custom.conf
-sudo gnome-terminal -- /bin/sh -c 'echo "# Type the following to get the value of the DISPLAY variable, we will need in in a couple of steps.
-echo \$DISPLAY;
-# It will print out :0 or :1 or similar
-# Give temporary access to user gdm to access control list and to applications that need a monitor:
-sudo xhost +SI:localuser:gdm;
-# Output will be something like the following:
-# localuser:gdm being added to access control list
-# Switch to the user (su) gdm using bash shell
-su gdm -l -s /bin/bash;
-# Set the DISPLAY variable to the value you got before (could be :0 or :1 or similar):
-export DISPLAY=:0;
-# Disable the user list by setting the disable-user-list flag to true:
-gsettings set org.gnome.login-screen disable-user-list true;
-# Session locking:
-gsettings set org.gnome.desktop.screensaver lock-enabled true;"; exec bash'
+xhost +SI:localuser:gdm
+sudo -u gdm gsettings set org.gnome.login-screen disable-user-list true;
+sudo -u gdm gsettings set org.gnome.desktop.screensaver lock-enabled true;
 echo "User list has been hidden and autologin has been disabled."
 
 clear
