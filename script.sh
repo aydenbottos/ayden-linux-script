@@ -20,6 +20,13 @@ echo "Script is being run as root."
 pw=CyberTaipan123!
 echo "Universal password set."
 
+clear
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
+echo "Listed all manually installed packages - for Ubuntu."
+
+apt list --installed >> /home/scriptuser/allInstalledPackages.log
+echo "Listed all installed packages, not just manual ones."
+
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
 find / -type f >> allfiles.log
 sed -i "s/aydenbottos/$mainUser/g" defaultfiles.log
@@ -1325,13 +1332,6 @@ clear
 apt install tree
 tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
-
-clear
-comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
-echo "Listed all manually installed packages - for Ubuntu."
-
-apt list --installed >> /home/scriptuser/allInstalledPackages.log
-echo "Listed all installed packages, not just manual ones."
 
 clear
 chmod 000 /usr/bin/as >/dev/null 2>&1
