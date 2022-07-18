@@ -1327,8 +1327,8 @@ tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
 clear
-comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n 's/^Package: //p' | sort -u)
-echo "Listed all packages that have been manually installed on the system."
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
+echo "Listed all manually installed packages - for Ubuntu."
 
 apt list --installed >> /home/scriptuser/allInstalledPackages.log
 echo "Listed all installed packages, not just manual ones."
