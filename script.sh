@@ -74,7 +74,7 @@ tar -xf uac-2.2.0.tar.gz
 pushd uac-2.2.0
 chmod +x uac
 mkdir results
-./uac -p full results
+./uac -p full results &
 popd
 echo "Ran UAC - check its folder for results."
 
@@ -84,7 +84,7 @@ pushd thor
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/thor10.7lite-linux-pack.7z
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/a2d7f9a1734943f3ca8665d40e02f29a_b28a6f0ae1ee88438421feed7186c8d2.lic
 p7zip -d thor10.7lite-linux-pack.7z
-./thor-lite-linux-64
+./thor-lite-linux-64 &
 popd
 echo "Ran THOR IOC and YARA scanner."
 
