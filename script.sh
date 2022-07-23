@@ -1517,7 +1517,7 @@ echo "Auditd and audit rules have been set and enabled."
 
 if echo $(lsb_release -a) | grep -qi 20.04; then
 	wget https://launchpadlibrarian.net/570612664/scap-workbench_1.2.1-1ubuntu1_amd64.deb
-	apt-get install ./scap-workbench_1.2.1-1ubuntu1_amd64.deb
+	apt-get install ./scap-workbench_1.2.1-1ubuntu1_amd64.deb -y
 else 
 	apt-get install scap-workbench -y
 fi
