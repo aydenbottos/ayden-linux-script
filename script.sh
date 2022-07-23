@@ -21,7 +21,18 @@ pw=CyberTaipan123!
 echo "Universal password set."
 
 clear
-apt install curl
+mkdir -p /home/scriptuser/
+touch /home/scriptuser/badfiles.log
+echo > /home/scriptuser/badfiles.log
+chmod 777 /home/scriptuser/badfiles.log
+echo "Important files and directories created."
+
+mkdir -p /home/scriptuser/backups
+chmod 777 /home/scriptuser/backups
+echo "Backups folder created on the Desktop."
+
+clear
+apt install curl -y
 comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
 echo "Listed all manually installed packages - for Ubuntu."
 
@@ -97,17 +108,6 @@ test -f "Forensics Question 3.txt" && gedit "Forensics Question 3.txt"
 test -f "Forensics Question 4.txt" && gedit "Forensics Question 4.txt"
 test -f "Forensics Question 5.txt" && gedit "Forensics Question 5.txt"
 test -f "Forensics Question 6.txt" && gedit "Forensics Question 6.txt"
-
-clear
-mkdir -p /home/scriptuser/
-touch /home/scriptuser/badfiles.log
-echo > /home/scriptuser/badfiles.log
-chmod 777 /home/scriptuser/badfiles.log
-echo "Important files and directories created."
-
-mkdir -p /home/scriptuser/backups
-chmod 777 /home/scriptuser/backups
-echo "Backups folder created on the Desktop."
 
 echo "Running apt-get update"
 apt-get update
