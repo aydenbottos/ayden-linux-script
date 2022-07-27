@@ -137,6 +137,32 @@ sed -i '/AllowUnauthenticated/d' /etc/apt/**
 echo "Forced digital signing on APT."
 
 clear
+<<<<<<< HEAD
+=======
+echo "Check to verify that all update settings are correct."
+if echo $(lsb_release -is) | grep -qi Debian; then
+	# Reset Debian sources.list to default
+	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" > /etc/apt/sources.list
+	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" >> /etc/apt/sources.list
+	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
+	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
+	echo "deb http://security.debian.org/debian-security $(lsb_release -cs)-security main contrib non-free" >> /etc/apt/sources.list
+	echo "deb-src http://security.debian.org/debian-security $(lsb_release -cs)-security main contrib non-free" >> /etc/apt/sources.list
+	# Reset update settings using apt purge
+	apt purge unattended-upgrades apt-config-auto-update -y
+	apt install unattended-upgrades apt-config-auto-update -y
+
+else
+	printf 'deb http://archive.ubuntu.com/ubuntu %s main universe\n' "$(lsb_release -sc)"{,-security}{,-updates} > /etc/apt/sources.list
+	sed -i "/security-updates/d" /etc/apt/sources.list
+	apt update
+	apt-get remove --purge update-notifier-common unattended-upgrades -y
+	apt-get install update-notifier-common unattended-upgrades update-manager -y
+	apt install firefox stubby -y
+fi
+
+clear
+>>>>>>> 6b65bb4 (Changes)
 chmod 644 /etc/apt/sources.list
 echo "Sources reset to default."
 
@@ -1480,9 +1506,9 @@ apt-get update
 apt-get upgrade -y
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
-clear
-su - $mainUser -c 'DISPLAY=:0 firefox --preferences'
-echo "Popup blocker enabled in Firefox"
+killall firefox
+echo "user_pref(\"dom.disable_open_during_load\", false);" >> /home/$mainUser/.mozilla/firefox/default/user.js
+echo "Check Firefox to ensure all settings have been applied."
 
 clear
 apt-get autoremove -y 
