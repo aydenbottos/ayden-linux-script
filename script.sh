@@ -21,6 +21,20 @@ pw=CyberTaipan123!
 echo "Universal password set."
 
 clear
+echo "Check to verify that all update settings are correct."
+if echo $(lsb_release -is) | grep -qi Debian; then
+	software-properties-gtk
+	apt install firefox-esr -y
+else 
+	printf 'deb http://archive.ubuntu.com/ubuntu %s main universe\n' "$(lsb_release -sc)"{,-security}{,-updates} > /etc/apt/sources.list
+	sed -i "/security-updates/d" /etc/apt/sources.list
+	apt update
+	apt-get remove --purge update-notifier-common unattended-upgrades -y
+	apt-get install --reinstall update-notifier-common unattended-upgrades update-manager -y
+	apt install firefox stubby -y
+fi
+
+clear
 mkdir -p /home/scriptuser/
 touch /home/scriptuser/badfiles.log
 echo > /home/scriptuser/badfiles.log
