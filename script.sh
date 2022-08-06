@@ -257,7 +257,7 @@ then
 		phpYN=yes
 	fi
 else
-	find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
+	find $(pwd) -iname 'README' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
 
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
