@@ -21,20 +21,6 @@ pw=CyberTaipan123!
 echo "Universal password set."
 
 clear
-echo "Check to verify that all update settings are correct."
-if echo $(lsb_release -is) | grep -qi Debian; then
-	software-properties-gtk
-	apt install firefox-esr -y
-else 
-	printf 'deb http://archive.ubuntu.com/ubuntu %s main universe\n' "$(lsb_release -sc)"{,-security}{,-updates} > /etc/apt/sources.list
-	sed -i "/security-updates/d" /etc/apt/sources.list
-	apt update
-	apt-get remove --purge update-notifier-common unattended-upgrades -y
-	apt-get install --reinstall update-notifier-common unattended-upgrades update-manager -y
-	apt install firefox stubby -y
-fi
-
-clear
 mkdir -p /home/scriptuser/
 touch /home/scriptuser/badfiles.log
 echo > /home/scriptuser/badfiles.log
@@ -127,7 +113,7 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad -y
+apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup aide unhide psad -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
@@ -137,8 +123,6 @@ sed -i '/AllowUnauthenticated/d' /etc/apt/**
 echo "Forced digital signing on APT."
 
 clear
-<<<<<<< HEAD
-=======
 echo "Check to verify that all update settings are correct."
 if echo $(lsb_release -is) | grep -qi Debian; then
 	# Reset Debian sources.list to default
@@ -162,7 +146,6 @@ else
 fi
 
 clear
->>>>>>> 6b65bb4 (Changes)
 chmod 644 /etc/apt/sources.list
 echo "Sources reset to default."
 
@@ -269,7 +252,7 @@ then
 		phpYN=yes
 	fi
 else
-	find $(pwd) -iname 'README.desktop' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
+	find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
 
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
@@ -1033,9 +1016,6 @@ then
 	ufw deny imap2 
 	ufw deny imaps 
 	ufw deny pop3s
-	systemctl disable postfix
-	systemctl stop postfix
-	apt purge dovecot -y
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been denied on the firewall."
 elif [ $mailYN == yes ]
 then
@@ -1465,9 +1445,12 @@ echo "Set a very strict umask."
 clear
 cp /etc/pam.d/common-auth /home/scriptuser/backups/
 cp /etc/pam.d/common-password /home/scriptuser/backups/
-echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent" > /etc/pam.d/common-auth
-echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_username minclass=4 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
+echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config" > /etc/pam.d/common-auth
+echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
+echo "Password policies have been set with and /etc/pam.d."
 getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
+echo -e "auth [default=die] pam_faillock.so authfail\n auth sufficient pam_faillock.so authsucc\nauth requisite pam_faillock.so preauth" >> /etc/pam.d/common-auth
+echo -e "audit\nsilent\ndeny = 3\nunlock_time = 600\neven_deny_root" >> /etc/security/faillock.conf
 echo "All users now need passwords to login"
 
 clear
