@@ -160,94 +160,197 @@ cp /etc/passwd /home/scriptuser/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
 
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
-do	
-	if grep -qi "$line" users.txt; then
-		echo -e "$pw\n$pw" | passwd "$line"
-		echo "$line has been given the password '$pw'."
-		passwd -x30 -n3 -w7 $line
-		usermod -U $line
-		echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
-	else
-		deluser --remove-home $line
-		echo "Deleted unauthorised user $line."
+if test -f "users.txt"
+then
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do	
+        	if grep -qi "$line" users.txt; then
+			echo -e "$pw\n$pw" | passwd "$line"
+			echo "$line has been given the password '$pw'."
+			passwd -x30 -n3 -w7 $line
+			usermod -U $line
+			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
+		else
+			deluser --remove-home $line
+			echo "Deleted unauthorised user $line."
+		fi
+	done
+	
+	readmeusers="$(cat users.txt | cut -d ' ' -f1)"
+	
+	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
+	do
+		useradd -m $readmeusersfor
+		echo Created missing user from ReadMe.
+		passwd -x30 -n3 -w7 $readmeusersfor
+		echo -e "$pw\n$pw" | passwd "$readmeusersfor"
+		usermod -U $readmeusersfor
+		echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
+	done
+	
+	readmeusers2="$(grep -i "Admin" users.txt | cut -d ' ' -f1)"
+	
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do
+		if echo $readmeusers2 | grep -qi "$line"; then
+			gpasswd -a $line sudo
+			gpasswd -a $line adm
+			gpasswd -a $line lpadmin
+			gpasswd -a $line sambashare
+			gpasswd -a $line root
+			echo "$line has been made a standard user."
+		else
+			gpasswd -d $line sudo
+			gpasswd -d $line adm
+			gpasswd -d $line lpadmin
+			gpasswd -d $line sambashare
+			echo "$line has been made an administrator."
+		fi
+	done
+	
+	sambaYN=no
+	ftpYN=no
+	sshYN=no
+	telnetYN=no
+	mailYN=no
+	printYN=no
+	dbYN=no
+	httpsYN=no
+	dnsYN=no
+	mediaFilesYN=no
+	vpnYN=no
+	phpYN=no
+	
+	if grep -qi 'smb\|samba' services.txt; then
+		sambaYN=yes
 	fi
-done
-
-readmeusers="$(cat users.txt | cut -d ' ' -f1)"
-
-echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
-do
-	useradd -m $readmeusersfor
-	echo Created missing user from ReadMe.
-	passwd -x30 -n3 -w7 $readmeusersfor
-	echo -e "$pw\n$pw" | passwd "$readmeusersfor"
-	usermod -U $readmeusersfor
-	echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
-done
-
-readmeusers2="$(grep -i "Admin" users.txt | cut -d ' ' -f1)"
-
-awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
-do
-	if echo $readmeusers2 | grep -qi "$line"; then
-		gpasswd -a $line sudo
-		gpasswd -a $line adm
-		gpasswd -a $line lpadmin
-		gpasswd -a $line sambashare
-		gpasswd -a $line root
-		echo "$line has been made a standard user."
-	else
-		gpasswd -d $line sudo
-		gpasswd -d $line adm
-		gpasswd -d $line lpadmin
-		gpasswd -d $line sambashare
-		echo "$line has been made an administrator."
+	if grep -qi ftp services.txt; then
+		ftpYN=yes
 	fi
-done
+	if grep -qi ssh services.txt; then
+		sshYN=yes
+	fi
+	if grep -qi telnet services.txt; then
+		telnetYN=yes
+	fi
+	if grep -qi mail services.txt; then
+		mailYN=yes
+	fi
+	if grep -qi print services.txt; then
+		printYN=yes
+	fi
+	if grep -qi 'db\|sql' services.txt; then
+		dbYN=yes
+	fi
+	if grep -qi 'web\|apache\|http' services.txt; then
+		httpsYN=yes
+	fi
+	if grep -qi 'bind9\|dns' services.txt; then
+		dnsYN=yes
+	fi
+	if grep -qi 'php' services.txt; then
+		phpYN=yes
+	fi
+else
+	find $(pwd) -iname 'README.desktop' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
 
-sambaYN=no
-ftpYN=no
-sshYN=no
-telnetYN=no
-mailYN=no
-printYN=no
-dbYN=no
-httpsYN=no
-dnsYN=no
-mediaFilesYN=no
-vpnYN=no
-phpYN=no
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do
+		if grep -qi "$line" readme.aspx; then
+			echo -e "$pw\n$pw" | passwd "$line"
+			echo "$line has been given the password '$pw'."
+			passwd -x30 -n3 -w7 $line
+			usermod -U $line
+			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
+		else
+			deluser --remove-home $line
+			echo "Deleted unauthorised user $line."
+		fi
+	done
+	clear
 
-if grep -qi 'smb\|samba' services.txt; then
-	sambaYN=yes
-fi
-if grep -qi ftp services.txt; then
-	ftpYN=yes
-fi
-if grep -qi ssh services.txt; then
-	sshYN=yes
-fi
-if grep -qi telnet services.txt; then
-	telnetYN=yes
-fi
-if grep -qi mail services.txt; then
-	mailYN=yes
-fi
-if grep -qi print services.txt; then
-	printYN=yes
-fi
-if grep -qi 'db\|sql' services.txt; then
-	dbYN=yes
-fi
-if grep -qi 'web\|apache\|http' services.txt; then
-	httpsYN=yes
-fi
-if grep -qi 'bind9\|dns' services.txt; then
-	dnsYN=yes
-fi
-if grep -qi 'php' services.txt; then
-	phpYN=yes
+	readmeusers="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "/<b>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | cat)"
+
+	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
+	do
+		if grep -qi "$readmeusersfor" /etc/passwd; then
+			echo "User already exists"
+		else
+			useradd -m $readmeusersfor
+			echo -e "$pw\n$pw" | passwd "$readmeusersfor"
+			echo Created missing user from ReadMe.
+			passwd -x30 -n3 -w7 $readmeusersfor
+			usermod -U $readmeusersfor
+			echo "$readmeusersfor's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."
+		fi
+	done
+
+	readmeusers2="$(sed -n '/<pre>/,/<\/pre>/p' readme.aspx | sed -e "/password:/d" | sed -e "/<pre>/d" | sed -e "/<\/pre>/d" | sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e 's/(you)//g' | awk -vN=2 '/<\/b>/{++n} n>=N' - | sed -e "/<b>/d" | cat)"
+
+	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
+	do
+		if echo $readmeusers2 | grep -qi "$line"; then
+			gpasswd -d $line sudo
+			gpasswd -d $line adm
+			gpasswd -d $line lpadmin
+			gpasswd -d $line sambashare
+			gpasswd -d $line root
+			echo "$line has been made a standard user."
+		else
+			gpasswd -a $line sudo
+			gpasswd -a $line adm
+			gpasswd -a $line lpadmin
+			gpasswd -a $line sambashare
+			echo "$line has been made an administrator."
+		fi
+	done
+
+	sambaYN=no
+	ftpYN=no
+	sshYN=no
+	telnetYN=no
+	mailYN=no
+	printYN=no
+	dbYN=no
+	httpsYN=no
+	dnsYN=no
+	mediaFilesYN=no
+	vpnYN=no
+	phpYN=no
+
+	services=$(cat readme.aspx | sed -e '/<ul>/,/<\/ul>/!d;/<\/ul>/q' | sed -e "/<ul>/d" | sed -e "/<\/ul>/d" |  sed -e "s/ //g" | sed -e "s/[[:blank:]]//g" | sed -e 's/[[:space:]]//g' | sed -e '/^$/d' | sed -e "s/<li>//g" | sed -e "s/<\/li>//g" | cat)
+	echo $services >> services
+
+	if grep -qi 'smb\|samba' services; then
+		sambaYN=yes
+	fi
+	if grep -qi ftp services; then
+		ftpYN=yes
+	fi
+	if grep -qi ssh services; then
+		sshYN=yes
+	fi
+	if grep -qi telnet services; then
+		telnetYN=yes
+	fi
+	if grep -qi mail services; then
+		mailYN=yes
+	fi
+	if grep -qi print services; then
+		printYN=yes
+	fi
+	if grep -qi 'db\|sql' services; then
+		dbYN=yes
+	fi
+	if grep -qi 'web\|apache\|http' services; then
+		httpsYN=yes
+	fi
+	if grep -qi 'bind9\|dns' services; then
+		dnsYN=yes
+	fi
+	if grep -qi 'php' services; then
+		phpYN=yes
+	fi
 fi
 
 clear
