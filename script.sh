@@ -113,7 +113,7 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins ecryptfs-utils cryptsetup aide unhide psad -y
+apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
@@ -1016,6 +1016,9 @@ then
 	ufw deny imap2 
 	ufw deny imaps 
 	ufw deny pop3s
+	systemctl stop postfix
+	systemctl disable postfix
+	apt purge dovecot -y
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been denied on the firewall."
 elif [ $mailYN == yes ]
 then
