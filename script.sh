@@ -125,7 +125,6 @@ echo "Forced digital signing on APT."
 clear
 echo "Check to verify that all update settings are correct."
 if echo $(lsb_release -is) | grep -qi Debian; then
-<<<<<<< HEAD
 	# Reset Debian sources.list to default
 	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" > /etc/apt/sources.list
 	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" >> /etc/apt/sources.list
@@ -136,22 +135,13 @@ if echo $(lsb_release -is) | grep -qi Debian; then
 	# Reset update settings using apt purge
 	apt purge unattended-upgrades apt-config-auto-update -y
 	apt install unattended-upgrades apt-config-auto-update -y
-
-else
-=======
-	software-properties-gtk
 	apt install firefox-esr -y
 else 
->>>>>>> parent of 85cf6f7 (Update script.sh)
 	printf 'deb http://archive.ubuntu.com/ubuntu %s main universe\n' "$(lsb_release -sc)"{,-security}{,-updates} > /etc/apt/sources.list
 	sed -i "/security-updates/d" /etc/apt/sources.list
 	apt update
 	apt-get remove --purge update-notifier-common unattended-upgrades -y
-<<<<<<< HEAD
 	apt-get install update-notifier-common unattended-upgrades update-manager -y
-=======
-	apt-get install --reinstall update-notifier-common unattended-upgrades update-manager -y
->>>>>>> parent of 85cf6f7 (Update script.sh)
 	apt install firefox stubby -y
 fi
 
@@ -182,39 +172,7 @@ do
 		deluser --remove-home $line
 		echo "Deleted unauthorised user $line."
 	fi
-<<<<<<< HEAD
-	if grep -qi ftp services.txt; then
-		ftpYN=yes
-	fi
-	if grep -qi ssh services.txt; then
-		sshYN=yes
-	fi
-	if grep -qi telnet services.txt; then
-		telnetYN=yes
-	fi
-	if grep -qi mail services.txt; then
-		mailYN=yes
-	fi
-	if grep -qi print services.txt; then
-		printYN=yes
-	fi
-	if grep -qi 'db\|sql' services.txt; then
-		dbYN=yes
-	fi
-	if grep -qi 'web\|apache\|http' services.txt; then
-		httpsYN=yes
-	fi
-	if grep -qi 'bind9\|dns' services.txt; then
-		dnsYN=yes
-	fi
-	if grep -qi 'php' services.txt; then
-		phpYN=yes
-	fi
-else
-	find $(pwd) -iname '*readme*.*' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
-=======
 done
->>>>>>> parent of 85cf6f7 (Update script.sh)
 
 readmeusers="$(cat users.txt | cut -d ' ' -f1)"
 
