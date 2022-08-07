@@ -1507,7 +1507,7 @@ apt-get upgrade -y
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 killall firefox
-echo "user_pref(\"dom.disable_open_during_load\", false);" >> /home/$mainUser/.mozilla/firefox/default/user.js
+echo "user_pref(\"dom.disable_open_during_load\", true);" >> /home/$mainUser/.mozilla/firefox/default/user.js
 echo "Check Firefox to ensure all settings have been applied."
 
 clear
