@@ -1397,7 +1397,7 @@ systemctl >> /home/scriptuser/systemctlUnits.log
 echo "All systemctl services listed."
 
 apt install nmap -y
-nmap -oN nmap.log -p- -v localhost 
+nmap -oN nmap.log localhost 
 apt purge nmap -y
 clear
 echo "Logged ports with Nmap then deleted it again."
@@ -1550,6 +1550,7 @@ systemctl start psad
 echo "PSAD started."
 
 clear
+apt install ecryptfs-utils
 echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
 apt install curl
 url=$(cat scriptlog.txt | curl -F 'sprunge=<-' http://sprunge.us)
