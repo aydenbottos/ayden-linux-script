@@ -109,16 +109,6 @@ test -f "Forensics Question 4.txt" && gedit "Forensics Question 4.txt"
 test -f "Forensics Question 5.txt" && gedit "Forensics Question 5.txt"
 test -f "Forensics Question 6.txt" && gedit "Forensics Question 6.txt"
 
-echo "Running apt-get update"
-apt-get update
-
-echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad -y
-echo "Deleting all bad software."
-wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
-while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
-sudo apt purge $(tr '\n' ' ' <packages-valid) -y
-
 sed -i '/AllowUnauthenticated/d' /etc/apt/**
 echo "Forced digital signing on APT."
 
@@ -132,6 +122,7 @@ if echo $(lsb_release -is) | grep -qi Debian; then
 	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
 	echo "deb http://security.debian.org/debian-security $(lsb_release -cs)-security main contrib non-free" >> /etc/apt/sources.list
 	echo "deb-src http://security.debian.org/debian-security $(lsb_release -cs)-security main contrib non-free" >> /etc/apt/sources.list
+	apt update
 	# Reset update settings using apt purge
 	apt purge unattended-upgrades apt-config-auto-update -y
 	apt install unattended-upgrades apt-config-auto-update -y
@@ -144,6 +135,16 @@ else
 	apt-get install update-notifier-common unattended-upgrades update-manager -y
 	apt install firefox stubby -y
 fi
+
+echo "Running apt-get update"
+apt-get update
+
+echo "Installing all neccessary software."
+apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd lynis chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad -y
+echo "Deleting all bad software."
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
+while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
+sudo apt purge $(tr '\n' ' ' <packages-valid) -y
 
 clear
 chmod 644 /etc/apt/sources.list
