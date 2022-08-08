@@ -578,13 +578,13 @@ chmod 777 /etc/lightdm/lightdm.conf
 cp /etc/lightdm/lightdm.conf /home/scriptuser/Desktop/backups/
 sudo touch /etc/lightdm/lightdm.conf.d/myconfig.conf
 echo "[SeatDefaults]"                   | tee /etc/lightdm/lightdm.conf > /dev/null
-echo "allow-guest=false"                | tee /etc/lightdm/lightdm.conf > /dev/null
-echo "greeter-hide-users=true"          | tee /etc/lightdm/lightdm.conf > /dev/null
-echo "greeter-show-manual-login=true"   | tee /etc/lightdm/lightdm.conf > /dev/null
-echo "greeter-allow-guest=false"        | tee /etc/lightdm/lightdm.conf > /dev/null
-echo "autologin-guest=false"            | tee /etc/lightdm/lightdm.conf > /dev/null
-echo "AutomaticLoginEnable=false"       | tee /etc/lightdm/lightdm.conf > /dev/null
-echo "xserver-allow-tcp=false"          | tee /etc/lightdm/lightdm.conf > /dev/null
+echo "allow-guest=false"                | tee -a /etc/lightdm/lightdm.conf > /dev/null
+echo "greeter-hide-users=true"          | tee -a /etc/lightdm/lightdm.conf > /dev/null
+echo "greeter-show-manual-login=true"   | tee -a /etc/lightdm/lightdm.conf > /dev/null
+echo "greeter-allow-guest=false"        | tee -a /etc/lightdm/lightdm.conf > /dev/null
+echo "autologin-guest=false"            | tee -a /etc/lightdm/lightdm.conf > /dev/null
+echo "AutomaticLoginEnable=false"       | tee -a /etc/lightdm/lightdm.conf > /dev/null
+echo "xserver-allow-tcp=false"          | tee -a /etc/lightdm/lightdm.conf > /dev/null
 chmod 644 /etc/lightdm/lightdm.conf
 echo "LightDM has been secured."
 
