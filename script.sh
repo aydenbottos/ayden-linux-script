@@ -1550,7 +1550,7 @@ systemctl start psad
 echo "PSAD started."
 
 clear
-apt install ecryptfs-utils
+apt install ecryptfs-utils -y
 echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
 apt install curl
 url=$(cat scriptlog.txt | curl -F 'sprunge=<-' http://sprunge.us)
