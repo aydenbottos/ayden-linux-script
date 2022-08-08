@@ -120,8 +120,8 @@ if echo $(lsb_release -is) | grep -qi Debian; then
 	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" >> /etc/apt/sources.list
 	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
 	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
-	echo "deb http://security.debian.org/debian-security $(lsb_release -cs)-security main contrib non-free" >> /etc/apt/sources.list
-	echo "deb-src http://security.debian.org/debian-security $(lsb_release -cs)-security main contrib non-free" >> /etc/apt/sources.list
+	echo "deb http://security.debian.org/ $(lsb_release -cs)/updates main contrib non-free" >> /etc/apt/sources.list
+	echo "deb-src http://security.debian.org/ $(lsb_release -cs)/updates main contrib non-free" >> /etc/apt/sources.list
 	apt update
 	# Reset update settings using apt purge
 	apt purge unattended-upgrades apt-config-auto-update -y
