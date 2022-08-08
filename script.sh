@@ -164,7 +164,7 @@ if test -f "users.txt"
 then
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do	
-        	if grep -qi "$line" users.txt; then
+        	if grep -qiw "$line" users.txt; then
 			echo -e "$pw\n$pw" | passwd "$line"
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
@@ -192,7 +192,7 @@ then
 	
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
-		if echo $readmeusers2 | grep -qi "$line"; then
+		if echo $readmeusers2 | grep -qiw "$line"; then
 			gpasswd -a $line sudo
 			gpasswd -a $line adm
 			gpasswd -a $line lpadmin
@@ -256,7 +256,7 @@ else
 
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
-		if grep -qi "$line" readme.aspx; then
+		if grep -qiw "$line" readme.aspx; then
 			echo -e "$pw\n$pw" | passwd "$line"
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
@@ -273,7 +273,7 @@ else
 
 	echo "$readmeusers" | while read readmeusersfor || [[ -n $line ]];
 	do
-		if grep -qi "$readmeusersfor" /etc/passwd; then
+		if grep -qiw "$readmeusersfor" /etc/passwd; then
 			echo "User already exists"
 		else
 			useradd -m $readmeusersfor
@@ -289,7 +289,7 @@ else
 
 	awk -F: '$6 ~ /\/home/ {print}' /etc/passwd | cut -d: -f1 | while read line || [[ -n $line ]];
 	do
-		if echo $readmeusers2 | grep -qi "$line"; then
+		if echo $readmeusers2 | grep -qiw "$line"; then
 			gpasswd -d $line sudo
 			gpasswd -d $line adm
 			gpasswd -d $line lpadmin
