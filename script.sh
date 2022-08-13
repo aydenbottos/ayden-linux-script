@@ -32,6 +32,30 @@ chmod 777 /home/scriptuser/backups
 echo "Backups folder created on the Desktop."
 
 clear
+echo "Check to verify that all update settings are correct."
+if echo $(lsb_release -is) | grep -qi Debian; then
+	# Reset Debian sources.list to default
+	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" > /etc/apt/sources.list
+	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" >> /etc/apt/sources.list
+	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
+	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
+	echo "deb http://security.debian.org/ $(lsb_release -cs)/updates main contrib non-free" >> /etc/apt/sources.list
+	echo "deb-src http://security.debian.org/ $(lsb_release -cs)/updates main contrib non-free" >> /etc/apt/sources.list
+	apt update
+	# Reset update settings using apt purge
+	apt purge unattended-upgrades apt-config-auto-update -y
+	apt install unattended-upgrades apt-config-auto-update -y
+	apt install firefox-esr -y
+else 
+	printf 'deb http://archive.ubuntu.com/ubuntu %s main universe\n' "$(lsb_release -sc)"{,-security}{,-updates} > /etc/apt/sources.list
+	sed -i "/security-updates/d" /etc/apt/sources.list
+	apt update
+	apt-get remove --purge update-notifier-common unattended-upgrades -y
+	apt-get install update-notifier-common unattended-upgrades update-manager -y
+	apt install firefox stubby -y
+fi
+
+clear
 apt install curl -y
 comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
 echo "Listed all manually installed packages - for Ubuntu."
@@ -111,30 +135,6 @@ test -f "Forensics Question 6.txt" && gedit "Forensics Question 6.txt"
 
 sed -i '/AllowUnauthenticated/d' /etc/apt/**
 echo "Forced digital signing on APT."
-
-clear
-echo "Check to verify that all update settings are correct."
-if echo $(lsb_release -is) | grep -qi Debian; then
-	# Reset Debian sources.list to default
-	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" > /etc/apt/sources.list
-	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" >> /etc/apt/sources.list
-	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
-	echo "deb-src http://ftp.au.debian.org/debian/ $(lsb_release -cs)-updates main contrib non-free" >> /etc/apt/sources.list
-	echo "deb http://security.debian.org/ $(lsb_release -cs)/updates main contrib non-free" >> /etc/apt/sources.list
-	echo "deb-src http://security.debian.org/ $(lsb_release -cs)/updates main contrib non-free" >> /etc/apt/sources.list
-	apt update
-	# Reset update settings using apt purge
-	apt purge unattended-upgrades apt-config-auto-update -y
-	apt install unattended-upgrades apt-config-auto-update -y
-	apt install firefox-esr -y
-else 
-	printf 'deb http://archive.ubuntu.com/ubuntu %s main universe\n' "$(lsb_release -sc)"{,-security}{,-updates} > /etc/apt/sources.list
-	sed -i "/security-updates/d" /etc/apt/sources.list
-	apt update
-	apt-get remove --purge update-notifier-common unattended-upgrades -y
-	apt-get install update-notifier-common unattended-upgrades update-manager -y
-	apt install firefox stubby -y
-fi
 
 echo "Running apt-get update"
 apt-get update
