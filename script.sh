@@ -217,7 +217,7 @@ then
 		cut -d "-" -f2 <<< $line | IFS=',' read -ra my_array
 		for i in "${my_array[@]}"
 		do
-			useradd -g $groupname i
+			useradd -g $groupname $i
 		done
 	done
 	
