@@ -208,18 +208,16 @@ then
 			echo "$line has been made an administrator."
 		fi
 	done
-
-	groups=$(cat groups.txt)
-	for line in $groups
-	do
-		groupadd $(echo $line | head -n1 | awk '{print $1;}')
+	
+	while IFS= read -r line; do
+  		groupadd $(echo $line | head -n1 | awk '{print $1;}')
 		groupname=$(echo $line | head -n1 | awk '{print $1;}')
 		cut -d "-" -f2 <<< $line | IFS=',' read -ra my_array
 		for i in "${my_array[@]}"
 		do
 			useradd -g $groupname $i
 		done
-	done
+	done < groups.txt
 	
 	sambaYN=no
 	ftpYN=no
