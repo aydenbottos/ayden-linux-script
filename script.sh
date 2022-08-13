@@ -525,7 +525,7 @@ sudo iptables -A INPUT -p all -s localhost  -i eth0 -j DROP
 clear
 env i='() { :;}; echo vulnerable >> test' bash -c "echo this is a test"
 if test -f "test"; then
-	apt-get install --only-upgrade bash
+	apt-get install --only-upgrade bash -y
 fi
 echo "Shellshock Bash vulnerability has been fixed."
 
@@ -1329,7 +1329,7 @@ find / -type f -perm /700 >> /home/scriptuser/badfiles.log
 echo "All files with perms 700-777 have been logged."
 
 clear
-apt install mawk
+apt install mawk -y
 for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/${i} ] && chmod -R 750 /home/${i}/; done
 echo "Home directory permissions set."
 
@@ -1355,7 +1355,7 @@ find / -nogroup -nouser >> /home/scriptuser/badfiles.log
 echo "All files with no owner have been logged."
 
 clear
-apt install tree
+apt install tree -y
 tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
