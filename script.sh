@@ -102,6 +102,11 @@ apt install curl -y
 comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
 echo "Listed all manually installed packages - for Ubuntu."
 
+clear
+apt install curl -y
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u)
+echo "Listed all manually installed packages - for Debian."
+
 apt install p7zip debsums -y
 mkdir thor
 pushd thor
