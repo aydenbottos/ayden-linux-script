@@ -1305,7 +1305,7 @@ clear
 if [ $mediaFilesYN == no ]
 then
 	mv $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg /
-	find /home -regextype posix-extended -regex '.*\.(midi|mid|mod|mp3|mp2|mpa|abs|mpega|au|snd|wav|aiff|aif|sid|flac|ogg)$' -delete
+	find /home -regextype posix-extended -regex '.*\.(midi|mid|mod|mp3|mp2|mpa|abs|mpega|au|snd|wav|aiff|aif|sid|mkv|flac|ogg)$' -delete
 	clear
 	echo "All audio files has been listed."
 
