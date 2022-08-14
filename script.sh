@@ -903,7 +903,18 @@ then
         echo "protocol = SMB2"              | tee -a /etc/samba/smb.conf > /dev/null
         echo "guest ok = no"                | tee -a /etc/samba/smb.conf > /dev/null
         echo "max log size = 24"            | tee -a /etc/samba/smb.conf > /dev/null
-	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been denied. Samba config file has been configured."
+	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been opened. Samba config file has been configured."
+	
+	shares=$(ls -l /var/lib/samba/usershares | awk '{print "/var/lib/samba/usershares/"$8}')
+        for i in $shares
+        do
+                cat $i | grep path >> /home/scriptuser/smbshares.log
+        done
+	
+	while read line; do
+                [[ "$line" =~ ^\[ ]] && name="$line"
+                [[ "$line" =~ ^[[:space:]]*path ]] && echo -e "$name\t$line" >> /home/scriptuser/smbshares.log
+        done < /etc/samba/smb.conf
 	clear
 else
 	echo Response not recognized.
@@ -1348,6 +1359,8 @@ clear
 find / -iname "*.sh" -type f >> /home/scriptuser/badfiles.log
 echo "All shell scripts have been listed. Note: there are a lot of system ones too."
 
+find / -iname "*.pl" -type f >> /home/scriptuser/badfiles.log
+
 clear
 find / -perm -4000 >> /home/scriptuser/badfiles.log
 find / -perm -2000 >> /home/scriptuser/badfiles.log
@@ -1407,6 +1420,10 @@ sed -i '/dhclient/ d' /home/scriptuser/runningProcesses.log
 sed -i '/dnsmasq/ d' /home/scriptuser/runningProcesses.log
 sed -i '/cupsd/ d' /home/scriptuser/runningProcesses.log
 echo "All running processes listed."
+
+clear
+echo -e "$pw\n$pw" | passwd
+echo "Root password set."
 
 clear
 systemctl >> /home/scriptuser/systemctlUnits.log
