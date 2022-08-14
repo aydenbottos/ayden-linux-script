@@ -55,11 +55,6 @@ else
 	apt install firefox stubby -y
 fi
 
-clear
-apt install curl -y
-comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
-echo "Listed all manually installed packages - for Ubuntu."
-
 apt list --installed >> /home/scriptuser/allInstalledPackages.log
 echo "Listed all installed packages, not just manual ones."
 
@@ -101,6 +96,11 @@ mkdir results
 ./uac -p full results &>/dev/null &
 popd
 echo "Ran UAC - check its folder for results."
+
+clear
+apt install curl -y
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
+echo "Listed all manually installed packages - for Ubuntu."
 
 apt install p7zip debsums -y
 mkdir thor
