@@ -1449,6 +1449,13 @@ clear
 echo '' > /etc/securetty
 echo "Removed any TTYs listed in /etc/securetty."
 
+grep "password:" readme.aspx | awk '{print $NF'} >> tempfile.txt
+while IFS= read -r line; do
+	grep -R --exclude-dir=home/$mainuser/Desktop $line / | xargs rm
+done < tempfile.txt
+rm tempfile.txt
+echo "Files containing plain-text passwords deleted."
+
 find / -depth -type d -name '.john' -exec rm -r '{}' \;
 ls -al ~/.john/*
 clear
