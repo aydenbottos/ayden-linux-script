@@ -1040,6 +1040,11 @@ then
 	ufw allow imaps 
 	ufw allow pop3s
 	apt-get install postfix dovecot -y
+	postconf -e disable_vrfy_command=yes
+	postconf -e inet_interfaces=loopback-only
+	postconf -e mynetworks="127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128"
+	postconf -e smtpd_helo_required=yes
+	postconf -e smtp_tls_loglevel=1
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been allowed on the firewall."
 else
 	echo Response not recognized.
