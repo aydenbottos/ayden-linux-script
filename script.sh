@@ -58,36 +58,6 @@ fi
 apt list --installed >> /home/scriptuser/allInstalledPackages.log
 echo "Listed all installed packages, not just manual ones."
 
-wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/defaultfiles.log
-find / -type f >> allfiles.log
-sed -i "s/aydenbottos/$mainUser/g" defaultfiles.log
-sed -i '/cache/d' allfiles.log
-sed -i '/\/sys/d' allfiles.log
-sed -i '/\/run/d' allfiles.log
-sed -i '/\/dev/d' allfiles.log
-sed -i '/\/proc/d' allfiles.log
-sed -i '/\/snap/d' allfiles.log
-sed -i '/apt/d' allfiles.log
-sed -i '/dpkg/d' allfiles.log
-sed -i '/man/d' allfiles.log
-sed -i '/doc/d' allfiles.log
-sed -i '/dpkg/d' defaultfiles.log
-sed -i '/cache/d' defaultfiles.log
-sed -i '/\/sys/d' defaultfiles.log
-sed -i '/\/run/d' defaultfiles.log
-sed -i '/\/dev/d' defaultfiles.log
-sed -i '/\/proc/d' defaultfiles.log
-sed -i '/\/snap/d' defaultfiles.log
-sed -i '/apt/d' defaultfiles.log
-sed -i '/dpkg/d' defaultfiles.log
-sed -i '/man/d' defaultfiles.log
-sed -i '/doc/d' defaultfiles.log
-sort allfiles.log >> allfiles2.log
-sort defaultfiles.log >> defaultfiles2.log
-diff allfiles2.log defaultfiles2.log >> addedanddeletedfiles.log
-echo "This log could be interesting - added and deleted files since installation."
-clear
-
 wget https://github.com/tclahr/uac/releases/download/v2.2.0/uac-2.2.0.tar.gz
 tar -xf uac-2.2.0.tar.gz
 pushd uac-2.2.0
@@ -99,7 +69,7 @@ echo "Ran UAC - check its folder for results."
 
 clear
 apt install curl -y
-comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubuntu.com/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubuntu.com/releases/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
 echo "Listed all manually installed packages - for Ubuntu."
 
 clear
@@ -435,33 +405,11 @@ echo "Set session timeout."
 
 clear
 for f in /etc/sudoers /etc/sudoers.d/* ; do
-	if [ ! -e "$f" ] ; then
-    		continue
-  	fi
-  	matching_list=$(grep -P '^(?!#).*[\s]+\!authenticate.*$' $f | uniq )
-  	if ! test -z "$matching_list"; then
-    		while IFS= read -r entry; do
-      			# comment out "!authenticate" matches to preserve user data
-      			sed -i "s/^${entry}$/# &/g" $f
-    		done <<< "$matching_list"
-
-    		/usr/sbin/visudo -cf $f &> /dev/null || echo "Fail to validate $f with visudo"
-  	fi
+	sed -i 's/\!noauthenticate//g' $f
 done
 
 for f in /etc/sudoers /etc/sudoers.d/* ; do
-	if [ ! -e "$f" ] ; then
-    		continue
-  	fi
-  	matching_list=$(grep -P '^(?!#).*[\s]+NOPASSWD[\s]*\:.*$' $f | uniq )
-  	if ! test -z "$matching_list"; then
-    		while IFS= read -r entry; do
-      			# comment out "NOPASSWD" matches to preserve user data
-      			sed -i "s/^${entry}$/# &/g" $f
-    		done <<< "$matching_list"
-
-    		/usr/sbin/visudo -cf $f &> /dev/null || echo "Fail to validate $f with visudo"
-  	fi
+	sed -i 's/NOPASSWD//g' $f
 done
 echo "Sudoers file secured."
 
@@ -603,98 +551,95 @@ echo "IRQ Balance has been disabled."
 
 clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
-touch /etc/sysctl.d/cybertai-system.conf
 
 # Add these configs
-echo kernel.dmesg_restrict=1            | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored
-echo fs.suid_dumpable=0                 | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Core dumps # Scored
-echo kernel.msgmnb=65536                | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.msgmax=65536                | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.sysrq=0                     | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.maps_protect=1              | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.core_uses_pid=1             | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.shmmax=68719476736          | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.shmall=4294967296           | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.exec_shield=1               | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo vm.mmap_min_addr = 65536           | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.pid_max = 65536             | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.panic=10                    | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.kptr_restrict=2             | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo vm.panic_on_oom=1                  | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo fs.protected_hardlinks=1           | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo fs.protected_symlinks=1            | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.randomize_va_space=2        | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored ASLR; 2 = full; 1 = semi; 0 = none
-echo kernel.unprivileged_userns_clone=0 | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored
-echo kernel.ctrl-alt-del=0              | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null # Scored CTRL-ALT-DEL disable
-echo kernel.perf_event_paranoid = 2     | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.perf_event_max_sample_rate = 1   | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
-echo kernel.perf_cpu_time_max_percent = 1    | tee -a /etc/sysctl.d/cybertai-system.conf > /dev/null
+echo kernel.dmesg_restrict=1            | tee /etc/sysctl.conf > /dev/null # Scored
+echo fs.suid_dumpable=0                 | tee -a /etc/sysctl.conf > /dev/null # Core dumps # Scored
+echo kernel.msgmnb=65536                | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.msgmax=65536                | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.sysrq=0                     | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.maps_protect=1              | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.core_uses_pid=1             | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.shmmax=68719476736          | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.shmall=4294967296           | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.exec_shield=1               | tee -a /etc/sysctl.conf > /dev/null
+echo vm.mmap_min_addr = 65536           | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.pid_max = 65536             | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.panic=10                    | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.kptr_restrict=2             | tee -a /etc/sysctl.conf > /dev/null
+echo vm.panic_on_oom=1                  | tee -a /etc/sysctl.conf > /dev/null
+echo fs.protected_hardlinks=1           | tee -a /etc/sysctl.conf > /dev/null
+echo fs.protected_symlinks=1            | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.randomize_va_space=2        | tee -a /etc/sysctl.conf > /dev/null # Scored ASLR; 2 = full; 1 = semi; 0 = none
+echo kernel.unprivileged_userns_clone=0 | tee -a /etc/sysctl.conf > /dev/null # Scored
+echo kernel.ctrl-alt-del=0              | tee -a /etc/sysctl.conf > /dev/null # Scored CTRL-ALT-DEL disable
+echo kernel.perf_event_paranoid = 2     | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.perf_event_max_sample_rate = 1   | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.perf_cpu_time_max_percent = 1    | tee -a /etc/sysctl.conf > /dev/null
 
-sysctl --system
+sysctl -p >> /dev/null
 clear
 echo "Sysctl system settings set."
 
-sudo touch /etc/sysctl.d/cybertai-networking.conf 
-
 # IPv4 TIME-WAIT assassination protection
-echo net.ipv4.tcp_rfc1337=1 | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.tcp_rfc1337=1 | tee -a /etc/sysctl.conf > /dev/null
 
 # IP Spoofing protection, Source route verification  
 # Scored
-echo net.ipv4.conf.all.rp_filter=1      | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.conf.default.rp_filter=1  | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.all.rp_filter=1      | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.conf.default.rp_filter=1  | tee -a /etc/sysctl.conf > /dev/null
 
 # Ignore ICMP broadcast requests
-echo net.ipv4.icmp_echo_ignore_broadcasts=1 | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.icmp_echo_ignore_broadcasts=1 | tee -a /etc/sysctl.conf > /dev/null
 
 # Ignore Directed pings
-echo net.ipv4.icmp_echo_ignore_all=1 | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.icmp_echo_ignore_all=1 | tee -a /etc/sysctl.conf > /dev/null
 
 # Log Martians
-echo net.ipv4.conf.all.log_martians=1               | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.icmp_ignore_bogus_error_responses=1   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.all.log_martians=1               | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.icmp_ignore_bogus_error_responses=1   | tee -a /etc/sysctl.conf > /dev/null
 
 # Disable source packet routing
-echo net.ipv4.conf.all.accept_source_route=0        | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.conf.default.accept_source_route=0    | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.all.accept_source_route=0        | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.accept_source_route=0    | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.all.accept_source_route=0        | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.conf.default.accept_source_route=0    | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.all.accept_source_route=0        | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.accept_source_route=0    | tee -a /etc/sysctl.conf > /dev/null
 
 # Block SYN attacks
-echo net.ipv4.tcp_syncookies=1          | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.tcp_max_syn_backlog=2048  | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.tcp_synack_retries=2      | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.tcp_syncookies=1          | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.tcp_max_syn_backlog=2048  | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.tcp_synack_retries=2      | tee -a /etc/sysctl.conf > /dev/null
     
 # Ignore ICMP redirects
-echo net.ipv4.conf.all.send_redirects=0         | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.conf.default.send_redirects=0     | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.conf.all.accept_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.conf.default.accept_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.conf.all.secure_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv4.conf.default.secure_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv4.conf.all.send_redirects=0         | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.conf.default.send_redirects=0     | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.conf.all.accept_redirects=0       | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.conf.default.accept_redirects=0   | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.conf.all.secure_redirects=0       | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.conf.default.secure_redirects=0   | tee -a /etc/sysctl.conf > /dev/null
 
-echo net.ipv6.conf.all.send_redirects=0         | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
-echo net.ipv6.conf.default.send_redirects=0     | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
-echo net.ipv6.conf.all.accept_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.accept_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.all.secure_redirects=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
-echo net.ipv6.conf.default.secure_redirects=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null # ignore ?
+echo net.ipv6.conf.all.send_redirects=0         | tee -a /etc/sysctl.conf > /dev/null # ignore ?
+echo net.ipv6.conf.default.send_redirects=0     | tee -a /etc/sysctl.conf > /dev/null # ignore ?
+echo net.ipv6.conf.all.accept_redirects=0       | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.accept_redirects=0   | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.all.secure_redirects=0       | tee -a /etc/sysctl.conf > /dev/null # ignore ?
+echo net.ipv6.conf.default.secure_redirects=0   | tee -a /etc/sysctl.conf > /dev/null # ignore ?
 
 # Note disabling ipv6 means you dont need the majority of the ipv6 settings
 
 # General options
-echo net.ipv6.conf.default.router_solicitations=0   | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.accept_ra_rtr_pref=0     | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.accept_ra_pinfo=0        | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.accept_ra_defrtr=0       | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.autoconf=0               | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.dad_transmits=0          | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.default.max_addresses=1          | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.all.disable_ipv6=1               | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
-echo net.ipv6.conf.lo.disable_ipv6=1                | tee -a /etc/sysctl.d/cybertai-networking.conf > /dev/null
+echo net.ipv6.conf.default.router_solicitations=0   | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.accept_ra_rtr_pref=0     | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.accept_ra_pinfo=0        | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.accept_ra_defrtr=0       | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.autoconf=0               | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.dad_transmits=0          | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.default.max_addresses=1          | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.all.disable_ipv6=1               | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv6.conf.lo.disable_ipv6=1                | tee -a /etc/sysctl.conf > /dev/null
 
 # Reload the configs 
-sysctl --system
+sysctl -p >> /dev/null
 
 # Disable IPV6
 sed -i '/^IPV6=yes/ c\IPV6=no\' /etc/default/ufw
@@ -1570,18 +1515,20 @@ systemctl --now enable auditd
 systemctl start auditd
 echo "Auditd and audit rules have been set and enabled."
 
-if echo $(lsb_release -a) | grep -qi 20.04; then
-	wget https://launchpadlibrarian.net/570612664/scap-workbench_1.2.1-1ubuntu1_amd64.deb
-	apt-get install ./scap-workbench_1.2.1-1ubuntu1_amd64.deb -y
-else 
-	apt-get install scap-workbench -y
-fi
+wget http://ftp.us.debian.org/debian/pool/main/s/scap-security-guide/ssg-debderived_0.1.62-1_all.deb
+apt install ./ssg-debderived_0.1.62-1_all.deb -y
 
-wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg-ubuntu2004-ds.xml
+wget http://ftp.au.debian.org/debian/pool/main/s/scap-security-guide/ssg-debian_0.1.62-1_all.deb
+apt install ./ssg-debian_0.1.62-1_all.deb -y
+
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg-ubuntu2004-ds-tailoring.xml
 
-oscap xccdf eval --remediate --verbose-log-file run1.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
-oscap xccdf eval --remediate --results results.xml --report cisreport.html --verbose-log-file run2.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-ubuntu2004-ds.xml
+var1=$(lsb_release -is | awk '{print tolower($0)}')
+var2=$(lsb_release -r | sed 's/[^0-9]*//g')
+code=$var1$var2
+
+oscap xccdf eval --remediate --verbose-log-file run1.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening /usr/share/xml/scap/ssg/content/ssg-$code-ds.xml
+oscap xccdf eval --remediate --results results.xml --report cisreport.html --verbose-log-file run2.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-$code-ds.xml
 echo "Ran OpenSCAP for CIS compliance."
 
 unhide -f procall sys
