@@ -67,6 +67,19 @@ mkdir results
 popd
 echo "Ran UAC - check its folder for results."
 
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/stat
+chmod +x stat
+originalhour=$(./stat -c '%w' /etc/passwd | awk -F' ' ' {print $2}' | cut -d: -f1)
+
+find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originalhour:\|: -\|cache\|dpkg\|app-info\/icons\|src\/linux\|mime\|man\|icons\|linux\-gnu\|modules\|doc\|include\|python\|zoneinfo\|lib" > tempresult
+(
+  export LC_ALL=C
+  comm -23 <(sort -u tempresult) \
+           <(sort -u /var/lib/dpkg/info/*.list)
+) >> potentiallynewfiles.log
+
+echo "Returned files that are potentially manually created."
+
 clear
 apt install curl -y
 comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubuntu.com/releases/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
