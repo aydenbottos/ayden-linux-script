@@ -410,23 +410,18 @@ echo "Disabled unused filesystems and network protocols."
 
 clear
 echo "Check for any files for users that should not be administrators in /etc/sudoers.d."
-ls -a /etc/sudoers.d >> /home/scriptuser/badfiles.log
+rm /etc/sudoers.d/*
 
 clear
 echo "TMOUT=600" > /etc/profile.d/99-terminal_tmout.sh
 echo "Set session timeout."
 
 clear
-for f in /etc/sudoers /etc/sudoers.d/* ; do
-	sed -i 's/\!noauthenticate//g' $f
-done
-
-for f in /etc/sudoers /etc/sudoers.d/* ; do
-	sed -i 's/NOPASSWD//g' $f
-done
+sed -i 's/\!noauthenticate//g' /etc/sudoers
+sed -i 's/NOPASSWD//g' /etc/sudoers
 echo "Sudoers file secured."
 
-echo -e "Defaults use_pty\nDefaults logfile=/var/log/sudo.log" > /etc/sudoers.d/custom
+echo -e "Defaults use_pty\nDefaults logfile=/var/log/sudo.log" >> /etc/sudoers
 echo "PTY and logfile set up for sudo."
 
 clear
