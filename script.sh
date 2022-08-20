@@ -530,6 +530,7 @@ echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[choos
 xhost +SI:localuser:gdm
 sudo -u gdm gsettings set org.gnome.login-screen disable-user-list true;
 sudo -u gdm gsettings set org.gnome.desktop.screensaver lock-enabled true;
+xhost -
 echo "User list has been hidden and autologin has been disabled."
 
 clear
