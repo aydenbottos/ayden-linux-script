@@ -17,6 +17,13 @@ then
 fi
 echo "Script is being run as root."
 
+if [[ "$PWD" != *"Desktop"* ]]
+then
+  echo "The script must be run in the Desktop directory."
+  exit
+fi
+echo "Script is being run in the correct directory."
+
 pw=CyberTaipan123!
 echo "Universal password set."
 
@@ -417,8 +424,10 @@ echo "TMOUT=600" > /etc/profile.d/99-terminal_tmout.sh
 echo "Set session timeout."
 
 clear
+sed -i 's/Defaults \!noauthenticate/d' /etc/sudoers
 sed -i 's/\!noauthenticate//g' /etc/sudoers
 sed -i 's/NOPASSWD//g' /etc/sudoers
+sed -i 's/\%users/d' /etc/sudoers
 echo "Sudoers file secured."
 
 echo -e "Defaults use_pty\nDefaults logfile=/var/log/sudo.log" >> /etc/sudoers
@@ -1451,6 +1460,7 @@ echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all sys
 echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_username minclass=4 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
 echo "Password policies have been set with and /etc/pam.d."
 getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
+sed -i s/sufficient/d' /etc/pam.d/gdm-password
 echo "All users now need passwords to login"
 
 clear
