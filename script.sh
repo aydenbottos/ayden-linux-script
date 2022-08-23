@@ -1008,7 +1008,7 @@ then
 	ufw deny pop3s
 	systemctl stop postfix
 	systemctl disable postfix
-	apt purge dovecot -y
+	apt purge dovecot exim4 opensmtpd -y
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been denied on the firewall."
 elif [ $mailYN == yes ]
 then
