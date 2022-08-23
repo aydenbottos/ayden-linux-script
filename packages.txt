@@ -3,6 +3,7 @@ netcat-openbsd
 minetest
 wesnoth
 manaplus
+ptunnel
 gameconqueror
 netcat-traditional
 gcc
