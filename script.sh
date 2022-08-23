@@ -94,7 +94,7 @@ echo "Listed all manually installed packages - for Ubuntu."
 
 clear
 apt install curl -y
-comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u)
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u)
 echo "Listed all manually installed packages - for Debian."
 
 apt install p7zip debsums -y
@@ -103,7 +103,7 @@ pushd thor
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/thor10.7lite-linux-pack.7z
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/a2d7f9a1734943f3ca8665d40e02f29a_b28a6f0ae1ee88438421feed7186c8d2.lic
 p7zip -d thor10.7lite-linux-pack.7z
-./thor-lite-linux-64 &>/dev/null &
+./thor-lite-linux &>/dev/null &
 popd
 echo "Ran THOR IOC and YARA scanner."
 
