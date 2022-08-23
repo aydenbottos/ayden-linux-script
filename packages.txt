@@ -8,6 +8,8 @@ netcat-traditional
 gcc
 g++
 ncat
+pompem
+sqlmap
 pnetcat
 socat
 freeciv*
