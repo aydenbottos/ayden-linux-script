@@ -1547,7 +1547,7 @@ var2=$(lsb_release -r | sed 's/[^0-9]*//g')
 code=$var1$var2
 
 oscap xccdf eval --remediate --verbose-log-file run1.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening /usr/share/xml/scap/ssg/content/ssg-$code-ds.xml
-oscap xccdf eval --remediate --results results.xml --report cisreport.html --verbose-log-file run2.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening ssg-$code-ds.xml
+oscap xccdf eval --remediate --results results.xml --report cisreport.html --verbose-log-file run2.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening /usr/share/xml/scap/ssg/content/ssg-$code-ds.xml
 echo "Ran OpenSCAP for CIS compliance."
 
 unhide -f procall sys
