@@ -94,7 +94,7 @@ echo "Listed all manually installed packages - for Ubuntu."
 
 clear
 apt install curl -y
-comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u)
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u)
 echo "Listed all manually installed packages - for Debian."
 
 apt install p7zip debsums -y
@@ -1367,6 +1367,7 @@ filter = sshd
 logpath = /var/log/auth.log
 maxretry = 3
 EOF
+systemctl restart fail2ban
 echo "Fail2Ban enabled."
 
 clear
