@@ -1359,6 +1359,14 @@ clear
 apt install fail2ban -y
 systemctl enable fail2ban
 systemctl start fail2ban
+cat <<EOF > /etc/fail2ban/jail.local
+[sshd]
+enabled = true
+port = 22
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+EOF
 echo "Fail2Ban enabled."
 
 clear
@@ -1411,13 +1419,6 @@ echo "Listed all files in the init directory."
 clear
 echo '' > /etc/securetty
 echo "Removed any TTYs listed in /etc/securetty."
-
-grep "password:" readme.aspx | awk '{print $NF'} >> tempfile.txt
-while IFS= read -r line; do
-	grep -R --exclude-dir=home/$mainUser/Desktop $line / | xargs rm
-done < tempfile.txt
-rm tempfile.txt
-echo "Files containing plain-text passwords deleted."
 
 find / -depth -type d -name '.john' -exec rm -r '{}' \;
 ls -al ~/.john/*
