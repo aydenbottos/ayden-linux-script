@@ -570,6 +570,9 @@ echo "IRQ Balance has been disabled."
 
 clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
+rm /etc/sysctl.d/*
+dpkg --purge --force-depends procps
+apt install procps
 
 # Add these configs
 echo kernel.dmesg_restrict=1            | tee /etc/sysctl.conf > /dev/null # Scored
