@@ -76,9 +76,9 @@ echo "Ran UAC - check its folder for results."
 
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/stat
 chmod +x stat
-originalhour=$(./stat -c '%w' /etc/passwd | awk -F' ' ' {print $2}' | cut -d: -f1)
+originaltime=$(./stat -c '%w' /etc/gai.conf | sed -r 's/^([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}).*/\1/')
 
-find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originalhour:\|: -\|cache\|dpkg\|app-info\/icons\|src\/linux\|mime\|man\|icons\|linux\-gnu\|modules\|doc\|include\|python\|zoneinfo\|lib" > tempresult
+find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originaltime:\|: -\|cache\|dpkg\|app-info\/icons\|src\/linux\|mime\|man\|icons\|linux\-gnu\|modules\|doc\|include\|python\|zoneinfo\|lib" > tempresult
 (
   export LC_ALL=C
   comm -23 <(sort -u tempresult) \
