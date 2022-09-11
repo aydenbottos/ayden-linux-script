@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 echo "Created by Ayden Bottos"
-echo "Last Modified on July 16, 2022"
+echo "Last Modified on Sep 11, 2022"
 echo "Linux script"
 echo "The password used is CyberTaipan123!"
 echo "Running at $(date)"
