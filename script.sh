@@ -167,6 +167,11 @@ then
 			usermod -U $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
 		else
+			if [ $line == $mainUser ] 
+			then
+				echo "Watch out, we were going to delete the main user!"
+				exit
+			fi
 			deluser --remove-home $line
 			echo "Deleted unauthorised user $line."
 		fi
