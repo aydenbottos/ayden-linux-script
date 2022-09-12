@@ -1545,11 +1545,11 @@ systemctl --now enable auditd
 systemctl start auditd
 echo "Auditd and audit rules have been set and enabled."
 
-wget http://ftp.us.debian.org/debian/pool/main/s/scap-security-guide/ssg-debderived_0.1.62-1_all.deb
-apt install ./ssg-debderived_0.1.62-1_all.deb -y
+wget http://ftp.us.debian.org/debian/pool/main/s/scap-security-guide/ssg-debderived_0.1.62-2_all.deb
+apt install ./ssg-debderived_0.1.62-2_all.deb -y
 
-wget http://ftp.au.debian.org/debian/pool/main/s/scap-security-guide/ssg-debian_0.1.62-1_all.deb
-apt install ./ssg-debian_0.1.62-1_all.deb -y
+wget http://ftp.au.debian.org/debian/pool/main/s/scap-security-guide/ssg-debian_0.1.62-2_all.deb
+apt install ./ssg-debian_0.1.62-2_all.deb -y
 
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/ssg-ubuntu2004-ds-tailoring.xml
 
