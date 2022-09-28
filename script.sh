@@ -683,8 +683,9 @@ echo net.ipv6.conf.all.disable_ipv6=1               | tee -a /etc/sysctl.conf > 
 echo net.ipv6.conf.lo.disable_ipv6=1                | tee -a /etc/sysctl.conf > /dev/null
 
 # Reload the configs 
-sysctl -p >> /dev/null
+sysctl --system 
 
+clear
 # Disable IPV6
 sed -i '/^IPV6=yes/ c\IPV6=no\' /etc/default/ufw
 echo 'blacklist ipv6' | tee -a /etc/modprobe.d/blacklist > /dev/null
