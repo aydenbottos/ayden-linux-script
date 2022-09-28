@@ -169,6 +169,8 @@ then
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
 			usermod -U $line
+			chage -E `date -d "30 days" +"%Y-%m-%d"` $line
+			chage -W `date -d "7 days" +"%Y-%m-%d"` $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
 		else
 			if [ $line == $mainUser ] 
@@ -276,6 +278,8 @@ else
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
 			usermod -U $line
+			chage -E `date -d "30 days" +"%Y-%m-%d"` $line
+			chage -W `date -d "7 days" +"%Y-%m-%d"` $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
 		else
 			
@@ -375,9 +379,11 @@ else
 fi
 
 clear
+echo "mesg n" >> /etc/skel/.profile
 profileFiles=$(find /home -type f -name .profile)
 for f in $profileFiles; do cp /etc/skel/.profile $f; done
 
+echo "mesg n" >> /etc/skel/.bashrc
 bashrcFiles=$(find /home -type f -name .bashrc)
 for f in $bashrcFiles; do cp /etc/skel/.bashrc $f; done
 
@@ -385,6 +391,9 @@ logoutFiles=$(find /home -type f -name .bash_logout)
 for f in $logoutFiles; do cp /etc/skel/.bash_logout $f; done
 clear
 echo "Replaced .bash files with originals."
+
+echo "ulimit -c 0" >> /etc/profile
+echo -e "ProcessSizeMax=0\nStorage=none" >> /etc/systemd/coredump.conf
 
 clear
 echo "Functions:" > FunctionsAndVariables.txt
@@ -602,7 +611,10 @@ echo fs.suid_dumpable=0                 | tee -a /etc/sysctl.conf > /dev/null # 
 echo kernel.msgmnb=65536                | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.msgmax=65536                | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.sysrq=0                     | tee -a /etc/sysctl.conf > /dev/null
+echo dev.tty.ldisc_autoload=0           | tee -a /etc/sysctl.conf > /dev/null
+echo fs.protected_fifos=2               | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.maps_protect=1              | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.unprivileged_bpf_disabled=1 | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.core_uses_pid=1             | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.shmmax=68719476736          | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.shmall=4294967296           | tee -a /etc/sysctl.conf > /dev/null
@@ -612,16 +624,17 @@ echo kernel.pid_max = 65536             | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.panic=10                    | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.kptr_restrict=2             | tee -a /etc/sysctl.conf > /dev/null
 echo vm.panic_on_oom=1                  | tee -a /etc/sysctl.conf > /dev/null
+echo net.core.bpf_jit_harden=2		| tee -a /etc/sysctl.conf > /dev/null
 echo fs.protected_hardlinks=1           | tee -a /etc/sysctl.conf > /dev/null
 echo fs.protected_symlinks=1            | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.randomize_va_space=2        | tee -a /etc/sysctl.conf > /dev/null # Scored ASLR; 2 = full; 1 = semi; 0 = none
 echo kernel.unprivileged_userns_clone=0 | tee -a /etc/sysctl.conf > /dev/null # Scored
 echo kernel.ctrl-alt-del=0              | tee -a /etc/sysctl.conf > /dev/null # Scored CTRL-ALT-DEL disable
-echo kernel.perf_event_paranoid = 2     | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.perf_event_paranoid = 3     | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.perf_event_max_sample_rate = 1   | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.perf_cpu_time_max_percent = 1    | tee -a /etc/sysctl.conf > /dev/null
 
-sysctl -p >> /dev/null
+sysctl --system
 clear
 echo "Sysctl system settings set."
 
@@ -653,6 +666,7 @@ echo net.ipv6.conf.default.accept_source_route=0    | tee -a /etc/sysctl.conf > 
 echo net.ipv4.tcp_syncookies=1          | tee -a /etc/sysctl.conf > /dev/null
 echo net.ipv4.tcp_max_syn_backlog=2048  | tee -a /etc/sysctl.conf > /dev/null
 echo net.ipv4.tcp_synack_retries=2      | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.tcp_max_orphans=256       | tee -a /etc/sysctl.conf > /dev/null
     
 # Ignore ICMP redirects
 echo net.ipv4.conf.all.send_redirects=0         | tee -a /etc/sysctl.conf > /dev/null
@@ -683,7 +697,8 @@ echo net.ipv6.conf.all.disable_ipv6=1               | tee -a /etc/sysctl.conf > 
 echo net.ipv6.conf.lo.disable_ipv6=1                | tee -a /etc/sysctl.conf > /dev/null
 
 # Reload the configs 
-sysctl --system 
+sysctl --system
+sysctl -w net.ipv4.route.flush=1
 
 clear
 # Disable IPV6
@@ -742,6 +757,9 @@ chmod 0750 /var/log
 chgrp adm /var/log/syslog
 chown syslog /var/log/syslog
 chmod 0640 /var/log/syslog
+chmod 04755 /usr/bin/su
+chmod 04755 /usr/bin/newgrp
+chmod 04755 /usr/bin/mount
 
 find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type d -exec chmod -R 755 '{}' ;
 find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type d -exec chown root '{}' ;
@@ -986,7 +1004,7 @@ then
 	apt-get install openssh-server -y
 	ufw allow ssh
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
-	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 60\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication no\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog no\nTCPKeepAlive yes\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 1\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no" > /etc/ssh/sshd_config
+	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 30\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication no\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog yes\nTCPKeepAlive no\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 1\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no\nMaxAuthTries 3\nMaxAuthTriesLog 0\nGatewayPorts 0\nAllowAgentForwarding no\nMaxSessions 2\nCompression no\nMaxStartups 10:30:100" > /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
 	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
         echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256' | tee -a /etc/ssh/sshd_config > /dev/null
@@ -1115,7 +1133,10 @@ then
 
         #Disables symbolic links
         echo "symbolic-links=0" | tee -a /etc/mysql/my.cnf
-
+	echo "secure_file_priv" | tee -a /etc/mysql/my.cnf
+	echo "old_passwords=0" | tee -a /etc/mysql/my.cnf
+	echo "safe-user-create=1" | tee -a /etc/mysql/my.cnf
+	echo "allow-suspicious-udfs" | tee -a /etc/mysql/my.cnf
         #Sets root account password
         echo "[mysqladmin]" | tee -a /etc/mysql/my.cnf
         echo "user = root" | tee -a /etc/mysql/my.cnf
@@ -1190,7 +1211,8 @@ then
 	    # security.conf
 	    # Enable HTTPOnly and Secure Flags
 	    echo 'Header edit Set-Cookie ^(.*)\$ \$1;HttpOnly;Secure'                                   | tee -a /etc/apache2/conf-available/security.conf > /dev/null
-
+	    echo 'ServerTokens Prod'                                                                    | tee -a /etc/apache2/conf-available/security.conf > /dev/null
+	    echo 'TraceEnable Off'                                                                      | tee -a /etc/apache2/conf-available/security.conf > /dev/null
 	    # Clickjacking Attack Protection
 	    echo 'Header always append X-Frame-Options SAMEORIGIN'                                      | tee -a /etc/apache2/conf-available/security.conf > /dev/null
 
@@ -1227,6 +1249,8 @@ then
 	    sed -i "s/SSLProtocol.*/SSLProtocol –ALL +TLSv1 +TLSv1.1 +TLSv1.2/" /etc/apache2/mods-available/ssl.conf
 	    # Stronger cipher suite
 	    sed -i "s/SSLCipherSuite.*/SSLCipherSuite HIGH:\!MEDIUM:\!aNULL:\!MD5:\!RC4/" /etc/apache2/mods-available/ssl.conf
+	    
+	    echo "LimitExcept GET" >> /etc/apache2/conf-available/hardening.conf
 
 	    chown -R root:root /etc/apache2
 	    chown -R root:root /etc/apache 2> /dev/null
@@ -1340,10 +1364,12 @@ echo "All files with perms 700-777 have been logged."
 clear
 apt install mawk -y
 for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/${i} ] && chmod -R 750 /home/${i}/; done
+chmod -R 700 /root
 echo "Home directory permissions set."
 
 clear
 for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/${i} ] && chown -R ${i}:${i} /home/${i}/; done
+chown -R root /root
 echo "Home directory owner set."
 
 clear
@@ -1483,6 +1509,7 @@ sed -ie "s/SYSLOG_SG_ENAB.*/SYSLOG_SG_ENAB\\tyes/" /etc/login.defs
 sed -ie "s/LOGIN_RETRIES.*/LOGIN_RETRIES\\t5/" /etc/login.defs
 sed -ie "s/ENCRYPT_METHOD.*/ENCRYPT_METHOD\\tSHA512/" /etc/login.defs
 sed -ie "s/LOGIN_TIMEOUT.*/LOGIN_TIMEOUT\\t60/" /etc/login.defs
+echo -e "SHA_CRYPT_MIN_ROUNDS\t6000" >> /etc/login.defs
 echo "Login settings set in login.defs"
 
 echo "umask 027" >> /etc/bash.bashrc
@@ -1493,7 +1520,8 @@ clear
 cp /etc/pam.d/common-auth /home/scriptuser/backups/
 cp /etc/pam.d/common-password /home/scriptuser/backups/
 echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent\nauth required pam_faildelay.so delay=4000000" > /etc/pam.d/common-auth
-echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_username minclass=4 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
+echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512 rounds=6000\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_username minclass=4 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
+echo "auth required pam_wheel.so" >> /etc/pam.d/su
 echo "Password policies have been set with and /etc/pam.d."
 getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
 sed -i 's/sufficient/d' /etc/pam.d/gdm-password
@@ -1519,6 +1547,11 @@ echo "AppArmor and ClamAV has been installed."
 clear
 for user in $(cut -f1 -d: /etc/passwd); do echo $user; crontab -u $user -l; done >> CronTabs.txt
 echo "All crontabs have been listed."
+
+clear
+apt install usbguard
+systemctl start usbguard
+echo "USBGuard has been installed."
 
 clear
 pushd /etc/
@@ -1551,6 +1584,7 @@ echo "PATH reset to normal."
 
 clear
 sed -i '1i\* hard maxlogins 10' /etc/security/limits.conf
+echo "* hard core 0" >> /etc/security/limits.conf
 echo "Login limits set."
 
 clear
@@ -1588,6 +1622,10 @@ echo "Ran OpenSCAP for CIS compliance."
 
 unhide -f procall sys
 echo "Looked for hidden processes."
+
+systemctl disable avahi-daemon
+systemctl stop avahi-daemon
+echo "Disabled Avahi daemon"
 
 sed -i 's/\/messages/syslog/g' /etc/psad/psad.conf
 psad --sig-update
