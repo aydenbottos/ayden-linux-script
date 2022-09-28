@@ -12,7 +12,6 @@ mainUser=$(stat -c "%U" .)
 
 wget https://raw.github.com/tdulcet/Linux-System-Information/master/info.sh -qO - | bash -s | tee systeminfo.log
 read -p "Press enter to begin script"
-echo "Welcome"
 clear
 
 if [[ $EUID -ne 0 ]]
