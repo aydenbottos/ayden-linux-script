@@ -38,6 +38,19 @@ mkdir -p /home/scriptuser/backups
 chmod 777 /home/scriptuser/backups
 echo "Backups folder created on the Desktop."
 
+wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/stat
+chmod +x stat
+originaltime=$(./stat -c '%w' /etc/gai.conf | sed -r 's/^([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}).*/\1/')
+
+find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originaltime:\|: -\|cache\|dpkg\|app-info\/icons\|src\/linux\|mime\|man\|icons\|linux\-gnu\|modules\|doc\|include\|python\|zoneinfo\|lib" > tempresult
+(
+  export LC_ALL=C
+  comm -23 <(sort -u tempresult) \
+           <(sort -u /var/lib/dpkg/info/*.list)
+) >> potentiallynewfiles.log
+
+echo "Returned files that are potentially manually created."
+
 clear
 echo "Check to verify that all update settings are correct."
 if echo $(lsb_release -is) | grep -qi Debian; then
@@ -74,27 +87,14 @@ mkdir results
 popd
 echo "Ran UAC - check its folder for results."
 
-wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/stat
-chmod +x stat
-originaltime=$(./stat -c '%w' /etc/gai.conf | sed -r 's/^([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}).*/\1/')
-
-find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originaltime:\|: -\|cache\|dpkg\|app-info\/icons\|src\/linux\|mime\|man\|icons\|linux\-gnu\|modules\|doc\|include\|python\|zoneinfo\|lib" > tempresult
-(
-  export LC_ALL=C
-  comm -23 <(sort -u tempresult) \
-           <(sort -u /var/lib/dpkg/info/*.list)
-) >> potentiallynewfiles.log
-
-echo "Returned files that are potentially manually created."
-
 clear
 apt install curl -y
-comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubuntu.com/releases/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u)
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubuntu.com/releases/$(grep -oP 'VERSION_CODENAME=\K.+' /etc/os-release)/ubuntu-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release)-desktop-amd64.manifest | cut -f1 | cut -d: -f1 | sort -u) >> newpackagesubuntu.log
 echo "Listed all manually installed packages - for Ubuntu."
 
 clear
 apt install curl -y
-comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u)
+comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u) >> newpackagesubuntu.log
 echo "Listed all manually installed packages - for Debian."
 
 apt install p7zip debsums -y
@@ -457,8 +457,10 @@ iptables -Z
 
 ufw enable
 ufw default deny incoming
+ufw default deny forward
 ufw status verbose
 ufw limit in on $(route | grep '^default' | grep -o '[^ ]*$')
+ufw logging on
 echo "UFW Firewall enabled and all ports blocked."
     
 # Iptables specific
@@ -578,6 +580,11 @@ cp /etc/default/irqbalance /home/scriptuser/backups/
 echo > /etc/default/irqbalance
 echo -e "#Configuration for the irqbalance daemon\n\n#Should irqbalance be enabled?\nENABLED=\"0\"\n#Balance the IRQs only once?\nONESHOT=\"0\"" >> /etc/default/irqbalance
 echo "IRQ Balance has been disabled."
+
+clear
+update-rc.d bluetooth remove
+echo 'alias net-pf-31 off' >> /etc/modprobe.conf
+echo "Bluetooth disabled."
 
 clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
@@ -1395,6 +1402,13 @@ apt install -y arpwatch
 systemctl enable --now arpwatch
 systemctl start arpwatch
 echo "Installed ARPWatch."
+
+clear
+sudo systemctl stop cups-browsed
+sudo systemctl disable cups-browsed
+echo "Disabled CUPS"
+
+
 
 clear
 echo -e "[org/gnome/settings-daemon/plugins/media-keys]\nlogout=\'\'" >> /etc/dconf/db/local.d/00-disable-CAD
