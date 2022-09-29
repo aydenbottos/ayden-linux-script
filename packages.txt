@@ -15,6 +15,7 @@ pnetcat
 socat
 freeciv*
 sock
+squid
 socket
 sbd
 transmission*
