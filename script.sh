@@ -142,7 +142,7 @@ echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
+apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
@@ -1548,6 +1548,9 @@ nmap -oN nmap.log localhost
 apt purge nmap -y
 clear
 echo "Logged ports with Nmap then deleted it again."
+
+echo "needs_root_rights = no" >> /etc/X11/Xwrapper.config
+echo "Enabled rootless Xorg."
 
 clear
 ls /etc/init/ >> /home/scriptuser/initFiles.log
