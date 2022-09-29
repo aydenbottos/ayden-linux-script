@@ -1634,6 +1634,7 @@ echo "All outside packets from internet claiming to be from loopback are denied.
 clear
 cp /etc/init/control-alt-delete.conf /home/scriptuser/backups/
 sed '/^exec/ c\exec false' /etc/init/control-alt-delete.conf
+systemctl mask ctrl-alt-del.target
 echo "Reboot using Ctrl-Alt-Delete has been disabled."
 
 clear
@@ -1705,8 +1706,10 @@ echo "Login limits set."
 echo "proc /proc proc nosuid,nodev,noexec,hidepid=2,gid=proc 0 0" >> /etc/fstab
 mkdir -p /etc/systemd/system/systemd-logind.service.d/
 echo -e "[Service]\nSupplementaryGroups=proc" >> /etc/systemd/system/systemd-logind.service.d/hidepid.conf
+echo "Hid processes not created by user in proc."
 
-echo "Hide processes not created by user in proc."
+echo "tmpfs	/run/shm	tmpfs	ro,noexec,nosuid	0 0" >> /etc/fstab
+echo "Secured shared memory."
 
 clear
 apt install rsyslog -y
@@ -1771,6 +1774,11 @@ echo "Disabled automounter."
 
 rfkill block all
 echo "Disabled WiFi."
+
+echo 'install usb-storage /bin/true' >> /etc/modprobe.d/disable-usb-storage.conf
+echo "Disabled usb-storage."
+
+echo -e "order bind,hosts\nnospoof on" >> /etc/host.conf
 
 sed -i 's/\/messages/syslog/g' /etc/psad/psad.conf
 psad --sig-update
