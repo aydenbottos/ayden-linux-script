@@ -135,11 +135,14 @@ test -f "Forensics Question 6.txt" && gedit "Forensics Question 6.txt"
 sed -i '/AllowUnauthenticated/d' /etc/apt/**
 echo "Forced digital signing on APT."
 
+echo "APT::Sandbox::Seccomp \"true\"\;" >> /etc/apt/apt.conf.d/40sandbox
+echo "Enabled APT sandboxing."
+
 echo "Running apt-get update"
 apt-get update
 
 echo "Installing all neccessary software."
-apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
+apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
 echo "Deleting all bad software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
@@ -435,10 +438,26 @@ echo "install hfsplus /bin/true" >> /etc/modprobe.d/CIS.conf
 echo "install squashfs /bin/true" >> /etc/modprobe.d/CIS.conf
 echo "install udf /bin/true" >> /etc/modprobe.d/CIS.conf
 echo "install vfat /bin/true" >> /etc/modprobe.d/CIS.conf
-echo "install dccp /bin/true" >> /etc/modprobe.d/CIS.conf
-echo "install sctp /bin/true" >> /etc/modprobe.d/CIS.conf
-echo "install rds /bin/true" >> /etc/modprobe.d/CIS.conf
-echo "install tipc /bin/true" >> /etc/modprobe.d/CIS.conf
+echo "install dccp /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install sctp /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install rds /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install tipc /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install n-hdlc /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install ax25 /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install netrom /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install x25 /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install rose /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install decnet /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install econet /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install af_802154 /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install ipx /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install appletalk /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install psnap /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install p8023 /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install p8022 /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install can /bin/false" >> /etc/modprobe.d/CIS.conf
+echo "install atm /bin/false" >> /etc/modprobe.d/CIS.conf
+
 echo "Disabled unused filesystems and network protocols."
 
 clear
@@ -622,6 +641,8 @@ echo kernel.shmmax=68719476736          | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.shmall=4294967296           | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.exec_shield=1               | tee -a /etc/sysctl.conf > /dev/null
 echo vm.mmap_min_addr = 65536           | tee -a /etc/sysctl.conf > /dev/null
+echo vm.mmap_rnd_bits = 32              | tee -a /etc/sysctl.conf > /dev/null
+vm.mmap_rnd_compat_bits = 16            | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.pid_max = 65536             | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.panic=10                    | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.kptr_restrict=2             | tee -a /etc/sysctl.conf > /dev/null
@@ -635,6 +656,11 @@ echo kernel.ctrl-alt-del=0              | tee -a /etc/sysctl.conf > /dev/null # 
 echo kernel.perf_event_paranoid = 3     | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.perf_event_max_sample_rate = 1   | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.perf_cpu_time_max_percent = 1    | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.yama.ptrace_scope = 3 | tee -a /etc/sysctl.conf > /dev/null
+echo kernel.kexec_load_disabled = 1 | tee -a /etc/sysctl.conf > /dev/null
+echo fs.protected_regular = 2 | tee -a /etc/sysctl.conf > /dev/null
+echo vm.unprivileged_userfaultfd = 0 | tee -a /etc/sysctl.conf > /dev/null
+
 
 sysctl --system
 clear
@@ -642,6 +668,9 @@ echo "Sysctl system settings set."
 
 # IPv4 TIME-WAIT assassination protection
 echo net.ipv4.tcp_rfc1337=1 | tee -a /etc/sysctl.conf > /dev/null
+
+echo net.ipv4.ip_forward = 0 | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.tcp_fin_timeout = 30 | tee -a /etc/sysctl.conf > /dev/null
 
 # IP Spoofing protection, Source route verification  
 # Scored
@@ -669,6 +698,9 @@ echo net.ipv4.tcp_syncookies=1          | tee -a /etc/sysctl.conf > /dev/null
 echo net.ipv4.tcp_max_syn_backlog=2048  | tee -a /etc/sysctl.conf > /dev/null
 echo net.ipv4.tcp_synack_retries=2      | tee -a /etc/sysctl.conf > /dev/null
 echo net.ipv4.tcp_max_orphans=256       | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.tcp_window_scaling = 0    | tee -a /etc/sysctl.conf > /dev/null
+echo net.ipv4.tcp_timestamps=0          | tee -a /etc/sysctl.conf > /dev/null
+
     
 # Ignore ICMP redirects
 echo net.ipv4.conf.all.send_redirects=0         | tee -a /etc/sysctl.conf > /dev/null
@@ -697,6 +729,7 @@ echo net.ipv6.conf.default.dad_transmits=0          | tee -a /etc/sysctl.conf > 
 echo net.ipv6.conf.default.max_addresses=1          | tee -a /etc/sysctl.conf > /dev/null
 echo net.ipv6.conf.all.disable_ipv6=1               | tee -a /etc/sysctl.conf > /dev/null
 echo net.ipv6.conf.lo.disable_ipv6=1                | tee -a /etc/sysctl.conf > /dev/null
+echo -e "net.ipv4.tcp_sack=0\nnet.ipv4.tcp_dsack=0\nnet.ipv4.tcp_fack=0" >> /etc/sysctl.conf
 
 # Reload the configs 
 sysctl --system
@@ -1006,11 +1039,12 @@ then
 	apt-get install openssh-server -y
 	ufw allow ssh
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
-	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 30\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication no\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog yes\nTCPKeepAlive no\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 1\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no\nMaxAuthTries 3\nMaxAuthTriesLog 0\nGatewayPorts 0\nAllowAgentForwarding no\nMaxSessions 2\nCompression no\nMaxStartups 10:30:100" > /etc/ssh/sshd_config
+	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 30\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication no\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog yes\nTCPKeepAlive no\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 1\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no\nMaxAuthTries 3\nMaxAuthTriesLog 0\nGatewayPorts 0\nAllowAgentForwarding no\nMaxSessions 2\nCompression no\nMaxStartups 10:30:100\nAllowStreamLocalForwarding no\nPermitTunnel no" > /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
 	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
         echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256' | tee -a /etc/ssh/sshd_config > /dev/null
 	echo 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' | tee -a /etc/ssh/sshd_config > /dev/null
+	echo 'KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256' >> /etc/ssh/sshd_config
 	systemctl restart sshd
 	systemctl status sshd
 	mkdir ../.ssh
@@ -1617,6 +1651,10 @@ systemctl start usbguard
 echo "USBGuard has been installed."
 
 clear
+systemctl enable haveged
+echo "/usr/local/sbin/haveged -w 1024" >> /etc/rc.local
+
+clear
 pushd /etc/
 /bin/rm -f cron.deny at.deny
 echo root >cron.allow
@@ -1625,6 +1663,13 @@ echo root >at.allow
 /bin/chmod 400 cron.allow at.allow
 popd
 echo "Only root allowed in cron."
+
+echo "chmod 400 /proc/kallsyms" >> /etc/rc.local
+echo "Set permissions for kallsyms."
+
+systemctl enable chronyd
+systemctl start chronyd
+echo "Started Chronyd and enabled it."
 
 clear
 apt-get update 
@@ -1648,7 +1693,15 @@ echo "PATH reset to normal."
 clear
 sed -i '1i\* hard maxlogins 10' /etc/security/limits.conf
 echo "* hard core 0" >> /etc/security/limits.conf
+echo "1000: hard cpu 180" >> /etc/security/limits.conf
+echo "*	hard nproc 1024" >> /etc/security/limits.conf
 echo "Login limits set."
+
+echo "proc /proc proc nosuid,nodev,noexec,hidepid=2,gid=proc 0 0" >> /etc/fstab
+mkdir -p /etc/systemd/system/systemd-logind.service.d/
+echo -e "[Service]\nSupplementaryGroups=proc" >> /etc/systemd/system/systemd-logind.service.d/hidepid.conf
+
+echo "Hide processes not created by user in proc."
 
 clear
 apt install rsyslog -y
@@ -1666,6 +1719,9 @@ auditctl -e 1
 auditd -s enable
 systemctl --now enable auditd
 systemctl start auditd
+echo -e "max_log_file = 6\naction_mail_acct = root\nadmin_space_left_action = single\nmax_log_file_action = single" >> /etc/audit/auditd.conf
+
+
 echo "Auditd and audit rules have been set and enabled."
 
 wget http://ftp.us.debian.org/debian/pool/main/s/scap-security-guide/ssg-debderived_0.1.62-2_all.deb
@@ -1684,6 +1740,20 @@ oscap xccdf eval --remediate --verbose-log-file run1.log --verbose ERROR --tailo
 oscap xccdf eval --remediate --results results.xml --report cisreport.html --verbose-log-file run2.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening /usr/share/xml/scap/ssg/content/ssg-$code-ds.xml
 echo "Ran OpenSCAP for CIS compliance."
 
+wget https://www.openwall.com/signatures/openwall-offline-signatures.asc
+gpg --import openwall-offline-signatures.asc
+wget https://lkrg.org/download/lkrg-0.9.5.tar.gz.sign
+wget https://lkrg.org/download/lkrg-0.9.5.tar.gz
+gpg --verify lkrg-0.9.5.tar.gz.sign lkrg-0.9.5.tar.gz
+tar -xf lkrg-0.9.5.tar.gz
+pushd lkrg-0.9.5/
+make
+make install
+systemctl start lkrg
+systemctl enable lkrg
+popd
+echo "Enabled Linux Kernel Runtime Guard."
+
 unhide -f procall sys
 echo "Looked for hidden processes."
 
@@ -1691,10 +1761,19 @@ systemctl disable avahi-daemon
 systemctl stop avahi-daemon
 echo "Disabled Avahi daemon"
 
+systemctl disable autofs.service
+echo "Disabled automounter."
+
+rfkill block all
+echo "Disabled WiFi."
+
 sed -i 's/\/messages/syslog/g' /etc/psad/psad.conf
 psad --sig-update
 systemctl start psad
 echo "PSAD started."
+
+chmod 700 /boot /usr/src /lib/modules /usr/lib/modules
+echo "Set kernel file permissions."
 
 clear
 apt install ecryptfs-utils -y
