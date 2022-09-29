@@ -60,7 +60,6 @@ find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originaltime:\|: -\|ca
 echo "Returned files that are potentially manually created."
 
 clear
-echo "Check to verify that all update settings are correct."
 if echo $(lsb_release -is) | grep -qi Debian; then
 	# Reset Debian sources.list to default
 	echo "deb http://ftp.au.debian.org/debian/ $(lsb_release -cs) main contrib non-free" > /etc/apt/sources.list
@@ -82,6 +81,7 @@ else
 	apt-get install update-notifier-common unattended-upgrades update-manager -y
 	apt install firefox stubby -y
 fi
+echo "Reset sources and update settings to defaults."
 
 apt list --installed >> /home/scriptuser/allInstalledPackages.log
 echo "Listed all installed packages, not just manual ones."
@@ -127,7 +127,6 @@ popd
 echo "Outputted every change on the system since installation - this log is a must-check."
 clear
 
-echo "Opening forensics questions."
 sudo gnome-terminal
 test -f "Forensics Question 1.txt" && gedit "Forensics Question 1.txt"
 test -f "Forensics Question 2.txt" && gedit "Forensics Question 2.txt"
@@ -135,6 +134,7 @@ test -f "Forensics Question 3.txt" && gedit "Forensics Question 3.txt"
 test -f "Forensics Question 4.txt" && gedit "Forensics Question 4.txt"
 test -f "Forensics Question 5.txt" && gedit "Forensics Question 5.txt"
 test -f "Forensics Question 6.txt" && gedit "Forensics Question 6.txt"
+echo "Opened forensics questions."
 
 sed -i '/AllowUnauthenticated/d' /etc/apt/**
 echo "Forced digital signing on APT."
@@ -142,25 +142,22 @@ echo "Forced digital signing on APT."
 echo "APT::Sandbox::Seccomp \"true\"\;" >> /etc/apt/apt.conf.d/40sandbox
 echo "Enabled APT sandboxing."
 
-echo "Running apt-get update"
 apt-get update
+echo "Ran apt-get update."
 
-echo "Installing all neccessary software."
 apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
-echo "Deleting all bad software."
+echo "Installed all necessary software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
 sudo apt purge $(tr '\n' ' ' <packages-valid) -y
+echo "Deleted all prohibited software."
 
 clear
-chmod 644 /etc/apt/sources.list
-echo "Sources reset to default."
+chmod -R 644 /etc/apt/*
+echo "Permissions set in APT config directory."
 
 echo -e "Unattended-Upgrade::Remove-Unused-Dependencies 'true';\nUnattended-Upgrade::Remove-Unused-Kernel-Packages 'true';" >> /etc/apt/apt.conf.d/50unattended-upgrades
-
-echo "Running apt-get update with HTTPS"
-apt-get update
-clear
+echo "Configured APT to remove unused packages."
 
 cp /etc/group /home/scriptuser/backups/
 cp /etc/passwd /home/scriptuser/backups/
@@ -403,6 +400,7 @@ echo "Replaced .bash files with originals."
 
 echo "ulimit -c 0" >> /etc/profile
 echo -e "ProcessSizeMax=0\nStorage=none" >> /etc/systemd/coredump.conf
+echo "Disabled core dumps using ulimits and systemd."
 
 clear
 echo "Functions:" > FunctionsAndVariables.txt
@@ -430,8 +428,8 @@ chmod 604 /etc/shadow
 echo "Read/Write permissions on shadow have been set."
 
 clear
-echo "Check for any user folders that do not belong to any users in /home/."
 ls -a /home/ >> /home/scriptuser/badfiles.log
+echo "Outputted all files and directories in the /home folder."
 
 clear
 echo "install cramfs /bin/true" >> /etc/modprobe.d/CIS.conf
@@ -461,12 +459,11 @@ echo "install p8023 /bin/false" >> /etc/modprobe.d/CIS.conf
 echo "install p8022 /bin/false" >> /etc/modprobe.d/CIS.conf
 echo "install can /bin/false" >> /etc/modprobe.d/CIS.conf
 echo "install atm /bin/false" >> /etc/modprobe.d/CIS.conf
-
 echo "Disabled unused filesystems and network protocols."
 
 clear
-echo "Check for any files for users that should not be administrators in /etc/sudoers.d."
 rm /etc/sudoers.d/*
+echo "Deleted all files in the sudoers.d directory."
 
 clear
 echo "TMOUT=600" > /etc/profile.d/99-terminal_tmout.sh
@@ -572,7 +569,7 @@ for i in $(netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat"); do
 	fi
 done
 echo "" >> backdoors.txt
-echo "Finished looking for netcat backdoors."
+echo "Removed any netcat backdoors."
 
 clear
 chmod 777 /etc/hosts
@@ -629,6 +626,7 @@ cp /etc/sysctl.conf /home/scriptuser/backups/
 rm /etc/sysctl.d/*
 dpkg --purge --force-depends procps
 apt install procps
+echo "Sysctl and Procps configuration set to defaults"
 
 # Add these configs
 echo kernel.dmesg_restrict=1            | tee /etc/sysctl.conf > /dev/null # Scored
@@ -664,7 +662,6 @@ echo kernel.yama.ptrace_scope = 3 | tee -a /etc/sysctl.conf > /dev/null
 echo kernel.kexec_load_disabled = 1 | tee -a /etc/sysctl.conf > /dev/null
 echo fs.protected_regular = 2 | tee -a /etc/sysctl.conf > /dev/null
 echo vm.unprivileged_userfaultfd = 0 | tee -a /etc/sysctl.conf > /dev/null
-
 
 sysctl --system
 clear
@@ -738,11 +735,12 @@ echo -e "net.ipv4.tcp_sack=0\nnet.ipv4.tcp_dsack=0\nnet.ipv4.tcp_fack=0" >> /etc
 # Reload the configs 
 sysctl --system
 sysctl -w net.ipv4.route.flush=1
+echo "Reloaded sysctl and flushed route."
 
 clear
 # Disable IPV6
-sed -i '/^IPV6=yes/ c\IPV6=no\' /etc/default/ufw
-echo 'blacklist ipv6' | tee -a /etc/modprobe.d/blacklist > /dev/null
+sed -i "/^IPV6=yes/ c\IPV6=no\" /etc/default/ufw
+echo "blacklist ipv6" | tee -a /etc/modprobe.d/blacklist > /dev/null
 clear
 echo "Sysctl network settings set."
 
@@ -1135,8 +1133,6 @@ else
 fi
 echo "Printing is complete."
 
-
-
 clear
 if [ $dbYN == no ]
 then
@@ -1192,8 +1188,6 @@ else
 	echo Response not recognized.
 fi
 echo "MySQL is complete."
-
-
 
 clear
 if [ $httpsYN == no ]
@@ -1363,7 +1357,7 @@ then
 	apt-get install bind9 -y
 	ufw allow domain
 	ufw allow 53
-	echo "domain port has been allowed on the firewall and bind9 installed."
+	echo "Domain port has been allowed on the firewall and bind9 installed."
 	chsh -s /sbin/nologin bind
 	passwd -l bind
 	wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/named.conf.options
@@ -1501,6 +1495,7 @@ fi
 else
     >&2 echo 'Remediation is not applicable, nothing was done'
 fi
+echo "Disabled XDMCP in GDM."
 
 clear
 echo -e "[org/gnome/settings-daemon/plugins/media-keys]\nlogout=\'\'" >> /etc/dconf/db/local.d/00-disable-CAD
@@ -1538,6 +1533,7 @@ else
     echo "Skipping remediation, /etc/sudoers failed to validate"
     false
 fi
+echo "Configured sudo to require a TTY."
 
 clear
 echo -e "$pw\n$pw" | passwd
@@ -1578,7 +1574,7 @@ echo "Ran Linux auditing tools."
 
 ( chkrootkit -q >> ChkrootkitOutput.txt; echo "Finished ChkRootKit" ) &
 disown; sleep 2;
-echo "Running ChkRootKit."
+echo "Started ChkRootKit."
 
 clear
 cp /etc/login.defs /home/scriptuser/backups/
@@ -1611,14 +1607,7 @@ for home_dir in $(awk -F':' '{ if ($3 >= 1000 && $3 != 65534) print $6 }' /etc/p
     # check systems that also check inodes timestamps.
     find "$home_dir" -maxdepth 0 -perm /7027 -exec chmod u-s,g-w-s,o=- {} \;
 done
-
-
-for home_dir in $(awk -F':' '{ if ($3 >= 1000 && $3 != 65534) print $6 }' /etc/passwd); do
-    # Only update the permissions when necessary. This will avoid changing the inode timestamp when
-    # the permission is already defined as expected, therefore not impacting in possible integrity
-    # check systems that also check inodes timestamps.
-    find "$home_dir" -maxdepth 0 -perm /7027 -exec chmod u-s,g-w-s,o=- {} \;
-done
+echo "Repaired home directory permissions."
 
 clear
 cp /etc/pam.d/common-auth /home/scriptuser/backups/
@@ -1688,7 +1677,8 @@ echo "Ubuntu OS has checked for updates and has been upgraded."
 
 killall firefox
 echo "user_pref(\"dom.disable_open_during_load\", true);" >> /home/$mainUser/.mozilla/firefox/default/user.js
-echo "Check Firefox to ensure all settings have been applied."
+pkexec --user $mainUser sh -c "DISPLAY=:0 firefox --preferences"
+echo "Opened Firefox to ensure all settings have been applied."
 
 clear
 apt-get autoremove -y 
@@ -1732,8 +1722,6 @@ auditd -s enable
 systemctl --now enable auditd
 systemctl start auditd
 echo -e "max_log_file = 6\naction_mail_acct = root\nadmin_space_left_action = single\nmax_log_file_action = single" >> /etc/audit/auditd.conf
-
-
 echo "Auditd and audit rules have been set and enabled."
 
 wget http://ftp.us.debian.org/debian/pool/main/s/scap-security-guide/ssg-debderived_0.1.62-2_all.deb
@@ -1783,6 +1771,7 @@ echo 'install usb-storage /bin/true' >> /etc/modprobe.d/disable-usb-storage.conf
 echo "Disabled usb-storage."
 
 echo -e "order bind,hosts\nnospoof on" >> /etc/host.conf
+echo "Set host configuration."
 
 sed -i 's/\/messages/syslog/g' /etc/psad/psad.conf
 psad --sig-update
