@@ -1661,8 +1661,9 @@ echo "Installed rsyslog if it already wasn't installed and configured it."
 clear
 wget https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
 mv audit.rules /etc/audit/audit.rules
+echo "-e 2" >> /etc/audit/audit.rules
 auditctl -e 1
-auditctl -s
+auditd -s enable
 systemctl --now enable auditd
 systemctl start auditd
 echo "Auditd and audit rules have been set and enabled."
