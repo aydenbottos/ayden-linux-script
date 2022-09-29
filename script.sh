@@ -1015,7 +1015,6 @@ then
     echo "connect_from_port_20=YES"     | sudo tee -a $config_file > /dev/null # use port 20 (ftp-data) on the server machine for PORT style connections
     echo "xferlog_std_format=YES"       | sudo tee -a $config_file > /dev/null # keep standard log file format
     echo "listen=NO"                    | sudo tee -a $config_file > /dev/null # prevent vsftpd from running in standalone mode
-    echo "listen_ipv6=YES"              | sudo tee -a $config_file > /dev/null # vsftpd will listen on an IPv6 socket instead of an IPv4 one
     echo "pam_service_name=vsftpd"      | sudo tee -a $config_file > /dev/null # name of the PAM service vsftpd will use
     echo "userlist_enable=YES"          | sudo tee -a $config_file > /dev/null # enable vsftpd to load a list of usernames
     echo "tcp_wrappers=YES"             | sudo tee -a $config_file > /dev/null # turn on tcp wrappers
@@ -1481,6 +1480,7 @@ sudo systemctl disable cups-browsed
 echo "Disabled CUPS"
 
 # Remediation is applicable only in certain platforms
+
 if dpkg-query --show --showformat='${db:Status-Status}\n' 'gdm3' 2>/dev/null | grep -q installed; then
 
 # Try find '[xdmcp]' and 'Enable' in '/etc/gdm/custom.conf', if it exists, set
