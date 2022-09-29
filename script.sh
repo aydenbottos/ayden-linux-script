@@ -169,6 +169,8 @@ then
 			echo "$line has been given the password '$pw'."
 			passwd -x30 -n3 -w7 $line
 			usermod -U $line
+			chage -M 30 $line
+			chage -m 3 $line
 			chage -E `date -d "30 days" +"%Y-%m-%d"` $line
 			chage -W `date -d "7 days" +"%Y-%m-%d"` $line
 			echo "$line's password has been given a maximum age of 30 days, minimum of 3 days, and warning of 7 days."	
@@ -1008,6 +1010,7 @@ then
 	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
 	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
         echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256' | tee -a /etc/ssh/sshd_config > /dev/null
+	echo 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' | tee -a /etc/ssh/sshd_config > /dev/null
 	systemctl restart sshd
 	systemctl status sshd
 	mkdir ../.ssh
@@ -1439,7 +1442,27 @@ sudo systemctl stop cups-browsed
 sudo systemctl disable cups-browsed
 echo "Disabled CUPS"
 
+# Remediation is applicable only in certain platforms
+if dpkg-query --show --showformat='${db:Status-Status}\n' 'gdm3' 2>/dev/null | grep -q installed; then
 
+# Try find '[xdmcp]' and 'Enable' in '/etc/gdm/custom.conf', if it exists, set
+# to 'false', if it isn't here, add it, if '[xdmcp]' doesn't exist, add it there
+if grep -qzosP '[[:space:]]*\[xdmcp]([^\n\[]*\n+)+?[[:space:]]*Enable' '/etc/gdm/custom.conf'; then
+    
+    sed -i 's/Enable[^(\n)]*/Enable=false/' '/etc/gdm/custom.conf'
+elif grep -qs '[[:space:]]*\[xdmcp]' '/etc/gdm/custom.conf'; then
+    sed -i '/[[:space:]]*\[xdmcp]/a Enable=false' '/etc/gdm/custom.conf'
+else
+    if test -d "/etc/gdm"; then
+        printf '%s\n' '[xdmcp]' 'Enable=false' >> '/etc/gdm/custom.conf'
+    else
+        echo "Config file directory '/etc/gdm' doesnt exist, not remediating, assuming non-applicability." >&2
+    fi
+fi
+
+else
+    >&2 echo 'Remediation is not applicable, nothing was done'
+fi
 
 clear
 echo -e "[org/gnome/settings-daemon/plugins/media-keys]\nlogout=\'\'" >> /etc/dconf/db/local.d/00-disable-CAD
@@ -1457,6 +1480,26 @@ sed -i '/dhclient/ d' /home/scriptuser/runningProcesses.log
 sed -i '/dnsmasq/ d' /home/scriptuser/runningProcesses.log
 sed -i '/cupsd/ d' /home/scriptuser/runningProcesses.log
 echo "All running processes listed."
+
+if /usr/sbin/visudo -qcf /etc/sudoers; then
+    cp /etc/sudoers /etc/sudoers.bak
+    if ! grep -P '^[\s]*Defaults.*\brequiretty\b.*$' /etc/sudoers; then
+        # sudoers file doesn't define Option requiretty
+        echo "Defaults requiretty" >> /etc/sudoers
+    fi
+    
+    # Check validity of sudoers and cleanup bak
+    if /usr/sbin/visudo -qcf /etc/sudoers; then
+        rm -f /etc/sudoers.bak
+    else
+        echo "Fail to validate remediated /etc/sudoers, reverting to original file."
+        mv /etc/sudoers.bak /etc/sudoers
+        false
+    fi
+else
+    echo "Skipping remediation, /etc/sudoers failed to validate"
+    false
+fi
 
 clear
 echo -e "$pw\n$pw" | passwd
@@ -1510,18 +1553,38 @@ sed -ie "s/LOGIN_RETRIES.*/LOGIN_RETRIES\\t5/" /etc/login.defs
 sed -ie "s/ENCRYPT_METHOD.*/ENCRYPT_METHOD\\tSHA512/" /etc/login.defs
 sed -ie "s/LOGIN_TIMEOUT.*/LOGIN_TIMEOUT\\t60/" /etc/login.defs
 echo -e "SHA_CRYPT_MIN_ROUNDS\t6000" >> /etc/login.defs
+echo -e "FAIL_DELAY\t4" >> /etc/login.defs
 echo "Login settings set in login.defs"
 
 echo "umask 027" >> /etc/bash.bashrc
 echo "umask 027" >> /etc/profile
 echo "Set a very strict umask."
 
+
+awk -F':' '{ if ($3 >= 1000 && $3 != 65534) system("chgrp -f " $3" "$6"/.[^\.]?*") }' /etc/passwd
+awk -F':' '{ if ($3 >= 1000 && $3 != 65534) system("chown -f " $3" "$6"/.[^\.]?*") }' /etc/passwd
+
+for home_dir in $(awk -F':' '{ if ($3 >= 1000 && $3 != 65534) print $6 }' /etc/passwd); do
+    # Only update the permissions when necessary. This will avoid changing the inode timestamp when
+    # the permission is already defined as expected, therefore not impacting in possible integrity
+    # check systems that also check inodes timestamps.
+    find "$home_dir" -maxdepth 0 -perm /7027 -exec chmod u-s,g-w-s,o=- {} \;
+done
+
+
+for home_dir in $(awk -F':' '{ if ($3 >= 1000 && $3 != 65534) print $6 }' /etc/passwd); do
+    # Only update the permissions when necessary. This will avoid changing the inode timestamp when
+    # the permission is already defined as expected, therefore not impacting in possible integrity
+    # check systems that also check inodes timestamps.
+    find "$home_dir" -maxdepth 0 -perm /7027 -exec chmod u-s,g-w-s,o=- {} \;
+done
+
 clear
 cp /etc/pam.d/common-auth /home/scriptuser/backups/
 cp /etc/pam.d/common-password /home/scriptuser/backups/
 echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of the authentication modules that define\n# the central authentication scheme for use on the system\n# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the\n# traditional Unix authentication mechanisms.\n#\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\nauth	[success=1 default=ignore]	pam_unix.so\n# here's the fallback if no module succeeds\nauth	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\nauth	required			pam_permit.so\n# and here are more per-package modules (the \"Additional\" block)\nauth	optional			pam_cap.so \n# end of pam-auth-update config\nauth required pam_tally2.so deny=5 unlock_time=1800 onerr=fail audit even_deny_root_account silent\nauth required pam_faildelay.so delay=4000000" > /etc/pam.d/common-auth
 echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512 rounds=6000\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_username minclass=4 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
-echo "auth required pam_wheel.so" >> /etc/pam.d/su
+echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su
 echo "Password policies have been set with and /etc/pam.d."
 getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
 sed -i 's/sufficient/d' /etc/pam.d/gdm-password
