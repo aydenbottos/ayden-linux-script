@@ -1,6 +1,7 @@
 #!/bin/bash
 clear
-echo "Created by Ayden Bottos"
+
+echo "Creator: Ayden Bottos"
 echo "Universal password: CyberTaipan123!"
 echo "Current time: $(date)"
 echo "Operating system: $(lsb_release -is)"
@@ -8,6 +9,7 @@ echo "Kernel info: $(uname -a)"
 echo "Hostname: $(hostname)"
 echo "Main user: $(stat -c "%U" .)"
 echo "Current directory: $(pwd)"
+
 mainUser=$(stat -c "%U" .)
 
 wget https://raw.github.com/tdulcet/Linux-System-Information/master/info.sh -qO - | bash -s | tee systeminfo.log
