@@ -1652,7 +1652,9 @@ echo "USBGuard has been installed."
 
 clear
 systemctl enable haveged
+systemctl start haveged
 echo "/usr/local/sbin/haveged -w 1024" >> /etc/rc.local
+echo "Enabled entropy generation daemon."
 
 clear
 pushd /etc/
