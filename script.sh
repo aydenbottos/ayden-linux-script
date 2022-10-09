@@ -739,7 +739,7 @@ echo "Reloaded sysctl and flushed route."
 
 clear
 # Disable IPV6
-sed -i "/^IPV6=yes/ c\IPV6=no\" /etc/default/ufw
+sed -i "s/IPV6=yes/IPV6=no/g" /etc/default/ufw
 echo "blacklist ipv6" | tee -a /etc/modprobe.d/blacklist > /dev/null
 clear
 echo "Sysctl network settings set."
