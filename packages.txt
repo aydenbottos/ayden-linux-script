@@ -7,6 +7,7 @@ ptunnel
 gameconqueror
 netcat-traditional
 gcc
+bleachbit
 g++
 ncat
 pompem
