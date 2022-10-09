@@ -267,12 +267,10 @@ then
 	fi
 	if grep -qi 'web\|apache\|http' services.txt; then
 		httpsYN=yes
+		phpYN=yes
 	fi
 	if grep -qi 'bind9\|dns' services.txt; then
 		dnsYN=yes
-	fi
-	if grep -qi 'php' services.txt; then
-		phpYN=yes
 	fi
 else
 	find $(pwd) -iname 'README.desktop' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
@@ -375,12 +373,10 @@ else
 	fi
 	if grep -qi 'web\|apache\|http' services; then
 		httpsYN=yes
+		phpYN=yes
 	fi
 	if grep -qi 'bind9\|dns' services; then
 		dnsYN=yes
-	fi
-	if grep -qi 'php' services; then
-		phpYN=yes
 	fi
 fi
 
@@ -1643,7 +1639,7 @@ for user in $(cut -f1 -d: /etc/passwd); do echo $user; crontab -u $user -l; done
 echo "All crontabs have been listed."
 
 clear
-apt install usbguard
+apt install usbguard -y
 systemctl start usbguard
 echo "USBGuard has been installed."
 
