@@ -1427,18 +1427,6 @@ tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
 clear
-chmod 000 /usr/bin/as >/dev/null 2>&1
-chmod 000 /usr/bin/byacc >/dev/null 2>&1
-chmod 000 /usr/bin/yacc >/dev/null 2>&1
-chmod 000 /usr/bin/bcc >/dev/null 2>&1
-chmod 000 /usr/bin/kgcc >/dev/null 2>&1
-chmod 000 /usr/bin/cc >/dev/null 2>&1
-chmod 000 /usr/bin/gcc >/dev/null 2>&1
-chmod 000 /usr/bin/*c++ >/dev/null 2>&1
-chmod 000 /usr/bin/*g++ >/dev/null 2>&1
-echo "Disabled compilers."
-
-clear
 apt install fail2ban -y
 systemctl enable fail2ban
 systemctl start fail2ban
@@ -1736,6 +1724,7 @@ oscap xccdf eval --remediate --verbose-log-file run1.log --verbose ERROR --tailo
 oscap xccdf eval --remediate --results results.xml --report cisreport.html --verbose-log-file run2.log --verbose ERROR --tailoring-file ssg-ubuntu2004-ds-tailoring.xml --profile xccdf_org.teammensa_profile_hardening /usr/share/xml/scap/ssg/content/ssg-$code-ds.xml
 echo "Ran OpenSCAP for CIS compliance."
 
+apt install build-essential -y
 wget https://www.openwall.com/signatures/openwall-offline-signatures.asc
 gpg --import openwall-offline-signatures.asc
 wget https://lkrg.org/download/lkrg-0.9.5.tar.gz.sign
@@ -1748,7 +1737,20 @@ make install
 systemctl start lkrg
 systemctl enable lkrg
 popd
+apt purge build-essential -y
 echo "Enabled Linux Kernel Runtime Guard."
+
+clear
+chmod 000 /usr/bin/as >/dev/null 2>&1
+chmod 000 /usr/bin/byacc >/dev/null 2>&1
+chmod 000 /usr/bin/yacc >/dev/null 2>&1
+chmod 000 /usr/bin/bcc >/dev/null 2>&1
+chmod 000 /usr/bin/kgcc >/dev/null 2>&1
+chmod 000 /usr/bin/cc >/dev/null 2>&1
+chmod 000 /usr/bin/gcc >/dev/null 2>&1
+chmod 000 /usr/bin/*c++ >/dev/null 2>&1
+chmod 000 /usr/bin/*g++ >/dev/null 2>&1
+echo "Disabled compilers."
 
 unhide -f procall sys
 echo "Looked for hidden processes."
