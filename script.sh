@@ -161,8 +161,6 @@ clear
 chmod -R 644 /etc/apt/*
 echo "Permissions set in APT config directory."
 
-
-
 echo -e "Unattended-Upgrade::Remove-Unused-Dependencies 'true';\nUnattended-Upgrade::Remove-Unused-Kernel-Packages 'true';" >> /etc/apt/apt.conf.d/50unattended-upgrades
 echo "Configured APT to remove unused packages."
 
@@ -610,6 +608,7 @@ echo "badfiles in bin have been removed."
 clear
 cp /etc/default/irqbalance /home/scriptuser/backups/
 echo > /etc/default/irqbalance
+
 echo -e "#Configuration for the irqbalance daemon\n\n#Should irqbalance be enabled?\nENABLED=\"0\"\n#Balance the IRQs only once?\nONESHOT=\"0\"" >> /etc/default/irqbalance
 echo "IRQ Balance has been disabled."
 
@@ -1422,6 +1421,7 @@ find / -iname "*.pl" -type f >> /home/scriptuser/badfiles.log
 
 clear
 find / -perm -4000 >> /home/scriptuser/badfiles.log
+
 find / -perm -2000 >> /home/scriptuser/badfiles.log
 echo "All files with perms 4000 and 2000 have been logged."
 
@@ -1549,6 +1549,7 @@ echo "Enabled rootless Xorg."
 
 clear
 ls /etc/init/ >> /home/scriptuser/initFiles.log
+
 ls /etc/init.d/ >> /home/scriptuser/initFiles.log
 echo "Listed all files in the init directory."
 
@@ -1611,6 +1612,8 @@ echo -e "#\n# /etc/pam.d/common-auth - authentication settings common to all sys
 echo -e "#\n# /etc/pam.d/common-password - password-related modules common to all systemctls\n#\n# This file is included from other systemctl-specific PAM config files,\n# and should contain a list of modules that define the systemctls to be\n# used to change user passwords.  The default is pam_unix.\n\n# Explanation of pam_unix options:\n#\n# The \"sha512\" option enables salted SHA512 passwords.  Without this option,\n# the default is Unix crypt.  Prior releases used the option \"md5\".\n#\n# The \"obscure\" option replaces the old \`OBSCURE_CHECKS_ENAB\' option in\n# login.defs.\n#\n# See the pam_unix manpage for other options.\n\n# As of pam 1.0.1-6, this file is managed by pam-auth-update by default.\n# To take advantage of this, it is recommended that you configure any\n# local modules either before or after the default block, and use\n# pam-auth-update to manage selection of other modules.  See\n# pam-auth-update(8) for details.\n\n# here are the per-package modules (the \"Primary\" block)\npassword	[success=1 default=ignore]	pam_unix.so obscure sha512 rounds=6000\n# here's the fallback if no module succeeds\npassword	requisite			pam_deny.so\n# prime the stack with a positive return value if there isn't one already; >> /dev/null\n# this avoids us returning an error just because nothing sets a success code\n# since the modules above will each just jump around\npassword	required			pam_permit.so\npassword requisite pam_cracklib.so retry=3 minlen=14 difok=8 reject_username minclass=4 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 ocredit=-1\npassword requisite pam_pwhistory.so use_authtok remember=24 enforce_for_root\n# and here are more per-package modules (the \"Additional\" block)\npassword	optional	pam_gnome_keyring.so \n# end of pam-auth-update config" > /etc/pam.d/common-password
 echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su
 echo "Password policies have been set with and /etc/pam.d."
+
+clear
 getent group nopasswdlogin && gpasswd nopasswdlogin -M ''
 sed -i 's/sufficient/d' /etc/pam.d/gdm-password
 echo "All users now need passwords to login"
