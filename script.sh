@@ -463,8 +463,16 @@ echo "install atm /bin/false" >> /etc/modprobe.d/CIS.conf
 echo "Disabled unused filesystems and network protocols."
 
 clear
+useradd -D -f 35
+echo "Set expiry for inactive accounts."
+
+clear
 rm /etc/sudoers.d/*
 echo "Deleted all files in the sudoers.d directory."
+
+clear
+find / -type d -perm -002 ! -perm -1000
+echo "Listed any public directories without sticky bit."
 
 clear
 echo "TMOUT=600" > /etc/profile.d/99-terminal_tmout.sh
@@ -1706,7 +1714,7 @@ clear
 apt install rsyslog -y
 systemctl enable --now rsyslog
 systemctl start rsyslog
-echo -e "auth.*,authpriv.* /var/log/secure\ndaemon.notice /var/log/messages" >> /etc/rsyslog.d/50-default.conf
+echo -e "auth.*,authpriv.* /var/log/secure\ndaemon.* /var/log/messages" >> /etc/rsyslog.d/50-default.conf
 systemctl restart rsyslog
 echo "Installed rsyslog if it already wasn't installed and configured it."
 
