@@ -150,12 +150,16 @@ echo "Enabled APT sandboxing."
 apt-get update
 echo "Ran apt-get update."
 
-apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
+apt-get install apt-transport-https dirmngr vlock ufw git logwatch binutils tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam clamav-daemon auditd audispd-plugins cryptsetup unhide psad fail2ban ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
 echo "Installed all necessary software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
 sudo apt purge $(tr '\n' ' ' <packages-valid) -y
 echo "Deleted all prohibited software."
+
+systemctl start fail2ban
+systemctl enable fail2ban
+echo "Started but not configured Fail2Ban."
 
 clear
 chmod -R 644 /etc/apt/*
@@ -1002,6 +1006,26 @@ then
     apt-get install vsftpd -y
     cp /etc/vsftpd.conf /home/scriptuser/backups/
     config_file="/etc/vsftpd.conf"
+    
+    cat <<EOF >> /etc/fail2ban/jail.local
+    [vsftpd]
+    enabled = true
+    port = ftp,ftp-data,ftps,ftps-data
+    logpath = %(vsftpd_log)s
+    EOF
+    
+    cat <<EOF > /etc/fail2ban/filter.d/vsftpd.conf
+    [INCLUDES]
+    before = common.conf
+    [Definition]
+    __pam_re=\(?%(__pam_auth)s(?:\(\S+\))?\)?:?
+    _daemon = vsftpd
+    failregex = ^%(__prefix_line)s%(__pam_re)s\s+authentication failure; logname=\S* uid=\S* euid=\S* tty=(ftp)? ruser=\S* rhost=<HOST>(?:\s+user=.*)?\s*$
+    ^ \[pid \d+\] \[[^\]]+\] FAIL LOGIN: Client "<HOST>"(?:\s*$|,)
+    ^ \[pid \d+\] \[root\] FAIL LOGIN: Client "<HOST>"(?:\s*$|,)
+    ignoreregex =
+    EOF
+    systemctl restart fail2ban
 
     # Jail users to home directory (user will need a home dir to exist)
     echo "chroot_local_user=YES"                        | sudo tee $config_file > /dev/null
@@ -1050,7 +1074,19 @@ elif [ $sshYN == yes ]
 then
 	apt-get install openssh-server -y
 	ufw allow ssh
-	cp /etc/ssh/sshd_config /home/scriptuser/backups/	
+	cp /etc/ssh/sshd_config /home/scriptuser/backups/
+	
+	cat <<EOF > /etc/fail2ban/jail.local
+	[sshd]
+	enabled = true
+	port = 22
+	filter = sshd
+	logpath = /var/log/auth.log
+	maxretry = 3
+	EOF
+	systemctl restart fail2ban
+	echo "Fail2Ban configured for SSH."
+
 	echo -e "# Package generated configuration file\n# See the sshd_config(5) manpage for details\n\n# What ports, IPs and protocols we listen for\nPort 223\n# Use these options to restrict which interfaces/protocols sshd will bind to\n#ListenAddress ::\n#ListenAddress 0.0.0.0\nProtocol 2\n# HostKeys for protocol version \nHostKey /etc/ssh/ssh_host_rsa_key\nHostKey /etc/ssh/ssh_host_dsa_key\nHostKey /etc/ssh/ssh_host_ecdsa_key\nHostKey /etc/ssh/ssh_host_ed25519_key\n#Privilege Separation is turned on for security\nUsePrivilegeSeparation yes\n\n# Lifetime and size of ephemeral version 1 server key\nKeyRegenerationInterval 3600\nServerKeyBits 1024\n\n# Logging\nSyslogFacility AUTH\nLogLevel VERBOSE\n\n# Authentication:\nLoginGraceTime 30\nPermitRootLogin no\nStrictModes yes\n\nRSAAuthentication yes\nPubkeyAuthentication yes\n#AuthorizedKeysFile	$(pwd)/../.ssh/authorized_keys\n\n# Don't read the user's /home/scriptuser/.rhosts and /home/scriptuser/.shosts files\nIgnoreRhosts yes\n# For this to work you will also need host keys in /etc/ssh_known_hosts\nRhostsRSAAuthentication no\n# similar for protocol version 2\nHostbasedAuthentication no\n# Uncomment if you don't trust /home/scriptuser/.ssh/known_hosts for RhostsRSAAuthentication\n#IgnoreUserKnownHosts yes\n\n# To enable empty passwords, change to yes (NOT RECOMMENDED)\nPermitEmptyPasswords no\n\n# Change to yes to enable challenge-response passwords (beware issues with\n# some PAM modules and threads)\nChallengeResponseAuthentication no\n\n# Change to no to disable tunnelled clear text passwords\nPasswordAuthentication no\n\n# Kerberos options\n#KerberosAuthentication no\n#KerberosGetAFSToken no\n#KerberosOrLocalPasswd yes\n#KerberosTicketCleanup yes\n\n# GSSAPI options\n#GSSAPIAuthentication no\n#GSSAPICleanupCredentials yes\n\nX11Forwarding no\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog yes\nTCPKeepAlive no\n#UseLogin no\n\nMaxStartups 2\n#Banner /etc/issue.net\n\n# Allow client to pass locale environment variables\nAcceptEnv LANG LC_*\n\nSubsystem sftp /usr/lib/openssh/sftp-server\n\n# Set this to 'yes' to enable PAM authentication, account processing,\n# and session processing. If this is enabled, PAM authentication will\n# be allowed through the ChallengeResponseAuthentication and\n# PasswordAuthentication.  Depending on your PAM configuration,\n# PAM authentication via ChallengeResponseAuthentication may bypass\n# the setting of \"PermitRootLogin without-password\".\n# If you just want the PAM account and session checks to run without\n# PAM authentication, then enable this but set PasswordAuthentication\n# and ChallengeResponseAuthentication to 'no'.\nUsePAM yes\nRhostsAuthentication no\nClientAliveInterval 300\nClientAliveCountMax 1\nVerifyReverseMapping yes\nAllowTcpForwarding no\nUseDNS no\nPermitUserEnvironment no\nMaxAuthTries 3\nGatewayPorts no\nAllowAgentForwarding no\nMaxSessions 2\nCompression no\nMaxStartups 10:30:100\nAllowStreamLocalForwarding no\nPermitTunnel no" > /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" | tee -a /etc/ssh/sshd_config > /dev/null
 	echo "CyberTaipan Team Mensa" | tee /etc/issue.net > /dev/null
@@ -1118,6 +1154,14 @@ then
 	postconf -e mynetworks="127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128"
 	postconf -e smtpd_helo_required=yes
 	postconf -e smtp_tls_loglevel=1
+	postconf -e smtpd_delay_reject=yes
+	postconf -e default_process_limit=100
+	postconf -e smtpd_client_connection_count_limit=10
+	postconf -e smtpd_client_connection_rate_limit=30
+	postconf -e queue_minfree=20971520
+	postconf -e header_size_limit=51200
+	postconf -e message_size_limit=10485760
+	postconf -e smtpd_recipient_limit=100
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been allowed on the firewall."
 else
 	echo Response not recognized.
@@ -1162,7 +1206,7 @@ then
 	ufw allow mysql 
 	ufw allow mysql-proxy
 	apt-get install mariadb-server-1* -y
-	mysql_secure_configuration
+	mysql_secure_installation
 	cp /etc/mysql/my.cnf /home/scriptuser/backups/ 
 
 	#Sets group
@@ -1192,6 +1236,9 @@ then
         #Sets packet restrictions
         echo "key_buffer_size         = 16M" | tee -a /etc/mysql/my.cnf
         echo "max_allowed_packet      = 16M" | tee -a /etc/mysql/my.cnf
+	
+	chown -R root:root /etc/mysql/
+	chmod 0644 /etc/mysql/my.cnf
 
 	systemctl restart mariadb
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been allowed on the firewall. MySQL has been installed. MySQL config file has been secured. MySQL systemctl has been restarted."
@@ -1299,12 +1346,22 @@ then
 
 	    chown -R root:root /etc/apache2
 	    chown -R root:root /etc/apache 2> /dev/null
+	    
+	    cat <<EOF > /etc/fail2ban/jail.local
+	    [apache]
+	    enabled = true
+	    port = http,https
+	    filter = apache-auth
+	    logpath = /var/log/apache2/*error.log
+	    maxretry = 4
+	    findtime = 500
+	    ignoreip = 10x.12x.1xx.xx7
+	    EOF
+	    systemctl restart fail2ban
+	    echo "Fail2Ban configured for Apache."
+	
+	    systemctl start apache2
 	fi
-        
-        chown -R root:root /etc/apache2
-	systemctl start apache2
-	systemctl status apache2
-
 	echo "https and https ports have been allowed on the firewall. Apache2 config file has been configured. Only root can now access the Apache2 folder."
 else
 	echo Response not recognized.
@@ -1443,21 +1500,6 @@ tree >> /home/scriptuser/directorytree.txt
 echo "Directory tree saved to file."
 
 clear
-apt install fail2ban -y
-systemctl enable fail2ban
-systemctl start fail2ban
-cat <<EOF > /etc/fail2ban/jail.local
-[sshd]
-enabled = true
-port = 22
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 3
-EOF
-systemctl restart fail2ban
-echo "Fail2Ban enabled."
-
-clear
 apt install acct -y
 touch /var/log/wtmp
 echo "Enabled process accounting."
@@ -1565,6 +1607,10 @@ clear
 echo '' > /etc/securetty
 echo "Removed any TTYs listed in /etc/securetty."
 
+clear
+logwatch >> logwatch.report
+echo "Created a report from all logs using LogWatch."
+
 find / -depth -type d -name '.john' -exec rm -r '{}' \;
 ls -al ~/.john/*
 clear
@@ -1637,8 +1683,11 @@ systemctl mask ctrl-alt-del.target
 echo "Reboot using Ctrl-Alt-Delete has been disabled."
 
 clear
-systemctl start clamav-freshclam && systemctl enable clamav-freshclam
-systemctl start clamav-daemon && systemctl enable clamav-daemon
+clamscan --verbose --recursive >> clamav.log
+systemctl stop clamav-freshclam
+freshclam
+systemctl start clamav-freshclam && systemctl start clamav-daemon
+systemctl enable clamav-freshclam && systemctl enable clamav-daemon
 aa-enforce /etc/apparmor.d/*
 systemctl reload apparmor
 systemctl status apparmor
@@ -1709,6 +1758,20 @@ echo "Hid processes not created by user in proc."
 
 echo "tmpfs	/run/shm	tmpfs	ro,noexec,nosuid	0 0" >> /etc/fstab
 echo "Secured shared memory."
+
+clear
+dd if=/dev/zero of=/usr/tmpDSK bs=1024 count=1024000
+cp -Rpf /tmp /tmpbackup
+mount -t tmpfs -o loop,noexec,nosuid,rw /usr/tmpDSK /tmp
+chmod 1777 /tmp
+cp -Rpf /tmpbackup/* /tmp/
+rm -rf /tmpbackup/*
+echo "/usr/tmpDSK /tmp tmpfs loop,nosuid,noexec,rw 0 0" >> /etc/fstab
+mount -o remount /tmp
+mv /var/tmp /var/tmpold
+ln -s /tmp /var/tmp
+cp -prf /var/tmpold/* /tmp/
+echo "Secured tmp filesystem."
 
 clear
 apt install rsyslog -y
@@ -1783,7 +1846,9 @@ systemctl disable avahi-daemon
 systemctl stop avahi-daemon
 echo "Disabled Avahi daemon"
 
+echo 'SUBSYSTEM=="usb", ENV{UDISKS_AUTO}="0"' >> /etc/udev/rules.d/85-no-automount.rules
 systemctl disable autofs.service
+systemctl restart udev
 echo "Disabled automounter."
 
 rfkill block all
