@@ -1489,6 +1489,9 @@ systemctl mask ctrl-alt-del.target
 systemctl daemon-reload
 echo "Disabled CTRL-ALT-DELETE reboot in Gnome."
 
+getcap -r / 2>/dev/null | tee binarieswithcapabilities.log
+echo "Listed all files with kernel capabilities. Refer to GTFOBins to check if any are vulnerable."
+
 clear
 lsof -Pnl +M -i > /home/scriptuser/runningProcesses.log
 ## Removing the default running processes
