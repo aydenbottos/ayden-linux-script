@@ -46,6 +46,12 @@ mkdir -p /home/scriptuser/backups
 chmod 777 /home/scriptuser/backups
 echo "Backups folder created on the Desktop."
 
+apt update
+apt install tripwire -y
+tripwire -m i
+tripwire -m c > tripwire.log 2>&1
+echo "Ran Tripwire to check file integrity."
+
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/stat
 chmod +x stat
 originaltime=$(./stat -c '%w' /etc/gai.conf | sed -r 's/^([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}).*/\1/')
@@ -101,7 +107,6 @@ comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://old-releases.ubun
 echo "Listed all manually installed packages - for Ubuntu."
 
 clear
-apt install curl -y
 comm -23 <(apt-mark showmanual | sort -u) <(curl -s -- https://cdimage.debian.org/mirror/cdimage/archive/$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-live/amd64/iso-hybrid/debian-live-$(grep -oP 'VERSION="\K[0-9\.]+' /etc/os-release).0.0-amd64-gnome.packages | cut -f1 | cut -d: -f1 | sort -u) >> newpackagesubuntu.log
 echo "Listed all manually installed packages - for Debian."
 
@@ -145,7 +150,7 @@ echo "Enabled APT sandboxing."
 apt-get update
 echo "Ran apt-get update."
 
-apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup aide unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
+apt-get install apt-transport-https dirmngr vlock ufw git binutils tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam auditd audispd-plugins cryptsetup unhide psad ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
 echo "Installed all necessary software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
@@ -155,6 +160,8 @@ echo "Deleted all prohibited software."
 clear
 chmod -R 644 /etc/apt/*
 echo "Permissions set in APT config directory."
+
+
 
 echo -e "Unattended-Upgrade::Remove-Unused-Dependencies 'true';\nUnattended-Upgrade::Remove-Unused-Kernel-Packages 'true';" >> /etc/apt/apt.conf.d/50unattended-upgrades
 echo "Configured APT to remove unused packages."
@@ -1742,6 +1749,9 @@ systemctl enable lkrg
 popd
 apt purge build-essential -y
 echo "Enabled Linux Kernel Runtime Guard."
+
+echo "" > /etc/security/capability.conf
+echo "Removed any capabilities of users."
 
 clear
 chmod 000 /usr/bin/as >/dev/null 2>&1
