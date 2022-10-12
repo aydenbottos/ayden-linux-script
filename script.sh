@@ -542,12 +542,6 @@ if test -f "test"; then
 fi
 echo "Shellshock Bash vulnerability has been fixed."
 
-clear
-systemctl start stubby
-systemctl enable stubby
-systemctl status stubby
-echo "DNS-over-TLS has been enabled"
-
 echo "netcat backdoors:" > backdoors.txt
 netstat -ntlup | grep -e "netcat" -e "nc" -e "ncat" >> backdoors.txt
 
@@ -580,7 +574,7 @@ apt purge *tftpd* -y
 echo "TFTP has been removed."
 
 clear
-echo "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm3/custom.conf
+echo -e "# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n" > /etc/gdm3/custom.conf
 xhost +SI:localuser:gdm
 sudo -u gdm gsettings set org.gnome.login-screen disable-user-list true;
 sudo -u gdm gsettings set org.gnome.desktop.screensaver lock-enabled true;
@@ -623,6 +617,13 @@ rm /etc/sysctl.d/*
 dpkg --purge --force-depends procps
 apt install procps
 echo "Sysctl and Procps configuration set to defaults"
+
+echo -e "DNS=8.8.8.8\nFallbackDNS=8.8.4.4\nDNSSEC=true\nDNSOverTLS=true" >> /etc/systemd/resolved.conf
+systemctl enable --now systemd-resolved
+systemctl start systemd-resolved
+ln -rsf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+echo "Correct nameserves and DNS settings set."
+
 
 # Add these configs
 echo kernel.dmesg_restrict=1            | tee /etc/sysctl.conf > /dev/null # Scored
@@ -1660,7 +1661,6 @@ apt-get upgrade -y
 echo "Ubuntu OS has checked for updates and has been upgraded."
 
 killall firefox
-echo "user_pref(\"dom.disable_open_during_load\", true);" >> /home/$mainUser/.mozilla/firefox/default/user.js
 pkexec --user $mainUser sh -c "DISPLAY=:0 firefox --preferences"
 echo "Opened Firefox to ensure all settings have been applied."
 
@@ -1767,9 +1767,6 @@ echo "Disabled WiFi."
 
 echo 'install usb-storage /bin/true' >> /etc/modprobe.d/disable-usb-storage.conf
 echo "Disabled usb-storage."
-
-echo -e "order bind,hosts\nnospoof on" >> /etc/host.conf
-echo "Set host configuration."
 
 sed -i 's/\/messages/syslog/g' /etc/psad/psad.conf
 psad --sig-update
