@@ -785,53 +785,328 @@ echo "IP info logged."
 netstat -pnola
 echo "All active ports logged."
 
-chown root:root /etc/fstab     # Scored
-chmod 644 /etc/fstab           # Scored
-chown root:root /etc/group     # Scored
-chmod 644 /etc/group           # Scored
-chown root:root /etc/shadow    # Scored
-chmod 400 /etc/shadow  	    # Scored	
-chown root:root /etc/apache2   # Scored
-chmod 755 /etc/apache2         # Scored
+chmod -f 0700 /etc/cron.monthly/*
+chmod -f 0700 /etc/cron.weekly/*
+chmod -f 0700 /etc/cron.daily/*
+chmod -f 0700 /etc/cron.hourly/*
+chmod -f 0700 /etc/cron.d/*
+chmod -f 0400 /etc/cron.allow
+chmod -f 0400 /etc/cron.deny
+chmod -f 0400 /etc/crontab
+chmod -f 0400 /etc/at.allow
+chmod -f 0400 /etc/at.deny
+chmod -f 0700 /etc/cron.daily
+chmod -f 0700 /etc/cron.weekly
+chmod -f 0700 /etc/cron.monthly
+chmod -f 0700 /etc/cron.hourly
+chmod -f 0700 /var/spool/cron
+chmod -f 0600 /var/spool/cron/*
+chmod -f 0700 /var/spool/at
+chmod -f 0600 /var/spool/at/*
+chmod -f 0400 /etc/anacrontab
+chmod -f 1777 /tmp
+chown -f root:root /var/crash
+chown -f root:root /var/cache/mod_proxy
+chown -f root:root /var/lib/dav
+chown -f root:root /usr/bin/lockfile
+chown -f rpcuser:rpcuser /var/lib/nfs/statd
+chown -f adm:adm /var/adm
+chmod -f 0600 /var/crash
+chown -f root:root /bin/mail
+chmod -f 0700 /sbin/reboot
+chmod -f 0700 /sbin/shutdown
+chmod -f 0600 /etc/ssh/ssh*config
+chown -f root:root /root
+chmod -f 0700 /root
+chmod -f 0500 /usr/bin/ypcat
+chmod -f 0700 /usr/sbin/usernetctl
+chmod -f 0700 /usr/bin/rlogin
+chmod -f 0700 /usr/bin/rcp
+chmod -f 0640 /etc/pam.d/system-auth*
+chmod -f 0640 /etc/login.defs
+chmod -f 0750 /etc/security
+chmod -f 0600 /etc/audit/audit.rules
+chown -f root:root /etc/audit/audit.rules
+chmod -f 0600 /etc/audit/auditd.conf
+chown -f root:root /etc/audit/auditd.conf
+chmod -f 0600 /etc/auditd.conf
+chmod -f 0744 /etc/rc.d/init.d/auditd
+chown -f root /sbin/auditctl
+chmod -f 0750 /sbin/auditctl
+chown -f root /sbin/auditd
+chmod -f 0750 /sbin/auditd
+chmod -f 0750 /sbin/ausearch
+chown -f root /sbin/ausearch
+chown -f root /sbin/aureport
+chmod -f 0750 /sbin/aureport
+chown -f root /sbin/autrace
+chmod -f 0750 /sbin/autrace
+chown -f root /sbin/audispd
+chmod -f 0750 /sbin/audispd
+chmod -f 0444 /etc/bashrc
+chmod -f 0444 /etc/csh.cshrc
+chmod -f 0444 /etc/csh.login
+chmod -f 0600 /etc/cups/client.conf
+chmod -f 0600 /etc/cups/cupsd.conf
+chown -f root:sys /etc/cups/client.conf
+chown -f root:sys /etc/cups/cupsd.conf
+chmod -f 0600 /etc/grub.conf
+chown -f root:root /etc/grub.conf
+chmod -f 0600 /boot/grub2/grub.cfg
+chown -f root:root /boot/grub2/grub.cfg
+chmod -f 0600 /boot/grub/grub.cfg
+chown -f root:root /boot/grub/grub.cfg
+chmod -f 0444 /etc/hosts
+chown -f root:root /etc/hosts
+chmod -f 0600 /etc/inittab
+chown -f root:root /etc/inittab
+chmod -f 0444 /etc/mail/sendmail.cf
+chown -f root:bin /etc/mail/sendmail.cf
+chmod -f 0600 /etc/ntp.conf
+chmod -f 0640 /etc/security/access.conf
+chmod -f 0600 /etc/security/console.perms
+chmod -f 0600 /etc/security/console.perms.d/50-default.perms
+chmod -f 0600 /etc/security/limits
+chmod -f 0444 /etc/services
+chmod -f 0444 /etc/shells
+chmod -f 0644 /etc/skel/.*
+chmod -f 0600 /etc/skel/.bashrc
+chmod -f 0600 /etc/skel/.bash_profile
+chmod -f 0600 /etc/skel/.bash_logout
+chmod -f 0440 /etc/sudoers
+chown -f root:root /etc/sudoers
+chmod -f 0600 /etc/sysctl.conf
+chown -f root:root /etc/sysctl.conf
+chown -f root:root /etc/sysctl.d/*
+chmod -f 0700 /etc/sysctl.d
+chmod -f 0600 /etc/sysctl.d/*
+chmod -f 0600 /etc/syslog.conf
+chmod -f 0600 /var/yp/binding
+chown -f root:$AUDIT /var/log
+chown -Rf root:$AUDIT /var/log/*
+chmod -Rf 0640 /var/log/*
+chmod -Rf 0640 /var/log/audit/*
+chmod -f 0755 /var/log
+chmod -f 0750 /var/log/syslog /var/log/audit
+chmod -f 0600 /var/log/lastlog*
+chmod -f 0600 /var/log/cron*
+chmod -f 0600 /var/log/btmp
+chmod -f 0660 /var/log/wtmp
+chmod -f 0444 /etc/profile
+chmod -f 0700 /etc/rc.d/rc.local
+chmod -f 0400 /etc/securetty
+chmod -f 0700 /etc/rc.local
+chmod -f 0750 /usr/bin/wall
+chown -f root:tty /usr/bin/wall
+chown -f root:users /mnt
+chown -f root:users /media
+chmod -f 0644 /etc/.login
+chmod -f 0644 /etc/profile.d/*
+chown -f root /etc/security/environ
+chown -f root /etc/xinetd.d
+chown -f root /etc/xinetd.d/*
+chmod -f 0750 /etc/xinetd.d
+chmod -f 0640 /etc/xinetd.d/*
+chmod -f 0640 /etc/selinux/config
+chmod -f 0750 /usr/bin/chfn
+chmod -f 0750 /usr/bin/chsh
+chmod -f 0750 /usr/bin/write
+chmod -f 0750 /sbin/mount.nfs
+chmod -f 0750 /sbin/mount.nfs4
+chmod -f 0700 /usr/bin/ldd #0400 FOR SOME SYSTEMS
+chmod -f 0700 /bin/traceroute
+chown -f root:root /bin/traceroute
+chmod -f 0700 /usr/bin/traceroute6*
+chown -f root:root /usr/bin/traceroute6
+chmod -f 0700 /bin/tcptraceroute
+chmod -f 0700 /sbin/iptunnel
+chmod -f 0700 /usr/bin/tracpath*
+chmod -f 0644 /dev/audio
+chown -f root:root /dev/audio
+chmod -f 0644 /etc/environment
+chown -f root:root /etc/environment
+chmod -f 0600 /etc/modprobe.conf
+chown -f root:root /etc/modprobe.conf
+chown -f root:root /etc/modprobe.d
+chown -f root:root /etc/modprobe.d/*
+chmod -f 0700 /etc/modprobe.d
+chmod -f 0600 /etc/modprobe.d/*
+chmod -f o-w /selinux/*
+#umask 077 /etc/*
+chmod -f 0755 /etc
+chmod -f 0644 /usr/share/man/man1/*
+chmod -Rf 0644 /usr/share/man/man5
+chmod -Rf 0644 /usr/share/man/man1
+chmod -f 0600 /etc/yum.repos.d/*
+chmod -f 0640 /etc/fstab
+chmod -f 0755 /var/cache/man
+chmod -f 0755 /etc/init.d/atd
+chmod -f 0750 /etc/ppp/peers
+chmod -f 0755 /bin/ntfs-3g
+chmod -f 0750 /usr/sbin/pppd
+chmod -f 0750 /etc/chatscripts
+chmod -f 0750 /usr/local/share/ca-certificates
+chmod -f 0755 /bin/csh
+chmod -f 0755 /bin/jsh
+chmod -f 0755 /bin/ksh
+chmod -f 0755 /bin/rsh
+chmod -f 0755 /bin/sh
+chmod -f 0640 /dev/kmem
+chown -f root:sys /dev/kmem
+chmod -f 0640 /dev/mem
+chown -f root:sys /dev/mem
+chmod -f 0666 /dev/null
+chown -f root:sys /dev/null
+chmod -f 0755 /etc/csh
+chmod -f 0755 /etc/jsh
+chmod -f 0755 /etc/ksh
+chmod -f 0755 /etc/rsh
+chmod -f 0755 /etc/sh
+chmod -f 0644 /etc/aliases
+chown -f root:root /etc/aliases
+chmod -f 0640 /etc/exports
+chown -f root:root /etc/exports
+chmod -f 0640 /etc/ftpusers
+chown -f root:root /etc/ftpusers
+chmod -f 0664 /etc/host.lpd
+chmod -f 0440 /etc/inetd.conf
+chown -f root:root /etc/inetd.conf
+chmod -f 0644 /etc/mail/aliases
+chown -f root:root /etc/mail/aliases
+chmod -f 0644 /etc/passwd
+chown -f root:root /etc/passwd
+chmod -f 0400 /etc/shadow
+chown -f root:root /etc/shadow
+chmod -f 0600 /etc/uucp/L.cmds
+chown -f uucp:uucp /etc/uucp/L.cmds
+chmod -f 0600 /etc/uucp/L.sys
+chown -f uucp:uucp /etc/uucp/L.sys
+chmod -f 0600 /etc/uucp/Permissions
+chown -f uucp:uucp /etc/uucp/Permissions
+chmod -f 0600 /etc/uucp/remote.unknown
+chown -f root:root /etc/uucp/remote.unknown
+chmod -f 0600 /etc/uucp/remote.systems
+chmod -f 0600 /etc/uccp/Systems
+chown -f uucp:uucp /etc/uccp/Systems
+chmod -f 0755 /sbin/csh
+chmod -f 0755 /sbin/jsh
+chmod -f 0755 /sbin/ksh
+chmod -f 0755 /sbin/rsh
+chmod -f 0755 /sbin/sh
+chmod -f 0755 /usr/bin/csh
+chmod -f 0755 /usr/bin/jsh
+chmod -f 0755 /usr/bin/ksh
+chmod -f 0755 /usr/bin/rsh
+chmod -f 0755 /usr/bin/sh
+chmod -f 1777 /var/mail
+chmod -f 1777 /var/spool/uucppublic
+chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
+chmod o= /etc/ftpusers 
+chmod o= /etc/group 
+chmod o= /etc/hosts
+chmod o= /etc/hosts.allow 
+chmod o= /etc/hosts.equiv
+chmod o= /etc/hosts.lpd 
+chmod o= /etc/inetd.conf
+chmod o= /etc/login.access 
+chmod o= /etc/login.conf 
+chmod o= /etc/newsyslog.conf
+chmod o= /etc/rc.conf 
+chmod o= /etc/ssh/sshd_config 
+chmod o= /etc/sysctl.conf
+chmod o= /etc/syslog.conf 
+chmod o= /etc/ttys 
+chmod o= /etc/fstab
+chown root:root /etc/anacrontab
+chmod og-rwx /etc/anacrontab
+chown root:root /etc/crontab
+chmod og-rwx /etc/crontab
+chown root:root /etc/cron.hourly
+chmod og-rwx /etc/cron.hourly
+chown root:root /etc/cron.daily
+chmod og-rwx /etc/cron.daily
+chown root:root /etc/cron.weekly
+chmod og-rwx /etc/cron.weekly
+chown root:root /etc/cron.monthly
+chmod og-rwx /etc/cron.monthly
+chown root:root /etc/cron.d
+chmod og-rwx /etc/cron.d
+chown root:root /etc/ssh/sshd_config
+chmod 600 /etc/ssh/sshd_config
+chown root:root /etc/grub.conf
+chown root:root /etc/fstab
+chmod og-rwx /etc/grub.conf
+chmod 710 /root "or" chmod 700 /root
+chmod o= /var/log 
+chmod 644 /etc/passwd
+chown root:root /etc/passwd
+chmod 644 /etc/group
+chown root:root /etc/group
+chmod 600 /etc/shadow
+chown root:root /etc/shadow
+chmod 600 /etc/gshadow
+chown root:root /etc/gshadow		
+chmod 700 /var/log/audit
+chmod 740 /etc/rc.d/init.d/iptables
+chmod 740 /sbin/iptables
+chmod 600 /etc/rsyslog.conf
+chmod 640 /etc/security/access.conf
+chmod 600 /etc/sysctl.conf
+chown root:root /etc/anacrontab
+chmod og-rwx /etc/anacrontab
+chown root:root /etc/crontab
+chmod og-rwx /etc/crontab
+chown root:root /etc/cron.hourly
+chmod og-rwx /etc/cron.hourly
+chown root:root /etc/cron.daily
+chmod og-rwx /etc/cron.daily
+chown root:root /etc/cron.weekly
+chmod og-rwx /etc/cron.weekly
+chown root:root /etc/cron.monthly
+chmod og-rwx /etc/cron.monthly
+chown root:root /etc/cron.d
+chmod og-rwx /etc/cron.d
+chown root:root /boot/grub/grub.cfg
+chmod og-rwx /boot/grub/grub.cfg
+chown root:root /boot/grub/grub.cfg
+chmod og-rwx /boot/grub/grub.cfg
 
-chmod 0600 /etc/securetty
-chmod 644 /etc/crontab
-chmod 640 /etc/ftpusers
-chmod 440 /etc/inetd.conf
-chmod 440 /etc/xinetd.conf
-chmod 400 /etc/inetd.d
-chmod 644 /etc/hosts.allow
-chmod 440 /etc/ers
-chmod 640 /etc/shadow              # Scored
-chmod 600 /boot/grub/grub.cfg      # Scored
-chmod 600 /etc/ssh/sshd_config     # Scored
-chmod 600 /etc/gshadow-            # Scored
-chmod 600 /etc/group-              # Scored
-chmod 600 /etc/passwd-             # Scored
 
-chown root:root /etc/ssh/sshd_config # Scored
-chown root:root /etc/passwd-         # Scored
-chown root:root /etc/group-          # Scored
-chown root:root /etc/shadow          # Scored
-chown root:root /etc/securetty
-chown root:root /boot/grub/grub.cfg  # Scored
+chown root:root /etc/cron*
+chmod og-rwx /etc/cron*
+#Ensure at/cron is restricted to authorized users 
 
-chmod og-rwx /boot/grub/grub.cfg  	# Scored
-chown root:shadow /etc/shadow-
-chmod o-rwx,g-rw /etc/shadow-
-chown root:shadow /etc/gshadow-
-chmod o-rwx,g-rw /etc/gshadow-
+touch /etc/cron.allow
+touch /etc/at.allow
 
-find /var/log -perm /137 -type f -exec chmod 640 '{}' ;
-chgrp syslog /var/log
-chown root /var/log
-chmod 0750 /var/log
-chgrp adm /var/log/syslog
-chown syslog /var/log/syslog
-chmod 0640 /var/log/syslog
-chmod 04755 /usr/bin/su
-chmod 04755 /usr/bin/newgrp
-chmod 04755 /usr/bin/mount
+chmod og-rwx /etc/cron.allow /etc/at.allow
+chown root:root /etc/cron.allow /etc/at.allow
+chmod -R g-wx,o-rwx /var/log/*
+
+chown root:root /etc/cron
+
+if [[ -d /usr/local/share/clamav ]]; then
+  passwd -l clamav 2>/dev/null
+  usermod -s /sbin/nologin clamav 2>/dev/null
+  chmod -f 0755 /usr/local/share/clamav
+  chown -f root:clamav /usr/local/share/clamav
+  chown -f root:clamav /usr/local/share/clamav/*.cvd
+  chmod -f 0664 /usr/local/share/clamav/*.cvd
+  mkdir -p /var/log/clamav
+  chown -f root:$AUDIT /var/log/clamav
+  chmod -f 0640 /var/log/clamav
+fi
+if [[ -d /var/clamav ]]; then
+  passwd -l clamav 2>/dev/null
+  usermod -s /sbin/nologin clamav 2>/dev/null
+  chmod -f 0755 /var/clamav
+  chown -f root:clamav /var/clamav
+  chown -f root:clamav /var/clamav/*.cvd
+  chmod -f 0664 /var/clamav/*.cvd
+  mkdir -p /var/log/clamav
+  chown -f root:$AUDIT /var/log/clamav
+  chmod -f 0640 /var/log/clamav
+fi
 
 find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type d -exec chmod -R 755 '{}' ;
 find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type d -exec chown root '{}' ;
@@ -1740,6 +2015,23 @@ echo "Only root allowed in cron."
 echo "chmod 400 /proc/kallsyms" >> /etc/rc.local
 echo "Set permissions for kallsyms."
 
+userdel -f games 2>/dev/null
+userdel -f news 2>/dev/null
+userdel -f gopher 2>/dev/null
+userdel -f tcpdump 2>/dev/null
+userdel -f shutdown 2>/dev/null
+userdel -f halt 2>/dev/null
+userdel -f sync 2>/dev/null
+userdel -f ftp 2>/dev/null
+userdel -f operator 2>/dev/null
+userdel -f lp 2>/dev/null
+userdel -f uucp 2>/dev/null
+userdel -f irc 2>/dev/null
+userdel -f gnats 2>/dev/null
+userdel -f pcap 2>/dev/null
+userdel -f netdump 2>/dev/null
+echo "Disabled unused users."
+
 clear
 apt-get update 
 apt-get upgrade -y
@@ -1758,6 +2050,22 @@ echo "All unused packages have been removed."
 clear
 export $(cat /etc/environment)
 echo "PATH reset to normal."
+
+for user in `awk -F: '($3 < 1000) {print $1 }' /etc/passwd`; do
+  if [ $user != "root" ]; then
+    usermod -L $user
+  if [ $user != "sync" ] && [ $user != "shutdown" ] && [ $user != "halt" ]; then
+    usermod -s /usr/sbin/nologin $user
+  fi
+  fi
+done
+echo "Ensured all system users have a nologin shell."
+
+dpkg-reconfigure tzdata
+echo "Configured timezone data."
+
+usermod -g 0 root
+echo "Set root's group."
 
 clear
 sed -i '1i\* hard maxlogins 10' /etc/security/limits.conf
