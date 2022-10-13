@@ -933,6 +933,7 @@ chmod -f 0700 /etc/modprobe.d
 chmod -f 0600 /etc/modprobe.d/*
 chmod -f o-w /selinux/*
 #umask 077 /etc/*
+
 chmod -f 0755 /etc
 chmod -f 0644 /usr/share/man/man1/*
 chmod -Rf 0644 /usr/share/man/man5
@@ -1001,6 +1002,7 @@ chmod -f 0755 /usr/bin/sh
 chmod -f 1777 /var/mail
 chmod -f 1777 /var/spool/uucppublic
 chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
+
 chmod o= /etc/ftpusers 
 chmod o= /etc/group 
 chmod o= /etc/hosts
@@ -1017,6 +1019,7 @@ chmod o= /etc/sysctl.conf
 chmod o= /etc/syslog.conf 
 chmod o= /etc/ttys 
 chmod o= /etc/fstab
+
 chown root:root /etc/anacrontab
 chmod og-rwx /etc/anacrontab
 chown root:root /etc/crontab
@@ -1052,6 +1055,7 @@ chmod 740 /sbin/iptables
 chmod 600 /etc/rsyslog.conf
 chmod 640 /etc/security/access.conf
 chmod 600 /etc/sysctl.conf
+
 chown root:root /etc/anacrontab
 chmod og-rwx /etc/anacrontab
 chown root:root /etc/crontab
@@ -1070,7 +1074,6 @@ chown root:root /boot/grub/grub.cfg
 chmod og-rwx /boot/grub/grub.cfg
 chown root:root /boot/grub/grub.cfg
 chmod og-rwx /boot/grub/grub.cfg
-
 
 chown root:root /etc/cron*
 chmod og-rwx /etc/cron*
