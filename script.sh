@@ -150,7 +150,7 @@ echo "Enabled APT sandboxing."
 apt-get update
 echo "Ran apt-get update."
 
-apt-get install apt-transport-https dirmngr vlock ufw git logwatch binutils tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam clamav-daemon auditd audispd-plugins cryptsetup unhide psad fail2ban ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
+apt-get install apt-transport-https dirmngr vlock rng-tools deborphan ntp ufw git logwatch binutils aide aide-common tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam clamav-daemon auditd audispd-plugins cryptsetup unhide psad fail2ban ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
 echo "Installed all necessary software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
@@ -160,6 +160,13 @@ echo "Deleted all prohibited software."
 systemctl start fail2ban
 systemctl enable fail2ban
 echo "Started but not configured Fail2Ban."
+
+cp --archive /etc/ntp.conf /etc/ntp.conf-COPY-$(date +"%Y%m%d%H%M%S")
+sed -i -r -e "s/^((server|pool).*)/# \1         # commented by $(whoami) on $(date +"%Y-%m-%d @ %H:%M:%S")/" /etc/ntp.conf
+echo -e "\npool pool.ntp.org iburst         # added by $(whoami) on $(date +"%Y-%m-%d @ %H:%M:%S")" | tee -a /etc/ntp.conf
+systemctl restart ntp
+systemctl enable --now ntp
+echo "NTP configured."
 
 clear
 chmod -R 644 /etc/apt/*
@@ -172,6 +179,9 @@ cp /etc/group /home/scriptuser/backups/
 cp /etc/passwd /home/scriptuser/backups/
 
 echo "/etc/group and /etc/passwd files backed up."
+
+passwd -l root
+echo "Locked root account."
 
 if test -f "users.txt"
 then
@@ -503,6 +513,11 @@ iptables -F
 iptables -X
 iptables -Z
 
+clear
+echo "HRNGDEVICE=/dev/urandom" | tee -a /etc/default/rng-tools
+systemctl restart rng-tools
+echo "Secured random entropy pool."
+
 ufw enable
 ufw default deny incoming
 ufw default deny forward
@@ -628,6 +643,11 @@ clear
 update-rc.d bluetooth remove
 echo 'alias net-pf-31 off' >> /etc/modprobe.conf
 echo "Bluetooth disabled."
+
+clear
+aideinit
+aide.wrapper --check
+echo "Initiated AIDE."
 
 clear
 cp /etc/sysctl.conf /home/scriptuser/backups/
@@ -1096,9 +1116,8 @@ then
 	systemctl restart sshd
 	systemctl status sshd
 	mkdir ../.ssh
-	chmod 700 ../.ssh
-	ssh-keygen -t rsa
-	echo "SSH port has been allowed on the firewall. SSH config file has been configured. SSH RSA 2048 keys have been created."
+	chmod -R 700 ../.ssh
+	echo "SSH port has been allowed on the firewall. SSH config file has been configured."
 else
 	echo Response not recognized.
 fi
@@ -1721,10 +1740,6 @@ echo "Only root allowed in cron."
 echo "chmod 400 /proc/kallsyms" >> /etc/rc.local
 echo "Set permissions for kallsyms."
 
-systemctl enable chronyd
-systemctl start chronyd
-echo "Started Chronyd and enabled it."
-
 clear
 apt-get update 
 apt-get upgrade -y
@@ -1864,6 +1879,9 @@ echo "PSAD started."
 
 chmod 700 /boot /usr/src /lib/modules /usr/lib/modules
 echo "Set kernel file permissions."
+
+apt --autoremove purge $(deborphan)
+echo "Removed orphaned packages."
 
 clear
 apt install ecryptfs-utils -y
