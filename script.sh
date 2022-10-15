@@ -291,6 +291,12 @@ then
 	if grep -qi 'bind9\|dns' services.txt; then
 		dnsYN=yes
 	fi
+	if grep -qi 'vpn' services.txt; then
+		vpnYN=yes
+	fi
+	if grep -qi 'alternate-ftp' services.txt; then
+		ftpYN=alternate
+	fi
 else
 	find $(pwd) -iname 'README.desktop' | xargs grep -oE "https:\/\/(.*).aspx" | xargs wget -O readme.aspx
 
@@ -397,6 +403,13 @@ else
 	if grep -qi 'bind9\|dns' services; then
 		dnsYN=yes
 	fi
+	if grep -qi 'vpn' services; then
+		dnsYN=yes
+	fi
+	if grep -qi 'alternate-ftp' services; then
+		ftpYN=alternate
+	fi
+	
 fi
 
 clear
@@ -1240,8 +1253,7 @@ then
 	apt-get purge samba4 -y
 	clear
 	echo "netbios-ns, netbios-dgm, netbios-ssn, and microsoft-ds ports have been denied. Samba has been removed."
-elif [ $sambaYN == yes ]
-then
+else
 	ufw allow netbios-ns
 	ufw allow netbios-dgm
 	ufw allow netbios-ssn
@@ -1279,8 +1291,6 @@ then
                 [[ "$line" =~ ^[[:space:]]*path ]] && echo -e "$name\t$line" >> /home/scriptuser/smbshares.log
         done < /etc/samba/smb.conf
 	clear
-else
-	echo Response not recognized.
 fi
 echo "Samba is complete."
 
@@ -1356,7 +1366,7 @@ EOF
     systemctl status vsftpd
     echo "ftp, sftp, saft, ftps-data, and ftps ports have been allowed on the firewall. vsFTPd systemctl has been restarted."
 else
-	echo Response not recognized.
+	echo "Alternate FTP server not configured."
 fi
 echo "FTP is complete."
 
@@ -1368,8 +1378,7 @@ then
 	apt-get purge openssh-server -y
 	rm -R ../.ssh
 	echo "SSH port has been denied on the firewall. Open-SSH has been removed."
-elif [ $sshYN == yes ]
-then
+else
 	apt-get install openssh-server -y
 	ufw allow ssh
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/
@@ -1396,8 +1405,6 @@ EOF
 	mkdir ../.ssh
 	chmod -R 700 ../.ssh
 	echo "SSH port has been allowed on the firewall. SSH config file has been configured."
-else
-	echo Response not recognized.
 fi
 echo "SSH is complete."
 
@@ -1412,15 +1419,12 @@ then
 	apt-get purge inetutils-telnetd -y
 	apt-get purge telnetd-ssl -y
 	echo "Telnet port has been denied on the firewall and Telnet has been removed."
-elif [ $telnetYN == yes ]
-then
+else
 	ufw allow telnet 
 	ufw allow rtelnet 
 	ufw allow telnets
 	apt-get install telnetd -y
 	echo "Telnet port has been allowed on the firewall."
-else
-	echo Response not recognized.
 fi
 echo "Telnet is complete."
 
@@ -1437,8 +1441,7 @@ then
 	systemctl disable postfix
 	apt purge dovecot exim4 opensmtpd -y
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been denied on the firewall."
-elif [ $mailYN == yes ]
-then
+else
 	ufw allow smtp 
 	ufw allow pop2 
 	ufw allow pop3
@@ -1460,8 +1463,6 @@ then
 	postconf -e message_size_limit=10485760
 	postconf -e smtpd_recipient_limit=100
 	echo "smtp, pop2, pop3, imap2, imaps, and pop3s ports have been allowed on the firewall."
-else
-	echo Response not recognized.
 fi
 echo "Mail is complete."
 
@@ -1474,14 +1475,11 @@ then
 	ufw deny printer 
 	ufw deny cups
 	echo "ipp, printer, and cups ports have been denied on the firewall."
-elif [ $printYN == yes ]
-then
+else
 	ufw allow ipp 
 	ufw allow printer 
 	ufw allow cups
 	echo "ipp, printer, and cups ports have been allowed on the firewall."
-else
-	echo Response not recognized.
 fi
 echo "Printing is complete."
 
@@ -1496,8 +1494,7 @@ then
 	apt-get purge mariadb* -y
 	apt-get purge postgresql*
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been denied on the firewall. MySQL has been removed."
-elif [ $dbYN == yes ]
-then
+else
 	ufw allow ms-sql-s 
 	ufw allow ms-sql-m 
 	ufw allow mysql 
@@ -1539,8 +1536,6 @@ then
 
 	systemctl restart mariadb
 	echo "ms-sql-s, ms-sql-m, mysql, and mysql-proxy ports have been allowed on the firewall. MySQL has been installed. MySQL config file has been secured. MySQL systemctl has been restarted."
-else
-	echo Response not recognized.
 fi
 echo "MySQL is complete."
 
@@ -1552,8 +1547,7 @@ then
 	apt-get purge apache2 nginx -y
 	rm -r /var/www/*
 	echo "https and https ports have been denied on the firewall. Apache2 has been removed. Web server files have been removed."
-elif [ $httpsYN == yes ]
-then
+else
 	apt-get install apache2 -y
 	ufw allow https 
 	ufw allow http
@@ -1660,8 +1654,6 @@ EOF
 	    systemctl start apache2
 	fi
 	echo "https and https ports have been allowed on the firewall. Apache2 config file has been configured. Only root can now access the Apache2 folder."
-else
-	echo Response not recognized.
 fi
 echo "Web Server is complete."
 
@@ -1669,8 +1661,7 @@ if [ $phpYN == no ]
 then
 	apt-get purge *php* -y
 	echo "PHP has been purged."
-elif [ $phpYN == yes ]
-then
+else
 	apt-get install php -y
 	PHPCONFIG=/etc/php/7.*/apache2/php.ini
 
@@ -1706,8 +1697,6 @@ then
         sed -i "s/^;\?open_basedir.*/open_basedir = \"c:inetpub\"/" $PHPCONFIG
 	
 	echo "PHP is configured."
-else
-	echo "Response not recognised."
 fi
 echo "PHP is complete."
 
@@ -1717,8 +1706,7 @@ then
 	ufw deny domain
 	apt-get purge bind9 -y
 	echo "domain port has been denied on the firewall. DNS name binding has been removed."
-elif [ $dnsYN == yes ]
-then
+else
 	apt-get install bind9 -y
 	ufw allow domain
 	ufw allow 53
@@ -1729,32 +1717,34 @@ then
 	cp named.conf.options /etc/bind/named.conf.options
 	systemctl start bind9
 	systemctl status bind9
-else
-	echo Response not recognized.
 fi
 echo "DNS is complete."
 
+clear
+if [ $vpnYN == no ]
+then
+	apt purge *vpn* -y
+	echo "All vpn-related packages deleted."
+else
+	apt install openvpn -y
+	echo "OpenVPN server installed."
+fi
 
 clear
-if [ $mediaFilesYN == no ]
-then
-	mv $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg /
-	find /home -regextype posix-extended -regex '.*\.(midi|mid|mod|mp3|mp2|mpa|abs|mpega|au|snd|wav|aiff|aif|sid|mkv|flac|ogg)$' -delete
-	clear
-	echo "All audio files has been listed."
+mv $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg /
+find /home -regextype posix-extended -regex '.*\.(midi|mid|mod|mp3|mp2|mpa|abs|mpega|au|snd|wav|aiff|aif|sid|mkv|flac|ogg)$' -delete
+clear
+echo "All audio files has been listed."
 
-	find /home -regextype posix-extended -regex '.*\.(mpeg|mpg|mpe|dl|movie|movi|mv|iff|anim5|anim3|anim7|avi|vfw|avx|fli|flc|mov|qt|spl|swf|dcr|dir|dxr|rpm|rm|smi|ra|ram|rv|wmv|asf|asx|wma|wax|wmv|wmx|3gp|mov|mp4|flv|m4v|xlsx|pptx|docx|csv)$' -delete
-	find /home -iname "*.txt" >> /home/scriptuser/badfiles.log
-	clear
-	echo "All video files have been listed."
+find /home -regextype posix-extended -regex '.*\.(mpeg|mpg|mpe|dl|movie|movi|mv|iff|anim5|anim3|anim7|avi|vfw|avx|fli|flc|mov|qt|spl|swf|dcr|dir|dxr|rpm|rm|smi|ra|ram|rv|wmv|asf|asx|wma|wax|wmv|wmx|3gp|mov|mp4|flv|m4v|xlsx|pptx|docx|csv)$' -delete
+find /home -iname "*.txt" >> /home/scriptuser/badfiles.log
+clear
+echo "All video files have been listed."
 	
-	find /home -regextype posix-extended -regex '.*\.(tiff|tif|rs|iml|gif|jpeg|exe|torrent|pdf|run|bat|jpg|jpe|png|rgb|xwd|xpm|ppm|pbm|pgm|pcx|ico|svg|svgz|pot|xml|pl)$' -delete
-	mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg
-	clear
-	echo "All image files have been listed."
-else
-	echo Response not recognized.
-fi
+find /home -regextype posix-extended -regex '.*\.(tiff|tif|rs|iml|gif|jpeg|exe|torrent|pdf|run|bat|jpg|jpe|png|rgb|xwd|xpm|ppm|pbm|pgm|pcx|ico|svg|svgz|pot|xml|pl)$' -delete
+mv /CyberTaipan_Background_WIDE.jpg $(pwd)/../Pictures/Wallpapers/CyberTaipan_Background_WIDE.jpg
+clear
+echo "All image files have been listed."
 echo "Media files are complete."
 
 find / -type f -perm /700 >> /home/scriptuser/badfiles.log
