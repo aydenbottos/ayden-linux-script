@@ -1111,19 +1111,19 @@ if [[ -d /var/clamav ]]; then
   chmod -f 0640 /var/log/clamav
 fi
 
-find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type d -exec chmod -R 755 '{}' ;
-find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type d -exec chown root '{}' ;
-find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -group root -type d -exec chgrp root '{}' ;
-find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type f -exec chmod 755 '{}' ;
-find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type f -exec chown root '{}' ;
-find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -group root -type f ! -perm /2000 -exec chgrp root '{}' ;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type d -exec chmod -R 755 {} \;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type d -exec chown root {} \;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -group root -type d -exec chgrp root {} \;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /022 -type f -exec chmod 755 {} \;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -user root -type f -exec chown root {} \;
+find /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! -group root -type f ! -perm /2000 -exec chgrp root {} \;
 
-find /lib /lib64 /usr/lib -perm /022 -type f -exec chmod 755 '{}' ;
-find /lib /lib64 /usr/lib -perm /022 -type d -exec chmod 755 '{}' ;
-find /lib /usr/lib /lib64 ! -user root -type f -exec chown root '{}' ;
-find /lib /usr/lib /lib64 ! -user root -type d -exec chown root '{}' ;
-find /lib /usr/lib /lib64 ! -group root -type f -exec chgrp root '{}' ;
-find /lib /usr/lib /lib64 ! -group root -type d -exec chgrp root '{}' ;
+find /lib /lib64 /usr/lib -perm /022 -type f -exec chmod 755 {} \;
+find /lib /lib64 /usr/lib -perm /022 -type d -exec chmod 755 {} \;
+find /lib /usr/lib /lib64 ! -user root -type f -exec chown root {} \;
+find /lib /usr/lib /lib64 ! -user root -type d -exec chown root {} \;
+find /lib /usr/lib /lib64 ! -group root -type f -exec chgrp root {} \;
+find /lib /usr/lib /lib64 ! -group root -type d -exec chgrp root {} \;
 
 echo "Finished changing permissions."
 
@@ -1185,7 +1185,7 @@ done
 echo "Confirmed that all groups have a unique name."
 
 clear
-grep ^shadow:[^:]*:[^:]*:[^:]+ /etc/group
+grep "^shadow:[^:]*:[^:]*:[^:]+" /etc/group
 echo "If any users are printed above this, they are part of the shadow group and need to be removed from the group IMMEDIATELY!"
 
 clear
@@ -1202,7 +1202,7 @@ then
 		thing=1
 		while true; do
 			rand=$(( ( RANDOM % 999 ) + 1000))
-			cut -d: -f1,3 /etc/passwd | egrep ":$rand$" | cut -d: -f1 > /uidusers
+			cut -d: -f1,3 /etc/passwd | grep -E ":$rand$" | cut -d: -f1 > /uidusers
 			if [ -s /uidusers ]
 			then
 				echo "Couldn't find unused UID. Trying Again... "
@@ -1215,7 +1215,7 @@ then
 		echo "Assigned UID: $rand"
 	done < "/zerouidusers"
 	update-passwd
-	cut -d: -f1,3 /etc/passwd | egrep ':0$' | cut -d: -f1 | grep -v root > /zerouidusers
+	cut -d: -f1,3 /etc/passwd | grep -E ':0$' | cut -d: -f1 | grep -v root > /zerouidusers
 
 	if [ -s /zerouidusers ]
 	then
@@ -1250,7 +1250,7 @@ then
 	systemctl start smbd
 	systemctl status smbd
 	cp /etc/samba/smb.conf /home/scriptuser/backups/
-	if [ "$(grep '####### Authentication #######' /etc/samba/smb.conf)"==0 ]
+	if [ "$(grep '####### Authentication #######' /etc/samba/smb.conf)" == 0 ]
 	then
 		sed -i 's/####### Authentication #######/####### Authentication #######\nsecurity = user/g' /etc/samba/smb.conf
 	fi
@@ -1310,7 +1310,7 @@ then
     enabled = true
     port = ftp,ftp-data,ftps,ftps-data
     logpath = %(vsftpd_log)s
-    EOF
+EOF
     
     cat << EOF > /etc/fail2ban/filter.d/vsftpd.conf
     [INCLUDES]
@@ -1322,7 +1322,7 @@ then
     ^ \[pid \d+\] \[[^\]]+\] FAIL LOGIN: Client "<HOST>"(?:\s*$|,)
     ^ \[pid \d+\] \[root\] FAIL LOGIN: Client "<HOST>"(?:\s*$|,)
     ignoreregex =
-    EOF
+EOF
     systemctl restart fail2ban
 
     # Jail users to home directory (user will need a home dir to exist)
@@ -1381,7 +1381,7 @@ then
 	filter = sshd
 	logpath = /var/log/auth.log
 	maxretry = 3
-	EOF
+EOF
 	systemctl restart fail2ban
 	echo "Fail2Ban configured for SSH."
 
@@ -1653,7 +1653,7 @@ then
 	    maxretry = 4
 	    findtime = 500
 	    ignoreip = 10x.12x.1xx.xx7
-	    EOF
+EOF
 	    systemctl restart fail2ban
 	    echo "Fail2Ban configured for Apache."
 	
@@ -2198,5 +2198,5 @@ clear
 apt install ecryptfs-utils -y
 echo "Script is complete. Log user out to enable home directory encryption. Once logged out, login to another administrator. Then, access terminal and run sudo ecryptfs-migrate-home -u <default user>. After that, follow the prompts."
 apt install curl
-url=$(cat scriptlog.txt | curl -F 'sprunge=<-' http://sprunge.us)
+url=$(curl -F 'sprunge=<-' http://sprunge.us < scriptlog.txt)
 wget -O/dev/null --header 'Content-type: application/json' --post-data '{"text":"<'$url'|Linux script results>"}' $(echo aHR0cHM6Ly9ob29rcy5zbGFjay5jb20vc2VydmljZXMvVEg3U0pLNUg5L0IwMko0NENHQkFSL3hHeGFHVXdNdDZmTU5aWkViaDlmbDhOaA== | base64 --decode) > /dev/null 2>&1
