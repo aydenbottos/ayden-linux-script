@@ -919,6 +919,7 @@ chown -f root /etc/security/environ
 chown -f root /etc/xinetd.d
 chown -f root /etc/xinetd.d/*
 chmod -f 0750 /etc/xinetd.d
+chmod 440 /etc/ers
 chmod -f 0640 /etc/xinetd.d/*
 chmod -f 0640 /etc/selinux/config
 chmod -f 0750 /usr/bin/chfn
@@ -945,7 +946,6 @@ chown -f root:root /etc/modprobe.d/*
 chmod -f 0700 /etc/modprobe.d
 chmod -f 0600 /etc/modprobe.d/*
 chmod -f o-w /selinux/*
-#umask 077 /etc/*
 
 chmod -f 0755 /etc
 chmod -f 0644 /usr/share/man/man1/*
@@ -1049,10 +1049,29 @@ chown root:root /etc/cron.d
 chmod og-rwx /etc/cron.d
 chown root:root /etc/ssh/sshd_config
 chmod 600 /etc/ssh/sshd_config
+chown root:root /etc/passwd-
+chmod og-rwx /boot/grub/grub.cfg  		
+chown root:shadow /etc/shadow-	
+chmod o-rwx,g-rw /etc/shadow-	
+chown root:shadow /etc/gshadow-	
+chmod o-rwx,g-rw /etc/gshadow-	
+chgrp syslog /var/log	
+chown root /var/log	
+chmod 0750 /var/log	
+chgrp adm /var/log/syslog	
+chown syslog /var/log/syslog	
+chmod 0640 /var/log/syslog	
+chmod 04755 /usr/bin/su	
+chmod 04755 /usr/bin/newgrp	
+chmod 04755 /usr/bin/mount
+chown root:root /etc/group-
+chmod 600 /etc/gshadow-            	
+chmod 600 /etc/group-             	
+chmod 600 /etc/passwd-   
 chown root:root /etc/grub.conf
 chown root:root /etc/fstab
 chmod og-rwx /etc/grub.conf
-chmod 710 /root "or" chmod 700 /root
+chmod 700 /root
 chmod o= /var/log 
 chmod 644 /etc/passwd
 chown root:root /etc/passwd
