@@ -1305,14 +1305,14 @@ then
     cp /etc/vsftpd.conf /home/scriptuser/backups/
     config_file="/etc/vsftpd.conf"
     
-    cat <<EOF > /etc/fail2ban/jail.local
+    cat << EOF > /etc/fail2ban/jail.local
     [vsftpd]
     enabled = true
     port = ftp,ftp-data,ftps,ftps-data
-    logpath = \%(vsftpd_log)s
+    logpath = %(vsftpd_log)s
     EOF
     
-    cat <<EOF > /etc/fail2ban/filter.d/vsftpd.conf
+    cat << EOF > /etc/fail2ban/filter.d/vsftpd.conf
     [INCLUDES]
     before = common.conf
     [Definition]
@@ -1374,7 +1374,7 @@ then
 	ufw allow ssh
 	cp /etc/ssh/sshd_config /home/scriptuser/backups/
 	
-	cat <<EOF >> /etc/fail2ban/jail.local
+	cat << EOF >> /etc/fail2ban/jail.local
 	[sshd]
 	enabled = true
 	port = 22
@@ -1644,7 +1644,7 @@ then
 	    chown -R root:root /etc/apache2
 	    chown -R root:root /etc/apache 2> /dev/null
 	    
-	    cat <<EOF > /etc/fail2ban/jail.local
+	    cat << EOF >> /etc/fail2ban/jail.local
 	    [apache]
 	    enabled = true
 	    port = http,https
