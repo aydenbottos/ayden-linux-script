@@ -670,7 +670,7 @@ dpkg --purge --force-depends procps
 apt install procps
 echo "Sysctl and Procps configuration set to defaults"
 
-echo -e "DNS=8.8.8.8\nFallbackDNS=8.8.4.4\nDNSSEC=true\nDNSOverTLS=true" >> /etc/systemd/resolved.conf
+echo -e "[Resolve]\nDNS=8.8.8.8#dns.google\nDomains=~.\nDNSSEC=yes\nDNSOverTLS=yes" > /etc/systemd/resolved.conf
 systemctl enable --now systemd-resolved
 systemctl start systemd-resolved
 ln -rsf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
