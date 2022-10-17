@@ -869,7 +869,6 @@ chmod -f 0600 /boot/grub2/grub.cfg
 chown -f root:root /boot/grub2/grub.cfg
 chmod -f 0600 /boot/grub/grub.cfg
 chown -f root:root /boot/grub/grub.cfg
-chmod -f 0444 /etc/hosts
 chown -f root:root /etc/hosts
 chmod -f 0600 /etc/inittab
 chown -f root:root /etc/inittab
@@ -1017,8 +1016,7 @@ chmod -f 1777 /var/spool/uucppublic
 chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
 
 chmod o= /etc/ftpusers 
-chmod o= /etc/group 
-chmod o= /etc/hosts
+chmod o= /etc/group
 chmod o= /etc/hosts.allow 
 chmod o= /etc/hosts.equiv
 chmod o= /etc/hosts.lpd 
