@@ -85,7 +85,7 @@ else
 	apt update
 	apt-get remove --purge update-notifier-common unattended-upgrades -y
 	apt-get install update-notifier-common unattended-upgrades update-manager -y
-	apt install firefox stubby -y
+	apt install firefox -y
 fi
 echo "Reset sources and update settings to defaults."
 
