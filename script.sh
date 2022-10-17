@@ -1944,7 +1944,6 @@ sed -ie "s/LOGIN_RETRIES.*/LOGIN_RETRIES\\t5/" /etc/login.defs
 sed -ie "s/ENCRYPT_METHOD.*/ENCRYPT_METHOD\\tSHA512/" /etc/login.defs
 sed -ie "s/LOGIN_TIMEOUT.*/LOGIN_TIMEOUT\\t60/" /etc/login.defs
 echo -e "SHA_CRYPT_MIN_ROUNDS\t6000" >> /etc/login.defs
-echo -e "FAIL_DELAY\t4" >> /etc/login.defs
 echo "Login settings set in login.defs"
 
 echo "umask 027" >> /etc/bash.bashrc
