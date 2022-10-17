@@ -378,7 +378,7 @@ else
 	if grep -qi 'smb\|samba' services; then
 		sambaYN=yes
 	fi
-	if grep -qi ftp services; then
+	if grep -qi vsftpd services; then
 		ftpYN=yes
 	fi
 	if grep -qi ssh services; then
@@ -406,9 +406,9 @@ else
 	if grep -qi 'vpn' services; then
 		dnsYN=yes
 	fi
-	if grep -qi 'alternate-ftp' services; then
+	if grep -qi 'ftp' services && ! grep -qi 'vsftpd' services; then
 		ftpYN=alternate
-	fi
+	fi	
 	
 fi
 
