@@ -150,7 +150,8 @@ echo "Enabled APT sandboxing."
 apt-get update
 echo "Ran apt-get update."
 
-apt-get install apt-transport-https dirmngr vlock rng-tools deborphan ntp ufw git logwatch binutils aide aide-common tcpd libpam-apparmor haveged chrony chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam clamav-daemon auditd audispd-plugins cryptsetup unhide psad fail2ban ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
+apt-get purge time-daemon -y
+apt-get install apt-transport-https dirmngr vlock rng-tools deborphan ntp ufw git logwatch binutils aide aide-common tcpd libpam-apparmor haveged chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam clamav-daemon auditd audispd-plugins cryptsetup unhide psad fail2ban ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
 echo "Installed all necessary software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
