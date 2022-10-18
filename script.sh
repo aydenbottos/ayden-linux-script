@@ -515,6 +515,11 @@ echo "Sudoers file secured."
 echo -e "Defaults use_pty\nDefaults logfile=/var/log/sudo.log" >> /etc/sudoers
 echo "PTY and logfile set up for sudo."
 
+systemctl mask apport
+systemctl mask motd-news.timer
+systemctl mask motd-news.service
+echo "Masked various services."
+
 clear
 cp /etc/rc.local /home/scriptuser/backups/
 echo > /etc/rc.local
@@ -525,6 +530,25 @@ clear
 iptables -F
 iptables -X
 iptables -Z
+
+clear
+echo -e "[Journal]\nStorage=persistent\nForwardToSyslog=yes\nCompress=yes" > /etc/systemd/journald.conf
+cat << EOF > /etc/logrotate.conf
+daily
+{% if ansible_distribution == 'Ubuntu' %}
+su root syslog
+{% endif %}
+rotate 7
+create
+dateext
+compress
+compresscmd /usr/bin/xz
+uncompresscmd /usr/bin/unxz
+compressext .xz
+include /etc/logrotate.d
+EOF
+echo "/usr/sbin/logrotate /etc/logrotate.conf" > /etc/cron.daily/logrotate
+echo "Set journal configuration."
 
 clear
 echo "HRNGDEVICE=/dev/urandom" | tee -a /etc/default/rng-tools
@@ -2081,7 +2105,21 @@ sed -i '1i\* hard maxlogins 10' /etc/security/limits.conf
 echo "* hard core 0" >> /etc/security/limits.conf
 echo "1000: hard cpu 180" >> /etc/security/limits.conf
 echo "*	hard nproc 1024" >> /etc/security/limits.conf
-echo "Login limits set."
+echo "System limits set."
+
+echo -e "[Login]\nKillUserProcesses=1\nKillExcludeUsers=root\nIdleAction=lock\nIdleActionSec=15min\nRemoveIPC=yes" > /etc/systemd/logind.conf
+echo "Logind configured."
+
+systemctl mask debug-shell
+echo "Disabled debug shell."
+
+find / -perm -u=s -type f 2>/dev/null | tee suidbinaries.log
+echo "Listed SUID binaries"
+
+systemctl unmask tmp.mount
+systemctl start tmp.mount
+systemctl enable --now tmp.mount
+echo "tmp.mount enabled."
 
 echo "proc /proc proc nosuid,nodev,noexec,hidepid=2,gid=proc 0 0" >> /etc/fstab
 mkdir -p /etc/systemd/system/systemd-logind.service.d/
