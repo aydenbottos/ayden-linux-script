@@ -1830,6 +1830,9 @@ echo "Directory tree saved to file."
 clear
 apt install acct -y
 touch /var/log/wtmp
+echo 'ENABLED="true"' > /etc/default/sysstat
+systemctl start sysstat
+systemctl enable --now sysstat
 echo "Enabled process accounting."
 
 clear
