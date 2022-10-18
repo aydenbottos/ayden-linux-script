@@ -1841,6 +1841,7 @@ echo "Installed ARPWatch."
 clear
 echo "By accessing this system, you agree that this is for authorised use only, and understand that your activity is monitored meaning that your communications and data are not private." > /etc/issue
 echo "By accessing this system, you agree that this is for authorised use only, and understand that your activity is monitored meaning that your communications and data are not private." > /etc/motd
+echo "Issue and MOTD set."
 
 clear
 sudo systemctl stop cups-browsed
