@@ -651,6 +651,10 @@ echo -e "127.0.0.1 localhost\n127.0.1.1 $mainUser\n::1 ip6-localhost ip6-loopbac
 chmod 644 /etc/hosts
 echo "HOSTS file has been set to defaults."
 
+mawk -F: '$1 == "sudo"' /etc/group >> sudousers.log
+mawk -F: '$2 == ""' /etc/passwd >> emptypasswordusers.log
+
+
 clear
 apt purge *tftpd* -y
 echo "TFTP has been removed."
@@ -849,6 +853,8 @@ clear
 # Disable IPV6
 sed -i "s/IPV6=yes/IPV6=no/g" /etc/default/ufw
 echo "blacklist ipv6" | tee -a /etc/modprobe.d/blacklist > /dev/null
+echo "blacklist firewire-core" >> /etc/modprobe.d/firewire.conf
+echo "blacklist thunderbolt" >> /etc/modprobe.d/thunderbolt.conf
 clear
 echo "Sysctl network settings set."
 
