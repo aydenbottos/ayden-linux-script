@@ -56,7 +56,7 @@ wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/sta
 chmod +x stat
 originaltime=$(./stat -c '%w' /etc/gai.conf | sed -r 's/^([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}).*/\1/')
 
-find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originaltime:\|: -\|cache\|dpkg\|app-info\/icons\|src\/linux\|mime\|man\|icons\|linux\-gnu\|modules\|doc\|include\|python\|zoneinfo\|lib" > tempresult
+find / -type f -exec ./stat -c '%n : %w' {} + | grep -v "$originaltime:\|: -\|cache\|dpkg\|mozilla\|app-info\/icons\|src\/linux\|mime\|man\|icons\|linux\-gnu\|modules\|doc\|include\|python\|zoneinfo\|lib" > tempresult
 (
   export LC_ALL=C
   comm -23 <(sort -u tempresult) \
@@ -150,7 +150,7 @@ echo "Enabled APT sandboxing."
 apt-get update
 echo "Ran apt-get update."
 
-apt-get install apt-transport-https dirmngr vlock rng-tools deborphan ntp sysstat ufw git logwatch binutils aide aide-common tcpd libpam-apparmor haveged chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam clamav-daemon auditd audispd-plugins cryptsetup unhide psad fail2ban ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
+apt-get install apt-transport-https dirmngr vlock rng-tools deborphan ntp fwupd secureboot-db sysstat ufw git logwatch binutils aide aide-common tcpd libpam-apparmor haveged chkrootkit net-tools iptables libpam-cracklib apparmor apparmor-utils apparmor-profiles-extra clamav clamav-freshclam clamav-daemon auditd audispd-plugins cryptsetup unhide psad fail2ban ssg-base ssg-debderived ssg-debian ssg-nondebian ssg-applications libopenscap8 -y
 echo "Installed all necessary software."
 wget https://raw.githubusercontent.com/aydenbottos/ayden-linux-script/master/packages.txt
 while read package; do apt show "$package" 2>/dev/null | grep -qvz 'State:.*(virtual)' && echo "$package" >>packages-valid && echo -ne "\r\033[K$package"; done <packages.txt
@@ -512,7 +512,7 @@ sed -i 's/NOPASSWD\://g' /etc/sudoers
 sed -i 's/\%users/d' /etc/sudoers
 echo "Sudoers file secured."
 
-echo -e "Defaults use_pty\nDefaults logfile=/var/log/sudo.log" >> /etc/sudoers
+echo -e "Defaults use_pty\nDefaults logfile=/var/log/sudo.log\nDefaults !pwfeedback\nDefaults !visiblepw\nDefaults passwd_timeout=1\nDefaults timestamp_timeout=5" >> /etc/sudoers
 echo "PTY and logfile set up for sudo."
 
 systemctl mask apport
@@ -554,6 +554,19 @@ clear
 echo "HRNGDEVICE=/dev/urandom" | tee -a /etc/default/rng-tools
 systemctl restart rng-tools
 echo "Secured random entropy pool."
+
+echo "ALL: PARANOID" > /etc/hosts.deny
+echo "ALL: localhost" > /etc/hosts.allow
+echo "root" > /etc/at.allow
+echo "root" > /etc/cron.allow
+echo "Allow and deny files configured."
+
+systemctl mask atd
+echo "Masked atd."
+
+find / -name ".rhosts" -delete
+find / -name "hosts.equiv" -delete
+echo "Removed any rhosts or hosts.equiv files."
 
 ufw enable
 ufw default deny incoming
@@ -675,6 +688,29 @@ echo > /etc/default/irqbalance
 
 echo -e "#Configuration for the irqbalance daemon\n\n#Should irqbalance be enabled?\nENABLED=\"0\"\n#Balance the IRQs only once?\nONESHOT=\"0\"" >> /etc/default/irqbalance
 echo "IRQ Balance has been disabled."
+
+find /boot/ -type f -name '*.cfg' -exec chmod 0400 {} \;
+echo "Secured any config files in boot."
+
+wget https://raw.githubusercontent.com/konstruktoid/hardening/master/misc/suid.list
+if ! [ -f suid.list ]; then
+    echo "The list with SUID binaries can't be found."
+else
+    while read -r suid; do
+      file=$(command -v "$suid")
+      if [ -x "$file" ]; then
+          if stat -c "%A" "$file" | grep -qi 's'; then
+            echo "$file SUID bit removed."
+          fi
+          chmod -s "$file"
+          oct=$(stat -c "%A" "$file" | sed 's/s/x/g')
+          ug=$(stat -c "%U %G" "$file")
+          dpkg-statoverride --remove "$file" 2> /dev/null
+          dpkg-statoverride --add "$ug" "$oct" "$file" 2> /dev/null
+      fi
+    done <<< "$(grep -E '^[a-zA-Z0-9]' suid.list)"
+fi
+echo "Removed SUID bit from known culprits."
 
 clear
 update-rc.d bluetooth remove
@@ -1971,12 +2007,18 @@ sed -ie "s/FAILLOG_ENAB.*/FAILLOG_ENAB\\tyes/" /etc/login.defs
 sed -ie "s/LOG_UNKFAIL_ENAB.*/LOG_UNKFAIL_ENAB\\tyes/" /etc/login.defs
 sed -ie "s/LOG_OK_LOGINS.*/LOG_OK_LOGINS\\tyes/" /etc/login.defs
 sed -ie "s/SYSLOG_SU_ENAB.*/SYSLOG_SU_ENAB\\tyes/" /etc/login.defs
-sed -ie "s/SYSLOG_SG_ENAB.*/SYSLOG_SG_ENAB\\tyes/" /etc/login.defs
 sed -ie "s/LOGIN_RETRIES.*/LOGIN_RETRIES\\t5/" /etc/login.defs
 sed -ie "s/ENCRYPT_METHOD.*/ENCRYPT_METHOD\\tSHA512/" /etc/login.defs
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' /etc/login.defs
 sed -ie "s/LOGIN_TIMEOUT.*/LOGIN_TIMEOUT\\t60/" /etc/login.defs
-echo -e "SHA_CRYPT_MIN_ROUNDS\t6000" >> /etc/login.defs
+sed -i 's/^#.*SHA_CRYPT_MIN_ROUNDS .*/SHA_CRYPT_MIN_ROUNDS 10000/' /etc/login.defs
+sed -i 's/^#.*SHA_CRYPT_MAX_ROUNDS .*/SHA_CRYPT_MAX_ROUNDS 65536/' /etc/login.defs
+sed -i 's/^UMASK.*/UMASK 077/' /etc/login.defs
 echo "Login settings set in login.defs"
+
+prelink -ua
+apt purge prelink -y
+echo "Undid prelinking and purged if it was installed."
 
 echo "umask 027" >> /etc/bash.bashrc
 echo "umask 027" >> /etc/profile
@@ -2023,9 +2065,11 @@ systemctl stop clamav-freshclam
 freshclam
 systemctl start clamav-freshclam && systemctl start clamav-daemon
 systemctl enable clamav-freshclam && systemctl enable clamav-daemon
-aa-enforce /etc/apparmor.d/*
-systemctl reload apparmor
-systemctl status apparmor
+if ! grep 'session.*pam_apparmor.so order=user,group,default' /etc/pam.d/*; then
+  echo 'session optional pam_apparmor.so order=user,group,default' > /etc/pam.d/apparmor
+fi
+find /etc/apparmor.d/ -maxdepth 1 -type f -exec aa-enforce {} \;
+systemctl restart apparmor
 echo "AppArmor and ClamAV has been installed."
 
 clear
@@ -2072,6 +2116,26 @@ userdel -f gnats 2>/dev/null
 userdel -f pcap 2>/dev/null
 userdel -f netdump 2>/dev/null
 echo "Disabled unused users."
+
+if command -v gsettings 2>/dev/null 1>&2; then
+    gsettings set com.ubuntu.update-notifier show-apport-crashes false
+fi
+
+if command -v ubuntu-report 2>/dev/null 1>&2; then
+    ubuntu-report -f send no
+fi
+
+if [ -f /etc/default/apport ]; then
+    sed -i 's/enabled=.*/enabled=0/' /etc/default/apport
+    systemctl stop apport.service
+    systemctl mask apport.service
+fi
+
+if dpkg -l | grep -E '^ii.*popularity-contest' 2>/dev/null 1>&2; then
+    $APT purge popularity-contest
+fi
+systemctl daemon-reload
+echo "Disabled polling software."
 
 clear
 apt-get update 
