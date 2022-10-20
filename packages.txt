@@ -8,7 +8,6 @@ gameconqueror
 netcat-traditional
 gcc
 bleachbit
-prelink
 g++
 beep
 whoopsie
