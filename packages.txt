@@ -9,6 +9,17 @@ netcat-traditional
 gcc
 bleachbit
 g++
+beep
+whoopsie
+rsync
+rsh
+apport*
+avahi
+autofs
+pastebinit
+popularity-contest
+yp-tools
+ypbind
 ncat
 pompem
 sqlmap
