@@ -2187,9 +2187,6 @@ echo "1000: hard cpu 180" >> /etc/security/limits.conf
 echo "*	hard nproc 1024" >> /etc/security/limits.conf
 echo "System limits set."
 
-echo -e "[Login]\nKillUserProcesses=1\nKillExcludeUsers=root\nIdleAction=lock\nIdleActionSec=15min\nRemoveIPC=yes" > /etc/systemd/logind.conf
-echo "Logind configured."
-
 systemctl mask debug-shell
 echo "Disabled debug shell."
 
