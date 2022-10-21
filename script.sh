@@ -2315,7 +2315,7 @@ echo "PSAD started."
 chmod 700 /boot /usr/src /lib/modules /usr/lib/modules
 echo "Set kernel file permissions."
 
-apt --autoremove purge $(deborphan)
+apt --autoremove purge $(deborphan) -y
 echo "Removed orphaned packages."
 
 clear
