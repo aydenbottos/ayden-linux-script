@@ -722,7 +722,7 @@ echo 'alias net-pf-31 off' >> /etc/modprobe.conf
 echo "Bluetooth disabled."
 
 clear
-aideinit
+aideinit &
 aide.wrapper --check
 echo "Initiated AIDE."
 
