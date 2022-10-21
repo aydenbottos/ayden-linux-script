@@ -739,6 +739,8 @@ systemctl start systemd-resolved
 ln -rsf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 echo "Correct nameserves and DNS settings set."
 
+lsattr -a -R 2>/dev/null | grep -P "(?<=-)i(?=-).* " | tee immutablefiles.log
+echo "Listed immutable files."
 
 # Add these configs
 echo kernel.dmesg_restrict=1            | tee /etc/sysctl.conf > /dev/null # Scored
