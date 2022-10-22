@@ -2200,7 +2200,6 @@ echo "tmp.mount enabled."
 
 echo "proc /proc proc nosuid,nodev,noexec,hidepid=2 0 0" >> /etc/fstab
 mkdir -p /etc/systemd/system/systemd-logind.service.d/
-echo -e "[Service]\nSupplementaryGroups=proc" >> /etc/systemd/system/systemd-logind.service.d/hidepid.conf
 echo "Hid processes not created by user in proc."
 
 echo "tmpfs	/run/shm	tmpfs	ro,noexec,nosuid	0 0" >> /etc/fstab
