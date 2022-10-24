@@ -1,6 +1,8 @@
 netcat
 netcat-openbsd
 minetest
+xscape
+kbind
 wesnoth
 manaplus
 ptunnel
