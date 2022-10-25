@@ -3,6 +3,8 @@ netcat-openbsd
 minetest
 xscape
 kbind
+proxychains
+doona
 wesnoth
 manaplus
 ptunnel
